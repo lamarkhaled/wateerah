@@ -404,6 +404,27 @@
       border-radius: 12px; font-size: 0.84rem; font-weight: 500; box-shadow: var(--shadow-float);
     }
     .hidden-el { display: none !important; }
+
+    /* تنسيقات الملاحظات والعناية والتغذية */
+    .note-card { background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 10px; cursor: pointer; transition: var(--transition); }
+    .note-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-ios); border-color: var(--accent-color); }
+    .note-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; color: var(--text-primary); }
+    .note-preview { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .care-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 99px; font-weight: 600; margin-left: 6px; }
+    .tag-skin { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
+    .tag-hair { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+    .tag-sup { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+
+    .plate-container { display: flex; align-items: center; gap: 20px; margin-bottom: 16px; padding: 16px; background: var(--bg-glass-strong); border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+    .plate-visual { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--bg-primary); box-shadow: var(--shadow-ios); transition: background 0.5s cubic-bezier(0.25, 1, 0.5, 1); background: conic-gradient(#10b981 0% 33%, #ef4444 33% 66%, #f59e0b 66% 100%); }
+    .plate-legend { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .legend-item { display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; font-weight: 600; }
+    .legend-item input { width: 50px; padding: 4px; border-radius: 6px; border: 1px solid var(--border-color); text-align: center; }
+    .legend-color { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-left: 8px; }
+
+    .recipe-card { background: var(--bg-primary); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 8px; }
+    .recipe-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -639,16 +660,71 @@
           </div>
         </div>
 
-        <div id="widget-journal" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-journal">
+        <!-- 1. أداة الملاحظات المتعددة -->
+        <div id="widget-notes" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-notes">
           <div class="card-header">
-            <div class="card-title-wrap">
-              <span class="drag-handle">⋮⋮</span>
-              <span class="card-title">مساحة التدوين الحر</span>
-            </div>
-            <button class="remove-widget-btn" onclick="removeWidget('widget-journal')">إخفاء</button>
+            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">مساحة التدوين والملاحظات</span></div>
+            <button class="remove-widget-btn" onclick="removeWidget('widget-notes')">إخفاء</button>
           </div>
-          <textarea id="journalText" class="journal-area" placeholder="اكتب أفكارك بحرية..." oninput="autoSave()"></textarea>
+          <div id="notesListArea" style="max-height: 250px; overflow-y: auto; margin-bottom: 12px;"></div>
+          <div class="add-row">
+            <input type="text" id="newNoteTitle" placeholder="عنوان الملاحظة...">
+            <button class="btn btn-primary" onclick="addNote()">ملاحظة جديدة</button>
+          </div>
         </div>
+
+        <!-- 2. أداة العناية الشخصية -->
+        <div id="widget-care" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-care">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">العناية والمكملات</span></div>
+            <button class="remove-widget-btn" onclick="removeWidget('widget-care')">إخفاء</button>
+          </div>
+          <ul id="careList" class="item-list"></ul>
+          <div class="add-row">
+            <input type="text" id="newCareItem" placeholder="المنتج أو الخطوة..." style="flex: 2;">
+            <select id="newCareType" style="flex: 1;">
+              <option value="skin">بشرة</option>
+              <option value="hair">شعر</option>
+              <option value="sup">مكملات</option>
+            </select>
+            <button class="btn btn-primary" onclick="addCareItem()">إضافة</button>
+          </div>
+        </div>
+
+        <!-- 3. أداة التغذية والوجبات (حاسبة الصحن والوصفات) -->
+        <div id="widget-nutrition" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-nutrition">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">صحّتي وتصميم الوجبات</span></div>
+            <button class="remove-widget-btn" onclick="removeWidget('widget-nutrition')">إخفاء</button>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            <!-- تصور الصحن -->
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">تصميم صحن الوجبة (المايكروز)</div>
+              <div class="plate-container">
+                <div id="visualPlate" class="plate-visual"></div>
+                <div class="plate-legend">
+                  <div class="legend-item"><span style="display:flex; align-items:center;"><span class="legend-color" style="background:#10b981;"></span>خضار/ألياف</span> <input type="number" id="plateVeg" value="33" oninput="updateVisualPlate()">%</div>
+                  <div class="legend-item"><span style="display:flex; align-items:center;"><span class="legend-color" style="background:#ef4444;"></span>بروتين</span> <input type="number" id="plateProt" value="33" oninput="updateVisualPlate()">%</div>
+                  <div class="legend-item"><span style="display:flex; align-items:center;"><span class="legend-color" style="background:#f59e0b;"></span>كاربوهيدرات</span> <input type="number" id="plateCarb" value="34" oninput="updateVisualPlate()">%</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- الوصفات -->
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">سجل الوصفات والوجبات</div>
+              <div id="recipesList" style="max-height: 180px; overflow-y: auto; margin-bottom: 10px;"></div>
+              <div class="add-row">
+                <input type="text" id="newRecipeTitle" placeholder="اسم الوجبة...">
+                <input type="text" id="newRecipeDetails" placeholder="المكونات والسعرات...">
+                <button class="btn btn-primary" onclick="addRecipe()">حفظ الوجبة</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
@@ -804,7 +880,7 @@
     </div>
   </div>
 
-  <!-- مركز الاشتراكات الموحد (مدمج به خيار التجديد) -->
+  <!-- مركز الاشتراكات الموحد -->
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 460px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
@@ -848,7 +924,6 @@
           </div>
         </div>
 
-        <!-- خانة التجديد المبكر داخل العضوية النشطة -->
         <div style="background: var(--bg-subtle); padding: 18px; border-radius: 14px; margin-bottom: 20px;">
           <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 8px;">تجديد وتمديد الاشتراك</h4>
           <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">يمكنك تجديد اشتراكك الآن، وستتم إضافة الأيام الجديدة إلى رصيدك الحالي مباشرة.</p>
@@ -875,6 +950,19 @@
     </div>
   </div>
 
+  <!-- مودال تفاصيل الملاحظة الجديد -->
+  <div id="noteDetailModal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('noteDetailModal')">&times;</button>
+      <input type="text" id="activeNoteTitle" style="width: 100%; border: none; background: transparent; font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; outline: none;" placeholder="عنوان الملاحظة">
+      <textarea id="activeNoteContent" class="journal-area" style="min-height: 250px; font-size: 0.95rem;" placeholder="ابدأ التدوين هنا..."></textarea>
+      <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+        <button class="btn btn-danger" onclick="deleteActiveNote()">حذف</button>
+        <button class="btn btn-primary" onclick="saveActiveNote()">حفظ وإغلاق</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
@@ -898,14 +986,17 @@
     let unverifiedUserObject = null;
     let activeVisionIndex = null;
     let draggedKanbanIndex = null;
+    let currentNoteIndex = null;
 
     const AVAILABLE_WIDGETS = [
-      { id: 'widget-vision', name: 'لوحة الأهداف', desc: 'بورد واقعي مع صور، خطط، تقويم، ونسبة إنجاز' },
+      { id: 'widget-vision', name: 'لوحة الأهداف', desc: 'بورد واقعي مع صور وخطط' },
       { id: 'widget-kanban', name: 'المهام المتنقلة', desc: 'أعمدة للحالات مع الأولوية' },
       { id: 'widget-focus', name: 'بوصلة التركيز', desc: 'تحديد الهدف الأهم لليوم' },
       { id: 'widget-habits', name: 'متتبع العادات', desc: 'قائمة العادات اليومية' },
-      { id: 'widget-finance', name: 'إدارة المالية', desc: 'المحافظ، الأمنيات، الاشتراكات، والتوزيع' },
-      { id: 'widget-journal', name: 'مساحة التدوين', desc: 'تدوين حر للأفكار' }
+      { id: 'widget-finance', name: 'إدارة المالية', desc: 'المحافظ والاشتراكات والتوزيع' },
+      { id: 'widget-notes', name: 'دفتر الملاحظات', desc: 'مساحة تدوين متعددة الصفحات' },
+      { id: 'widget-care', name: 'العناية الشخصية', desc: 'جدول العناية بالبشرة والشعر والمكملات' },
+      { id: 'widget-nutrition', name: 'التغذية والوجبات', desc: 'تصميم صحن المايكروز وحفظ الوصفات' }
     ];
 
     window.userProfile = {
@@ -921,15 +1012,18 @@
       hasStarted: false,
       theme: 'default',
       activeWidgets: [],
-      widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
+      widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-notes', 'widget-care', 'widget-nutrition'],
       focusGoal: '',
-      journal: '',
       habits: [],
       visionBoard: [],
       kanbanTasks: [],
       wallets: [],
       wishlist: [],
-      subscriptions: []
+      subscriptions: [],
+      notes: [],
+      careRoutine: [],
+      recipes: [],
+      plateData: { veg: 33, prot: 33, carb: 34 }
     };
 
     window.showToast = function(msg) {
@@ -1302,6 +1396,110 @@
       autoSave();
     };
 
+    window.renderNewFeatures = function() {
+      // رندر الملاحظات
+      document.getElementById('notesListArea').innerHTML = (window.appState.notes || []).map((n, i) => `
+        <div class="note-card" onclick="openNote(${i})">
+          <div class="note-title">${n.title || 'بدون عنوان'}</div>
+          <div class="note-preview">${n.content || 'لا يوجد محتوى...'}</div>
+        </div>`).join('');
+
+      // رندر العناية الشخصية
+      const careLabels = { skin: ['tag-skin', 'بشرة'], hair: ['tag-hair', 'شعر'], sup: ['tag-sup', 'مكملات'] };
+      document.getElementById('careList').innerHTML = (window.appState.careRoutine || []).map((c, i) => `
+        <li class="list-item ${c.done ? 'completed' : ''}">
+          <div class="item-left">
+            <div class="checkbox" onclick="toggleCareItem(${i})">${c.done ? '✓' : ''}</div>
+            <span class="item-text-input">${c.text}</span>
+            <span class="care-tag ${careLabels[c.type][0]}">${careLabels[c.type][1]}</span>
+          </div>
+          <button class="delete-btn" onclick="window.appState.careRoutine.splice(${i},1); renderNewFeatures(); autoSave()">&times;</button>
+        </li>`).join('');
+
+      // رندر الوصفات
+      document.getElementById('recipesList').innerHTML = (window.appState.recipes || []).map((r, i) => `
+        <div class="recipe-card">
+          <div style="display:flex; justify-content:space-between;">
+            <div class="recipe-title">${r.title}</div>
+            <button class="delete-btn" style="font-size:1.2rem;" onclick="window.appState.recipes.splice(${i},1); renderNewFeatures(); autoSave()">&times;</button>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-secondary);">${r.details}</div>
+        </div>`).join('');
+
+      // تحديث بيانات الصحن المحفوظة
+      const pData = window.appState.plateData || { veg: 33, prot: 33, carb: 34 };
+      if(document.getElementById('plateVeg')) {
+        document.getElementById('plateVeg').value = pData.veg;
+        document.getElementById('plateProt').value = pData.prot;
+        document.getElementById('plateCarb').value = pData.carb;
+        updateVisualPlate(false);
+      }
+    };
+
+    // دوال الملاحظات
+    window.addNote = () => {
+      const t = document.getElementById('newNoteTitle');
+      if(!t.value.trim()) return showToast('أدخل عنوان الملاحظة');
+      window.appState.notes.push({ title: t.value.trim(), content: '' });
+      t.value = ''; renderNewFeatures(); autoSave();
+    };
+    window.openNote = (i) => {
+      currentNoteIndex = i;
+      const n = window.appState.notes[i];
+      document.getElementById('activeNoteTitle').value = n.title;
+      document.getElementById('activeNoteContent').value = n.content;
+      openModal('noteDetailModal');
+    };
+    window.saveActiveNote = () => {
+      if(currentNoteIndex !== null) {
+        window.appState.notes[currentNoteIndex].title = document.getElementById('activeNoteTitle').value;
+        window.appState.notes[currentNoteIndex].content = document.getElementById('activeNoteContent').value;
+        renderNewFeatures(); autoSave(); closeModal('noteDetailModal');
+      }
+    };
+    window.deleteActiveNote = () => {
+      if(currentNoteIndex !== null) {
+        window.appState.notes.splice(currentNoteIndex, 1);
+        currentNoteIndex = null;
+        renderNewFeatures(); autoSave(); closeModal('noteDetailModal');
+      }
+    };
+
+    // دوال العناية والوجبات
+    window.addCareItem = () => {
+      const t = document.getElementById('newCareItem');
+      const type = document.getElementById('newCareType').value;
+      if(!t.value.trim()) return;
+      window.appState.careRoutine.push({ text: t.value.trim(), type: type, done: false });
+      t.value = ''; renderNewFeatures(); autoSave();
+    };
+    window.toggleCareItem = (i) => { window.appState.careRoutine[i].done = !window.appState.careRoutine[i].done; renderNewFeatures(); autoSave(); };
+
+    window.addRecipe = () => {
+      const t = document.getElementById('newRecipeTitle');
+      const d = document.getElementById('newRecipeDetails');
+      if(!t.value.trim()) return;
+      window.appState.recipes.push({ title: t.value.trim(), details: d.value.trim() });
+      t.value = ''; d.value = ''; renderNewFeatures(); autoSave();
+    };
+
+    window.updateVisualPlate = (triggerSave = true) => {
+      const v = parseInt(document.getElementById('plateVeg').value) || 0;
+      const p = parseInt(document.getElementById('plateProt').value) || 0;
+      const c = parseInt(document.getElementById('plateCarb').value) || 0;
+      
+      const total = v + p + c;
+      const vPct = total > 0 ? (v/total)*100 : 33;
+      const pPct = total > 0 ? (p/total)*100 : 33;
+      
+      document.getElementById('visualPlate').style.background = `conic-gradient(#10b981 0% ${vPct}%, #ef4444 ${vPct}% ${vPct + pPct}%, #f59e0b ${vPct + pPct}% 100%)`;
+      
+      if(triggerSave) {
+        window.appState.plateData = { veg: v, prot: p, carb: c };
+        autoSave();
+      }
+    };
+
     window.renderLists = function() {
       renderVisionBoard();
       renderKanbanBoard();
@@ -1344,6 +1542,7 @@
         </li>`).join('');
 
       calculateDistribution();
+      renderNewFeatures();
     };
 
     window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; renderLists(); autoSave(); };
@@ -1446,11 +1645,15 @@
     };
 
     let saveTimer;
-    window.autoSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => saveCurrentWateerah(false), 700); };
+    window.autoSave = () => { 
+      clearTimeout(saveTimer); 
+      saveTimer = setTimeout(() => saveCurrentWateerah(false), 700); 
+    };
 
     window.saveCurrentWateerah = async (manual) => {
-      window.appState.focusGoal = document.getElementById('focusGoalInput')?.value || '';
-      window.appState.journal = document.getElementById('journalText')?.value || '';
+      if(document.getElementById('focusGoalInput')) {
+        window.appState.focusGoal = document.getElementById('focusGoalInput').value || '';
+      }
       localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
 
       const user = auth.currentUser;
@@ -1522,7 +1725,6 @@
       } catch(e) { showToast('البريد غير مسجل'); }
     };
 
-    // تفعيل الكود وتجديد الاشتراك (يُضيف الأيام على الاشتراك الحالي)
     window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeInput') => {
       const codeInput = document.getElementById(inputId);
       const code = codeInput ? codeInput.value.trim() : '';
@@ -1539,7 +1741,6 @@
         const days = parseInt(snap.data().days) || 30;
         
         let startDate = new Date();
-        // إذا كان العضو مشترك واشتراكه ساري، نضيف الأيام فوق اشتراكه الحالي
         if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
            const currentExpiry = new Date(window.userProfile.expiryDate);
            if (currentExpiry > startDate) {
@@ -1554,7 +1755,6 @@
         window.userProfile.planType = 'عضوية نشطة';
         window.userProfile.expiryDate = expiryDate.toISOString().slice(0, 10);
         
-        // حساب إجمالي الأيام المتبقية لتحديث شريط التقدم
         const now = new Date();
         const totalRemainingDays = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
         window.userProfile.totalSubDays = totalRemainingDays;
@@ -1656,6 +1856,7 @@
 
     async function loadAdminCodes() {
       const el = document.getElementById('adminCodesList');
+      if(!el) return;
       try {
         const snap = await getDocs(collection(db, "activationCodes"));
         let html = '';
@@ -1761,8 +1962,11 @@
         document.getElementById('headerUserName').innerText = window.userProfile.name || user.email;
         document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0];
         document.getElementById('profileNameInput').value = window.userProfile.name || '';
-        document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
-        document.getElementById('journalText').value = window.appState.journal || '';
+        
+        if(document.getElementById('focusGoalInput')) {
+          document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
+        }
+        
         renderWorkspaceVisibility();
         renderLists();
       } else {
