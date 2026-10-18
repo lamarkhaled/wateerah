@@ -1,1 +1,66 @@
+/* assets/css/variables.css */
 
+:root {
+  /* الألوان الأصلية مع شفافية نظام iOS */
+  --bg-primary: #F9F8F6;
+  --bg-glass: rgba(255, 255, 255, 0.72);
+  --bg-glass-strong: rgba(255, 255, 255, 0.88);
+  --bg-subtle: rgba(242, 240, 236, 0.75);
+  --text-primary: #141413;
+  --text-secondary: #6E6D6A;
+  --border-color: rgba(20, 20, 19, 0.08);
+  --border-glass: rgba(255, 255, 255, 0.6);
+  --accent-color: #1F4E3D;
+  --accent-light: rgba(31, 78, 61, 0.1);
+  --danger-color: #C93B2B;
+  --danger-light: rgba(201, 59, 43, 0.1);
+  --warning-color: #D97706;
+  --warning-light: rgba(217, 119, 6, 0.12);
+  --admin-color: #5B21B6;
+  --admin-light: rgba(91, 33, 182, 0.1);
+  
+  /* الحواف والظلال */
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --shadow-ios: 0 8px 30px rgba(20, 20, 19, 0.04), 0 1px 3px rgba(20, 20, 19, 0.02);
+  --shadow-float: 0 20px 50px rgba(20, 20, 19, 0.1);
+  
+  /* التأثيرات الزجاجية */
+  --blur-ios: blur(24px) saturate(180%);
+  --transition: all 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+  --sky-glow: radial-gradient(circle at 50% -10%, rgba(253, 230, 138, 0.25), transparent 60%);
+}
+
+/* الثيم النقي (Minimal) */
+[data-theme="minimal"] {
+  --bg-primary: #F5F5F7;
+  --bg-glass: rgba(255, 255, 255, 0.78);
+  --bg-glass-strong: rgba(255, 255, 255, 0.92);
+  --bg-subtle: rgba(232, 232, 237, 0.7);
+  --text-primary: #1D1D1F;
+  --text-secondary: #86868B;
+  --border-color: rgba(0, 0, 0, 0.07);
+  --accent-color: #1D1D1F;
+  --accent-light: rgba(29, 29, 31, 0.08);
+}
+
+/* الثيم الداكن (Dark) */
+[data-theme="dark"] {
+  --bg-primary: #111110;
+  --bg-glass: rgba(28, 28, 26, 0.72);
+  --bg-glass-strong: rgba(36, 36, 33, 0.9);
+  --bg-subtle: rgba(44, 44, 41, 0.65);
+  --text-primary: #F3F2EE;
+  --text-secondary: #9A9893;
+  --border-color: rgba(255, 255, 255, 0.09);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --accent-color: #D4A373;
+  --accent-light: rgba(212, 163, 115, 0.15);
+  --sky-glow: radial-gradient(circle at 50% -10%, rgba(56, 189, 248, 0.08), transparent 60%);
+}
+
+/* تأثير التوقيت المسائي التلقائي */
+body.night-mode-glow {
+  --sky-glow: radial-gradient(circle at 80% -10%, rgba(99, 102, 241, 0.12), transparent 60%);
+}
