@@ -15,10 +15,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="assets/css/variables.css">
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/layout.css">
-  <link rel="stylesheet" href="assets/css/components.css">
+  <!-- استدعاء ملفات الـ CSS الاحترافية -->
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
 </head>
 <body>
 
@@ -31,12 +32,12 @@
         <p>نظام إدارة الحياة الشخصي</p>
       </div>
       <div class="nav-actions">
-        <button id="iosInstallBtn" class="btn btn-subtle" onclick="openModal('iosGuideModal')">تثبيت التطبيق</button>
-        <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">لوحة التحكم</button>
-        <span id="planBadge" class="pro-badge" onclick="openModal('pricingModal')">الباقة الأساسية</span>
-        <button id="upgradeBtn" class="btn" onclick="openModal('pricingModal')">إدارة الاشتراك</button>
-        <button id="guestAuthBtn" class="btn btn-primary" onclick="openAuthModal('login')">تسجيل الدخول</button>
-        <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="openModal('profileModal')">
+        <button id="iosInstallBtn" class="btn btn-subtle" onclick="window.openModal('iosGuideModal')">تثبيت التطبيق</button>
+        <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="window.openModal('adminModal')">لوحة التحكم</button>
+        <span id="planBadge" class="pro-badge" onclick="window.openModal('pricingModal')">الباقة الأساسية</span>
+        <button id="upgradeBtn" class="btn" onclick="window.openModal('pricingModal')">إدارة الاشتراك</button>
+        <button id="guestAuthBtn" class="btn btn-primary" onclick="window.openAuthModal()">تسجيل الدخول</button>
+        <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="window.openModal('profileModal')">
           <div id="headerAvatar" class="avatar-circle">ل</div>
           <span id="headerUserName">لمار</span>
         </div>
@@ -48,26 +49,20 @@
     <section id="onboardingScreen" class="hidden-el">
       <div class="time-pill" id="onboardingTimePill">الفترة الصباحية</div>
       <h2 id="onboardingGreeting">صباح الخير، أهلاً بك في وتيرة</h2>
-      <p>مساحتك الخاصة بنظام iOS الشفاف والنقي. اختر المظهر المفضل لديك للبدء في تشكيل أدواتك الخاصة من الصفر.</p>
-      
+      <p>مساحتك الخاصة بنظام iOS الشفاف والنقي. اختر المظهر المفضل لديك للبدء في تشكيل أدواتك.</p>
       <div class="theme-selector-grid">
-        <div class="theme-card active" onclick="selectOnboardingTheme('default', this)">ورق دافئ</div>
-        <div class="theme-card" onclick="selectOnboardingTheme('minimal', this)">صباح نقي</div>
-        <div class="theme-card" onclick="selectOnboardingTheme('dark', this)">سكون ليلي</div>
+        <div class="theme-card active" onclick="window.selectOnboardingTheme('default', this)">ورق دافئ</div>
+        <div class="theme-card" onclick="window.selectOnboardingTheme('minimal', this)">صباح نقي</div>
+        <div class="theme-card" onclick="window.selectOnboardingTheme('dark', this)">سكون ليلي</div>
       </div>
-
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
     <div id="mainWorkspace" class="hidden-el">
       <section class="hero-section">
         <div class="greeting-box">
-          <div class="greeting-meta">
-            <span id="syncIndicator">غير متصل بالسحابة</span>
-            <span>•</span>
-            <span id="liveDateText"></span>
-          </div>
-          <h2 id="welcomeText">صباح الخير، أهلاً بك يا لمار.</h2>
+          <div class="greeting-meta"><span id="syncIndicator">غير متصل بالسحابة</span><span>•</span><span id="liveDateText"></span></div>
+          <h2 id="welcomeText">صباح الخير، أهلاً بك.</h2>
           <p id="dayNightSubtext">رتّب أولوياتك بهدوء وتركيز.</p>
         </div>
 
@@ -77,7 +72,7 @@
               <span class="msg-tag">رسالة المنصة</span>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="msg-timer" id="msgRemainingTime"></span>
-                <button onclick="dismissGlassMessage()" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1rem;">&times;</button>
+                <button onclick="window.dismissGlassMessage()" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1rem;">&times;</button>
               </div>
             </div>
             <p id="glassMessageText" style="font-size: 0.9rem; color: var(--text-primary); line-height: 1.5;"></p>
@@ -88,7 +83,7 @@
               <div style="font-size: 0.85rem; font-weight: 600;">صندوق الرسائل والتنبيهات</div>
               <div style="font-size: 0.78rem; color: var(--text-secondary);">تظهر هنا الرسائل الإدارية والمسابقات المؤقتة بشفافية.</div>
             </div>
-            <button class="btn btn-subtle" onclick="saveCurrentWateerah(true)">حفظ فوري</button>
+            <button class="btn btn-subtle" onclick="window.saveCurrentWateerah(true)">حفظ فوري</button>
           </div>
         </div>
       </section>
@@ -96,400 +91,189 @@
       <section class="toolbar-ios">
         <div class="toolbar-group">
           <span class="toolbar-label">المظهر:</span>
-          <button class="chip active" data-theme-btn="default" onclick="setTheme('default', this)">ورق دافئ</button>
-          <button class="chip" data-theme-btn="minimal" onclick="setTheme('minimal', this)">صباح نقي</button>
-          <button class="chip" data-theme-btn="dark" onclick="setTheme('dark', this)">سكون ليلي</button>
+          <button class="chip active" data-theme-btn="default" onclick="window.setTheme('default', this)">ورق دافئ</button>
+          <button class="chip" data-theme-btn="minimal" onclick="window.setTheme('minimal', this)">صباح نقي</button>
+          <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
         </div>
         <div class="toolbar-group">
           <span class="toolbar-label">أدواتي (سحب للترتيب):</span>
           <div id="activeWidgetsChips" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
-          <button class="add-widget-plus" title="إضافة أداة جديدة" onclick="openModal('addWidgetModal')">+</button>
+          <button class="add-widget-plus" title="إضافة أداة جديدة" onclick="window.openModal('addWidgetModal')">+</button>
         </div>
       </section>
 
       <div id="emptyWorkspaceState" class="hidden-el">
         <h3>مساحتك فارغة وجاهزة للتشكيل</h3>
         <p>اضغط على زر (+) لإضافة الأدوات التي تحتاجها وترتيبها بالسحب والإفلات.</p>
-        <button class="btn btn-primary" onclick="openModal('addWidgetModal')">+ إضافة أول أداة</button>
+        <button class="btn btn-primary" onclick="window.openModal('addWidgetModal')">+ إضافة أول أداة</button>
       </div>
 
       <div id="bentoGrid" class="bento-grid">
+        <!-- الفجن بورد -->
         <div id="widget-vision" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-vision">
           <div class="card-header">
-            <div class="card-title-wrap">
-              <span class="drag-handle" title="اسحب لترتيب الأداة">⋮⋮</span>
-              <span class="card-title">لوحة الأهداف (Vision Board)</span>
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <span style="font-size: 0.76rem; color: var(--text-secondary);">اضغط على أي بطاقة لفتح خطتها ومهامها</span>
-              <button class="remove-widget-btn" onclick="removeWidget('widget-vision')">إخفاء</button>
-            </div>
+            <div class="card-title-wrap"><span class="drag-handle" title="سحب للترتيب">⋮⋮</span><span class="card-title">لوحة الأهداف (Vision Board)</span></div>
+            <div style="display: flex; gap: 8px; align-items: center;"><span style="font-size: 0.76rem; color: var(--text-secondary);">اضغط على البطاقة لفتح خطتها</span><button class="remove-widget-btn" onclick="window.removeWidget('widget-vision')">إخفاء</button></div>
           </div>
           <div id="corkboardContainer" class="corkboard-surface"></div>
           <div class="add-row" style="margin-top: 16px;">
-            <input type="text" id="newVisionTitle" placeholder="عنوان الهدف أو الحلم..." style="flex: 1.5;">
-            <input type="text" id="newVisionImg" placeholder="رابط الصورة (https://...)" style="flex: 2;">
+            <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex: 1.5;">
+            <input type="text" id="newVisionImg" placeholder="رابط الصورة (اختياري)..." style="flex: 2;">
             <input type="date" id="newVisionDate" style="flex: 1;">
-            <button class="btn btn-primary" onclick="addVisionItem()">تثبيت على البورد</button>
+            <button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت</button>
           </div>
         </div>
 
+        <!-- المهام الكانبان -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-kanban">
           <div class="card-header">
-            <div class="card-title-wrap">
-              <span class="drag-handle">⋮⋮</span>
-              <span class="card-title">لوحة العمل والمهام المتنقلة</span>
-            </div>
-            <button class="remove-widget-btn" onclick="removeWidget('widget-kanban')">إخفاء</button>
+            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">لوحة العمل والمهام المتنقلة</span></div>
+            <button class="remove-widget-btn" onclick="window.removeWidget('widget-kanban')">إخفاء</button>
           </div>
           <div class="add-row" style="margin-top: 0; margin-bottom: 18px;">
-            <input type="text" id="newKanbanTitle" placeholder="عنوان المهمة أو الفكرة..." style="flex: 2;">
-            <select id="newKanbanStatus" style="flex: 1;">
-              <option value="idea">فكرة</option>
-              <option value="scheduled">مجدول بتقويم</option>
-              <option value="progress">قيد التنفيذ</option>
-              <option value="done">مكتمل</option>
-            </select>
-            <select id="newKanbanPriority" style="flex: 1;">
-              <option value="urgent">عاجل</option>
-              <option value="normal" selected>غير عاجل</option>
-              <option value="low">غير مهم</option>
-            </select>
+            <input type="text" id="newKanbanTitle" placeholder="عنوان المهمة..." style="flex: 2;">
+            <select id="newKanbanStatus" style="flex: 1;"><option value="idea">فكرة</option><option value="scheduled">مجدول بتقويم</option><option value="progress">قيد التنفيذ</option><option value="done">مكتمل</option></select>
+            <select id="newKanbanPriority" style="flex: 1;"><option value="urgent">عاجل</option><option value="normal" selected>غير عاجل</option><option value="low">غير مهم</option></select>
             <input type="date" id="newKanbanDate" style="flex: 1;">
-            <button class="btn btn-primary" onclick="addKanbanTask()">إضافة</button>
+            <button class="btn btn-primary" onclick="window.addKanbanTask()">إضافة</button>
           </div>
           <div class="kanban-grid">
-            <div class="kanban-col" ondragover="allowKanbanDrop(event)" ondrop="dropKanbanCard(event, 'idea')">
-              <div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div>
-              <div class="kanban-cards-wrap" id="col-idea"></div>
-            </div>
-            <div class="kanban-col" ondragover="allowKanbanDrop(event)" ondrop="dropKanbanCard(event, 'scheduled')">
-              <div class="kanban-col-header"><span>مجدول بتقويم</span><span class="kanban-count" id="count-scheduled">0</span></div>
-              <div class="kanban-cards-wrap" id="col-scheduled"></div>
-            </div>
-            <div class="kanban-col" ondragover="allowKanbanDrop(event)" ondrop="dropKanbanCard(event, 'progress')">
-              <div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div>
-              <div class="kanban-cards-wrap" id="col-progress"></div>
-            </div>
-            <div class="kanban-col" ondragover="allowKanbanDrop(event)" ondrop="dropKanbanCard(event, 'done')">
-              <div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div>
-              <div class="kanban-cards-wrap" id="col-done"></div>
-            </div>
+            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'idea')"><div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div><div class="kanban-cards-wrap" id="col-idea"></div></div>
+            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div>
+            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div>
+            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div>
           </div>
         </div>
 
+        <!-- البوصلة -->
         <div id="widget-focus" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-focus">
           <div class="card-header">
-            <div class="card-title-wrap">
-              <span class="drag-handle">⋮⋮</span>
-              <span class="card-title">بوصلة التركيز اليومي</span>
-            </div>
-            <button class="remove-widget-btn" onclick="removeWidget('widget-focus')">إخفاء</button>
+            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">بوصلة التركيز اليومي</span></div><button class="remove-widget-btn" onclick="window.removeWidget('widget-focus')">إخفاء</button>
           </div>
-          <input type="text" id="focusGoalInput" class="focus-input" placeholder="ما هي النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="autoSave()">
+          <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
 
+        <!-- العادات -->
         <div id="widget-habits" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-habits">
           <div class="card-header">
-            <div class="card-title-wrap">
-              <span class="drag-handle">⋮⋮</span>
-              <span class="card-title">متتبع العادات اليومية</span>
-            </div>
-            <button class="remove-widget-btn" onclick="removeWidget('widget-habits')">إخفاء</button>
+            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">متتبع العادات اليومية</span></div><button class="remove-widget-btn" onclick="window.removeWidget('widget-habits')">إخفاء</button>
           </div>
           <ul id="habitsList" class="item-list"></ul>
-          <div class="add-row">
-            <input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') addHabit()">
-            <button class="btn btn-primary" onclick="addHabit()">إضافة</button>
-          </div>
+          <div class="add-row"><input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') window.addHabit()"><button class="btn btn-primary" onclick="window.addHabit()">إضافة</button></div>
         </div>
 
+        <!-- المالية -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-finance">
           <div class="card-header">
-            <div class="card-title-wrap">
-              <span class="drag-handle">⋮⋮</span>
-              <span class="card-title">إدارة المالية الشاملة</span>
-            </div>
-            <button class="remove-widget-btn" onclick="removeWidget('widget-finance')">إخفاء</button>
+            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">إدارة المالية الشاملة</span></div><button class="remove-widget-btn" onclick="window.removeWidget('widget-finance')">إخفاء</button>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-            <div>
-              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الحسابات والمحافظ البنكية</div>
-              <ul id="walletsList" class="item-list"></ul>
-              <div class="add-row">
-                <input type="text" id="newWalletName" placeholder="اسم الحساب...">
-                <input type="number" id="newWalletBalance" placeholder="الرصيد">
-                <button class="btn btn-primary" onclick="addWallet()">إضافة</button>
-              </div>
-            </div>
-            <div>
-              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">قائمة الأمنيات</div>
-              <ul id="wishlistList" class="item-list"></ul>
-              <div class="add-row">
-                <input type="text" id="newWishTitle" placeholder="الأمنية...">
-                <input type="number" id="newWishCost" placeholder="التكلفة">
-                <button class="btn btn-primary" onclick="addWishlistItem()">إضافة</button>
-              </div>
-            </div>
-            <div>
-              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الالتزامات والاشتراكات الشهرية</div>
-              <ul id="subscriptionsList" class="item-list"></ul>
-              <div class="add-row">
-                <input type="text" id="newSubName" placeholder="الالتزام...">
-                <input type="number" id="newSubCost" placeholder="المبلغ">
-                <button class="btn btn-primary" onclick="addSubscription()">إضافة</button>
-              </div>
-            </div>
+            <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">المحافظ البنكية</div><ul id="walletsList" class="item-list"></ul><div class="add-row"><input type="text" id="newWalletName" placeholder="الحساب..."><input type="number" id="newWalletBalance" placeholder="الرصيد"><button class="btn btn-primary" onclick="window.addWallet()">إضافة</button></div></div>
+            <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">قائمة الأمنيات</div><ul id="wishlistList" class="item-list"></ul><div class="add-row"><input type="text" id="newWishTitle" placeholder="الأمنية..."><input type="number" id="newWishCost" placeholder="التكلفة"><button class="btn btn-primary" onclick="window.addWishlistItem()">إضافة</button></div></div>
+            <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الاشتراكات الشهرية</div><ul id="subscriptionsList" class="item-list"></ul><div class="add-row"><input type="text" id="newSubName" placeholder="الاشتراك..."><input type="number" id="newSubCost" placeholder="المبلغ"><button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button></div></div>
           </div>
           <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
-              <span style="font-size: 0.88rem; font-weight: 700;">حاسبة توزيع الدخل الشهري</span>
-              <input type="number" id="totalIncomeInput" value="5000" oninput="calculateDistribution()" style="width: 160px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);">
-            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;"><span style="font-size: 0.88rem; font-weight: 700;">توزيع الدخل الشهري</span><input type="number" id="totalIncomeInput" value="5000" oninput="window.calculateDistribution()" style="width: 160px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);"></div>
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:10px;" id="distributionResults"></div>
           </div>
         </div>
 
+        <!-- التدوين -->
         <div id="widget-journal" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-journal">
-          <div class="card-header">
-            <div class="card-title-wrap">
-              <span class="drag-handle">⋮⋮</span>
-              <span class="card-title">مساحة التدوين الحر</span>
-            </div>
-            <button class="remove-widget-btn" onclick="removeWidget('widget-journal')">إخفاء</button>
-          </div>
-          <textarea id="journalText" class="journal-area" placeholder="اكتب أفكارك بحرية..." oninput="autoSave()"></textarea>
+          <div class="card-header"><div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">التدوين الحر</span></div><button class="remove-widget-btn" onclick="window.removeWidget('widget-journal')">إخفاء</button></div>
+          <textarea id="journalText" class="journal-area" placeholder="اكتب أفكارك بحرية..." oninput="window.autoSave()"></textarea>
         </div>
       </div>
     </div>
   </main>
 
-  <div id="addWidgetModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 480px;">
-      <button class="modal-close" onclick="closeModal('addWidgetModal')">&times;</button>
-      <h3 style="margin-bottom: 6px;">مكتبة أدوات وتيرة</h3>
-      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف الأدوات التي تحتاجها لمساحتك.</p>
-      <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    </div>
-  </div>
+  <!-- النوافذ المنبثقة -->
+  <div id="addWidgetModal" class="modal-overlay"><div class="modal-box" style="max-width: 480px;"><button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button><h3 style="margin-bottom: 6px;">مكتبة الأدوات</h3><p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف ما تحتاجه لمساحتك.</p><div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div></div></div>
 
   <div id="visionDetailModal" class="modal-overlay">
     <div class="modal-box">
-      <button class="modal-close" onclick="closeModal('visionDetailModal')">&times;</button>
+      <button class="modal-close" onclick="window.closeModal('visionDetailModal')">&times;</button>
       <img id="vModalImg" src="" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 14px; margin-bottom: 14px;">
-      
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <h3 id="vModalTitle" style="font-size: 1.25rem;"></h3>
-        <span id="vModalPercentBadge" class="pro-badge">0% مكتمل</span>
-      </div>
-
-      <div class="progress-bar-bg" style="margin-bottom: 18px;">
-        <div id="vModalProgressBar" class="progress-bar-fill"></div>
-      </div>
-
-      <div class="form-group">
-        <label>التاريخ المستهدف:</label>
-        <input type="date" id="vModalDate" onchange="saveVisionModalChanges()">
-      </div>
-
-      <div class="form-group">
-        <label>الخطة الاستراتيجية:</label>
-        <textarea id="vModalPlan" rows="3" placeholder="اكتب خطتك التفصيلية..." oninput="saveVisionModalChanges()"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label>المهام (تُحتسب منها نسبة الاكتمال):</label>
-        <ul id="vModalTasksList" class="item-list" style="margin-bottom: 10px;"></ul>
-        <div class="add-row" style="margin-top: 6px;">
-          <input type="text" id="vModalNewTaskInput" placeholder="أضف مهمة فرعية..." onkeypress="if(event.key==='Enter') addVisionSubTask()">
-          <button class="btn btn-primary" onclick="addVisionSubTask()">إضافة</button>
-        </div>
-      </div>
-
-      <div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);">
-        <button class="btn btn-danger" onclick="deleteCurrentVisionItem()">حذف البطاقة</button>
-        <button class="btn btn-primary" onclick="closeModal('visionDetailModal')">حفظ</button>
-      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><h3 id="vModalTitle" style="font-size: 1.25rem;"></h3><span id="vModalPercentBadge" class="pro-badge">0% مكتمل</span></div>
+      <div class="progress-bar-bg" style="margin-bottom: 18px;"><div id="vModalProgressBar" class="progress-bar-fill"></div></div>
+      <div class="form-group"><label>التاريخ المستهدف:</label><input type="date" id="vModalDate" onchange="window.saveVisionModalChanges()"></div>
+      <div class="form-group"><label>الخطة الاستراتيجية:</label><textarea id="vModalPlan" rows="3" placeholder="خطتك التفصيلية..." oninput="window.saveVisionModalChanges()"></textarea></div>
+      <div class="form-group"><label>المهام (تُحتسب منها نسبة الاكتمال):</label><ul id="vModalTasksList" class="item-list" style="margin-bottom: 10px;"></ul><div class="add-row" style="margin-top: 6px;"><input type="text" id="vModalNewTaskInput" placeholder="أضف مهمة فرعية..." onkeypress="if(event.key==='Enter') window.addVisionSubTask()"><button class="btn btn-primary" onclick="window.addVisionSubTask()">إضافة</button></div></div>
+      <div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);"><button class="btn btn-danger" onclick="window.deleteCurrentVisionItem()">حذف البطاقة</button><button class="btn btn-primary" onclick="window.closeModal('visionDetailModal')">حفظ</button></div>
     </div>
   </div>
 
-  <div id="iosGuideModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 440px; text-align: center;">
-      <button class="modal-close" onclick="closeModal('iosGuideModal')">&times;</button>
-      <h3 style="margin-bottom: 10px;">إضافة وتيرة لتطبيقاتك</h3>
-      <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 18px;">
-        تم تهيئة المنصة لتعمل كتطبيق بشاشة كاملة على أجهزة أبل:
-      </p>
-      <div style="text-align: right; background: var(--bg-subtle); padding: 16px; border-radius: 14px; font-size: 0.85rem; line-height: 1.9; margin-bottom: 18px;">
-        1. افتح الموقع من متصفح <strong>Safari</strong>.<br>
-        2. اضغط على زر <strong>المشاركة</strong> في الشريط السفلي.<br>
-        3. اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong>.<br>
-        4. اضغط <strong>إضافة</strong> لتظهر وتيرة بين تطبيقاتك.
-      </div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="closeModal('iosGuideModal')">حسناً</button>
-    </div>
-  </div>
+  <div id="iosGuideModal" class="modal-overlay"><div class="modal-box" style="max-width: 440px; text-align: center;"><button class="modal-close" onclick="window.closeModal('iosGuideModal')">&times;</button><h3 style="margin-bottom: 10px;">إضافة وتيرة كتطبيق</h3><div style="text-align: right; background: var(--bg-subtle); padding: 16px; border-radius: 14px; font-size: 0.85rem; line-height: 1.9; margin-bottom: 18px;">1. افتح الموقع من <strong>Safari</strong>.<br>2. اضغط على زر <strong>المشاركة</strong> بالأسفل.<br>3. اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong>.<br>4. اضغط <strong>إضافة</strong>.</div><button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.closeModal('iosGuideModal')">حسناً</button></div></div>
 
   <div id="authModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 440px;">
-      <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+      <button class="modal-close" onclick="window.closeModal('authModal')">&times;</button>
       <div id="viewLogin">
-        <h3 style="margin-bottom: 14px; font-weight: 600;">تسجيل الدخول</h3>
-        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="loginEmail"></div>
-        <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="handleLogin()">متابعة</button>
-        <div style="display: flex; justify-content: space-between; font-size: 0.82rem;">
-          <span style="color: var(--accent-color); cursor: pointer;" onclick="openResetModal()">نسيت كلمة المرور؟</span>
-          <span style="color: var(--text-secondary); cursor: pointer;" onclick="switchToRegister()">إنشاء حساب جديد</span>
-        </div>
+        <h3 style="margin-bottom: 14px;">تسجيل الدخول</h3>
+        <div class="form-group"><label>البريد</label><input type="email" id="loginEmail"></div><div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="window.handleLogin()">متابعة</button>
+        <div style="display: flex; justify-content: space-between; font-size: 0.82rem;"><span style="color: var(--accent-color); cursor: pointer;" onclick="window.openResetModal()">نسيت كلمة المرور؟</span><span style="color: var(--text-secondary); cursor: pointer;" onclick="window.switchToRegister()">إنشاء حساب جديد</span></div>
       </div>
       <div id="viewRegister" style="display: none;">
-        <h3 style="margin-bottom: 14px; font-weight: 600;">إنشاء حساب جديد (تجربة مجانية يومين)</h3>
-        <div class="form-group"><label>الاسم</label><input type="text" id="regName"></div>
-        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="regEmail"></div>
-        <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="handleRegister()">إنشاء الحساب</button>
-        <span style="color: var(--text-secondary); cursor: pointer; font-size: 0.82rem;" onclick="switchToLogin()">لديك حساب بالفعل؟ سجل دخول</span>
+        <h3 style="margin-bottom: 14px;">إنشاء حساب جديد</h3>
+        <div class="form-group"><label>الاسم</label><input type="text" id="regName"></div><div class="form-group"><label>البريد</label><input type="email" id="regEmail"></div><div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="window.handleRegister()">إنشاء الحساب</button>
+        <div style="text-align:center;"><span style="color: var(--text-secondary); cursor: pointer; font-size: 0.82rem;" onclick="window.switchToLogin()">لديك حساب بالفعل؟ سجل دخول</span></div>
       </div>
     </div>
   </div>
 
-  <div id="verificationNoticeModal" class="modal-overlay">
-    <div class="modal-box" style="text-align: center; max-width: 420px;">
-      <h3 style="margin-bottom: 10px; font-weight: 600; color: var(--danger-color);">تحقق من بريدك الإلكتروني</h3>
-      <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
-        يرجى النقر على رابط التفعيل المرسل إلى بريدك لتفعيل حسابك بالكامل.
-      </p>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px; padding: 12px;" onclick="resendVerificationEmailDirectly()">إعادة إرسال الرابط</button>
-      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('verificationNoticeModal')">إغلاق</button>
-    </div>
-  </div>
-
-  <div id="resetModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 420px;">
-      <button class="modal-close" onclick="closeModal('resetModal')">&times;</button>
-      <h3 style="margin-bottom: 10px; font-weight: 600;">استعادة كلمة المرور</h3>
-      <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="resetEmail"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleResetPassword()">إرسال رابط الاستعادة</button>
-    </div>
-  </div>
+  <div id="verificationNoticeModal" class="modal-overlay"><div class="modal-box" style="text-align: center; max-width: 420px;"><button class="modal-close" onclick="window.closeModal('verificationNoticeModal')">&times;</button><h3 style="margin-bottom: 10px; color: var(--danger-color);">تحقق من بريدك الإلكتروني</h3><p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">يرجى النقر على الرابط المرسل لبريدك لتفعيل الحساب.</p><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button></div></div>
+  <div id="resetModal" class="modal-overlay"><div class="modal-box" style="max-width: 420px;"><button class="modal-close" onclick="window.closeModal('resetModal')">&times;</button><h3 style="margin-bottom: 10px;">استعادة كلمة المرور</h3><div class="form-group"><label>البريد</label><input type="email" id="resetEmail"></div><button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.handleResetPassword()">إرسال رابط الاستعادة</button></div></div>
 
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
-      <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
-      <h3 style="margin-bottom: 6px; font-weight: 600; color: var(--admin-color);">لوحة التحكم الإدارية</h3>
-      <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 20px;">إدارة المسابقات، المشتركين، وأكواد التفعيل.</p>
-      
+      <button class="modal-close" onclick="window.closeModal('adminModal')">&times;</button>
+      <h3 style="margin-bottom: 6px; color: var(--admin-color);">لوحة التحكم الإدارية</h3>
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">إرسال رسالة في الهيرو</h4>
-        <div class="form-group" style="margin-bottom: 8px;">
-          <label>إرسال إلى:</label>
-          <select id="adminNotifTarget" onchange="toggleTargetEmailBox(this.value)">
-            <option value="ALL">جميع المشتركين</option>
-            <option value="SPECIFIC">مستخدم معين (بالإيميل / المعرف)</option>
-          </select>
-        </div>
-        <div class="form-group" id="adminSpecificEmailBox" style="display:none; margin-bottom: 8px;">
-          <input type="text" id="adminTargetUserEmail" placeholder="إيميل أو معرف المستخدم...">
-        </div>
+        <h4 style="font-size: 0.9rem; margin-bottom: 10px;">إرسال رسالة في الهيرو</h4>
+        <div class="form-group" style="margin-bottom: 8px;"><select id="adminNotifTarget" onchange="window.toggleTargetEmailBox(this.value)"><option value="ALL">جميع المشتركين</option><option value="SPECIFIC">مستخدم معين (إيميل/UID)</option></select></div>
+        <div class="form-group" id="adminSpecificEmailBox" style="display:none; margin-bottom: 8px;"><input type="text" id="adminTargetUserEmail" placeholder="إيميل أو معرف المستخدم..."></div>
         <div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الرسالة أو المسابقة..."></textarea></div>
         <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط الصورة (اختياري)"></div>
         <div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="المدة بالدقائق (0 يعني دائم)"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="adminSendCloudMessage()">نشر الرسالة</button>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.adminSendCloudMessage()">نشر الرسالة</button>
       </div>
-
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">المستخدمين المسجلين</h4>
-        <div id="adminUsersList" style="font-size: 0.82rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color);">جاري التحميل...</div>
-      </div>
-
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">توليد أكواد التفعيل</h4>
-        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-          <input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;">
-          <input type="number" id="adminCodeCustomDays" value="365" placeholder="الأيام" style="flex:1;">
-        </div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="adminGenerateActivationCode()">توليد الكود</button>
-      </div>
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">المستخدمين المسجلين</h4><div id="adminUsersList" style="font-size: 0.82rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 12px;">جاري التحميل...</div></div>
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">توليد أكواد التفعيل</h4><div style="display: flex; gap: 8px; margin-bottom: 8px;"><input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;"><input type="number" id="adminCodeCustomDays" value="365" placeholder="الأيام" style="flex:1;"></div><button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.adminGenerateActivationCode()">توليد الكود</button><div id="adminCodesList" style="font-size: 0.82rem; max-height: 90px; overflow-y: auto; margin-top: 10px;"></div></div>
     </div>
   </div>
 
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 460px;">
-      <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
-      
+      <button class="modal-close" onclick="window.closeModal('pricingModal')">&times;</button>
       <div id="pricingViewUnsubscribed">
-        <span class="pro-badge">الاشتراك</span>
-        <h3 style="margin: 10px 0 6px; font-weight: 600;">تفعيل الاشتراك</h3>
-        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 14px;">
-          للحصول على كود التفعيل، يمكنك إتمام الطلب عبر متجرنا في سلة ثم إدخال الكود أدناه:
-        </p>
-
-        <div id="oneTimeTrialBox" style="background: var(--accent-light); border: 1px solid var(--accent-color); padding: 14px; border-radius: 12px; margin-bottom: 16px; display: none;">
-          <div style="font-size: 0.86rem; font-weight: 700; color: var(--accent-color); margin-bottom: 4px;">متاح لحسابك: تجربة مجانية لمدة يومين</div>
-          <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 10px;">تُمنح لمرة واحدة فقط لكل حساب لتجربة كافة المزايا.</p>
-          <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="activateOneTimeFreeTrial()">تفعيل التجربة المجانية</button>
-        </div>
-
-        <a href="https://salla.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 14px;">الانتقال لمتجر سلة للشراء</a>
-        
-        <div class="form-group">
-          <label>أدخل كود التفعيل (يُستخدم لمرة واحدة):</label>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="userActivationCodeInput" placeholder="أدخل الكود هنا...">
-            <button class="btn btn-primary" onclick="activateUserSubscriptionWithCode('userActivationCodeInput')">تفعيل</button>
-          </div>
-        </div>
+        <span class="pro-badge">الاشتراك</span><h3 style="margin: 10px 0 6px;">تفعيل الاشتراك</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 14px;">أتمم الطلب عبر متجر سلة ثم أدخل الكود أدناه:</p>
+        <div id="oneTimeTrialBox" style="background: var(--accent-light); border: 1px solid var(--accent-color); padding: 14px; border-radius: 12px; margin-bottom: 16px; display: none;"><div style="font-size: 0.86rem; font-weight: 700; color: var(--accent-color);">متاح لحسابك: تجربة مجانية ليومين</div><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top:10px;" onclick="window.activateOneTimeFreeTrial()">تفعيل التجربة المجانية</button></div>
+        <a href="https://salla.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 14px;">متجر سلة للشراء</a>
+        <div class="form-group"><div style="display: flex; gap: 8px;"><input type="text" id="userActivationCodeInput" placeholder="أدخل الكود..."><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userActivationCodeInput')">تفعيل</button></div></div>
       </div>
-
       <div id="pricingViewSubscribed" style="display: none; padding: 8px;">
-        <div style="text-align: center; margin-bottom: 24px;">
-          <span class="pro-badge" style="font-size: 0.95rem; padding: 6px 16px;">عضوية نشطة</span>
-          <h3 style="margin: 12px 0 6px; font-weight: 600;">إدارة الاشتراك</h3>
-          <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px;" id="subActiveDetails"></p>
-          
-          <div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;">
-              <span>المدة المتبقية:</span>
-              <strong id="daysRemainingText">0 يوم</strong>
-            </div>
-            <div class="progress-bar-bg" style="height: 8px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div>
-          </div>
-        </div>
-
-        <div style="background: var(--bg-subtle); padding: 18px; border-radius: 14px; margin-bottom: 20px;">
-          <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 8px;">تجديد وتمديد الاشتراك</h4>
-          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">يمكنك تجديد اشتراكك الآن، وستتم إضافة الأيام الجديدة إلى رصيدك الحالي مباشرة.</p>
-          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-            <input type="text" id="userRenewalCodeInput" placeholder="أدخل كود التجديد..." style="flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.85rem;">
-            <button class="btn btn-primary" onclick="activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button>
-          </div>
-          <a href="https://salla.sa" target="_blank" style="font-size: 0.8rem; color: var(--accent-color); text-decoration: none; font-weight: 500;">شراء كود جديد من المتجر</a>
-        </div>
-
-        <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('pricingModal')">إغلاق</button>
+        <div style="text-align: center; margin-bottom: 24px;"><span class="pro-badge">عضوية نشطة</span><h3 style="margin: 12px 0 6px;">إدارة الاشتراك</h3><p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;" id="subActiveDetails"></p><div><div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;"><span>المدة المتبقية:</span><strong id="daysRemainingText">0 يوم</strong></div><div class="progress-bar-bg"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div></div></div>
+        <div style="background: var(--bg-subtle); padding: 18px; border-radius: 14px; margin-bottom: 20px;"><h4 style="font-size: 0.9rem; margin-bottom: 8px;">تجديد الاشتراك</h4><div style="display: flex; gap: 8px; margin-bottom: 10px;"><input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); outline: none;"><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button></div></div>
       </div>
     </div>
   </div>
 
   <div id="profileModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 400px;">
-      <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
-      <h3 style="margin-bottom: 14px; font-weight: 600;">إعدادات الحساب</h3>
+      <button class="modal-close" onclick="window.closeModal('profileModal')">&times;</button>
+      <h3 style="margin-bottom: 14px;">إعدادات الحساب</h3>
       <div class="form-group"><label>الاسم</label><input type="text" id="profileNameInput"></div>
       <div class="form-group"><label>معرف الحساب (UID)</label><input type="text" id="profileUidDisplay" readonly style="opacity: 0.7;"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px; padding: 12px;" onclick="saveProfile()">حفظ التغييرات</button>
-      <button class="btn btn-danger" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleLogout()">تسجيل الخروج</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.saveProfile()">حفظ التغييرات</button>
+      <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="window.handleLogout()">تسجيل الخروج</button>
     </div>
   </div>
 
-  <!-- الحل السحري لتشغيل الملفات على Vercel بدون مشاكل الـ Import -->
-  <script type="module" src="assets/js/firebase-config.js"></script>
-  <script type="module" src="assets/js/ui.js"></script>
-  <script type="module" src="assets/js/widgets.js"></script>
-  <script type="module" src="assets/js/auth.js"></script>
-  <script type="module" src="assets/js/admin.js"></script>
-  <script type="module" src="assets/js/main.js"></script>
+  <!-- الاستدعاء البرمجي للوحدات -->
+  <script type="module" src="./assets/js/main.js"></script>
 
 </body>
 </html>
