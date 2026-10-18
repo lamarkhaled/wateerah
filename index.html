@@ -5,19 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>وتيرة — صمّم إيقاع يومك</title>
   
-  <!-- إعدادات تطبيق أجهزة أبل (iOS Web App / PWA) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="وتيرة">
   <meta name="theme-color" content="#F9F8F6">
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231F4E3D'/><circle cx='50' cy='50' r='18' fill='%23F9F8F6'/></svg>">
 
-  <!-- الخطوط -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- ربط ملفات التصميم (CSS) المنفصلة باحترافية -->
   <link rel="stylesheet" href="assets/css/variables.css">
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/layout.css">
@@ -25,10 +22,8 @@
 </head>
 <body>
 
-  <!-- حاوية الإشعارات السريعة (Toasts) -->
   <div id="toastContainer"></div>
 
-  <!-- الهيدر الزجاجي -->
   <header>
     <div class="header-inner">
       <div class="brand">
@@ -50,7 +45,6 @@
   </header>
 
   <main>
-    <!-- 1. شاشة البدء لأول مرة (Onboarding) -->
     <section id="onboardingScreen" class="hidden-el">
       <div class="time-pill" id="onboardingTimePill">الفترة الصباحية</div>
       <h2 id="onboardingGreeting">صباح الخير، أهلاً بك في وتيرة</h2>
@@ -65,10 +59,7 @@
       <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <!-- 2. واجهة العمل الرئيسية -->
     <div id="mainWorkspace" class="hidden-el">
-      
-      <!-- قسم الهيرو والترحيب -->
       <section class="hero-section">
         <div class="greeting-box">
           <div class="greeting-meta">
@@ -80,7 +71,6 @@
           <p id="dayNightSubtext">رتّب أولوياتك بهدوء وتركيز.</p>
         </div>
 
-        <!-- خانة الرسائل الزجاجية الشفافة في الهيرو -->
         <div class="hero-glass-messages">
           <div id="activeGlassMessage" style="display: none;">
             <div class="msg-header">
@@ -103,7 +93,6 @@
         </div>
       </section>
 
-      <!-- شريط المظهر والأدوات -->
       <section class="toolbar-ios">
         <div class="toolbar-group">
           <span class="toolbar-label">المظهر:</span>
@@ -118,17 +107,13 @@
         </div>
       </section>
 
-      <!-- حالة المساحة الفارغة -->
       <div id="emptyWorkspaceState" class="hidden-el">
         <h3>مساحتك فارغة وجاهزة للتشكيل</h3>
         <p>اضغط على زر (+) لإضافة الأدوات التي تحتاجها وترتيبها بالسحب والإفلات.</p>
         <button class="btn btn-primary" onclick="openModal('addWidgetModal')">+ إضافة أول أداة</button>
       </div>
 
-      <!-- شبكة الأدوات القابلة للسحب -->
       <div id="bentoGrid" class="bento-grid">
-        
-        <!-- أداة الفجن بورد -->
         <div id="widget-vision" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-vision">
           <div class="card-header">
             <div class="card-title-wrap">
@@ -149,7 +134,6 @@
           </div>
         </div>
 
-        <!-- أداة المهام المتنقلة -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap">
@@ -194,7 +178,6 @@
           </div>
         </div>
 
-        <!-- أداة البوصلة -->
         <div id="widget-focus" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-focus">
           <div class="card-header">
             <div class="card-title-wrap">
@@ -206,7 +189,6 @@
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="ما هي النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="autoSave()">
         </div>
 
-        <!-- أداة العادات -->
         <div id="widget-habits" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-habits">
           <div class="card-header">
             <div class="card-title-wrap">
@@ -222,7 +204,6 @@
           </div>
         </div>
 
-        <!-- أداة المالية الشاملة -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-finance">
           <div class="card-header">
             <div class="card-title-wrap">
@@ -269,7 +250,6 @@
           </div>
         </div>
 
-        <!-- أداة التدوين -->
         <div id="widget-journal" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-journal">
           <div class="card-header">
             <div class="card-title-wrap">
@@ -284,8 +264,6 @@
     </div>
   </main>
 
-  <!-- النوافذ المنبثقة (Modals) -->
-  <!-- مكتبة الأدوات -->
   <div id="addWidgetModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 480px;">
       <button class="modal-close" onclick="closeModal('addWidgetModal')">&times;</button>
@@ -295,7 +273,6 @@
     </div>
   </div>
 
-  <!-- تفاصيل الفجن بورد -->
   <div id="visionDetailModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('visionDetailModal')">&times;</button>
@@ -336,7 +313,6 @@
     </div>
   </div>
 
-  <!-- نافذة التثبيت لأبل -->
   <div id="iosGuideModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 440px; text-align: center;">
       <button class="modal-close" onclick="closeModal('iosGuideModal')">&times;</button>
@@ -354,7 +330,6 @@
     </div>
   </div>
 
-  <!-- الدخول والتسجيل -->
   <div id="authModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 440px;">
       <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
@@ -399,7 +374,6 @@
     </div>
   </div>
 
-  <!-- لوحة تحكم الأدمن -->
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
@@ -407,7 +381,7 @@
       <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 20px;">إدارة المسابقات، المشتركين، وأكواد التفعيل.</p>
       
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">إرسال رسالة / مسابقة في الهيرو</h4>
+        <h4 style="font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">إرسال رسالة في الهيرو</h4>
         <div class="form-group" style="margin-bottom: 8px;">
           <label>إرسال إلى:</label>
           <select id="adminNotifTarget" onchange="toggleTargetEmailBox(this.value)">
@@ -421,7 +395,7 @@
         <div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الرسالة أو المسابقة..."></textarea></div>
         <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط الصورة (اختياري)"></div>
         <div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="المدة بالدقائق (0 يعني دائم)"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="adminSendCloudMessage()">إرسال الرسالة</button>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="adminSendCloudMessage()">نشر الرسالة</button>
       </div>
 
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;">
@@ -440,7 +414,6 @@
     </div>
   </div>
 
-  <!-- مركز الاشتراكات الموحد -->
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 460px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
@@ -484,7 +457,6 @@
           </div>
         </div>
 
-        <!-- خانة التجديد المبكر -->
         <div style="background: var(--bg-subtle); padding: 18px; border-radius: 14px; margin-bottom: 20px;">
           <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 8px;">تجديد وتمديد الاشتراك</h4>
           <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">يمكنك تجديد اشتراكك الآن، وستتم إضافة الأيام الجديدة إلى رصيدك الحالي مباشرة.</p>
@@ -511,7 +483,12 @@
     </div>
   </div>
 
-  <!-- استدعاء ملف الجافاسكريبت الرئيسي الذي سيربط دوال الموقع (بناءً على التقسيم الجديد) -->
+  <!-- الحل السحري لتشغيل الملفات على Vercel بدون مشاكل الـ Import -->
+  <script type="module" src="assets/js/firebase-config.js"></script>
+  <script type="module" src="assets/js/ui.js"></script>
+  <script type="module" src="assets/js/widgets.js"></script>
+  <script type="module" src="assets/js/auth.js"></script>
+  <script type="module" src="assets/js/admin.js"></script>
   <script type="module" src="assets/js/main.js"></script>
 
 </body>
