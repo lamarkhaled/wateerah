@@ -80,11 +80,11 @@ window.renderBanksList = function() {
         ${(bank.accounts || []).map((acc, aIdx) => `
           <li class="list-item" style="padding: 8px 12px; background: transparent;">
             <div class="item-left" style="gap: 8px;">
-              <input type="text" class="item-text-input" value="${acc.name}" onchange="window.updateAccountName(${bIdx}, ${aIdx}, this.value)" style="font-weight: 500;" placeholder="اسم الحساب">
-              <input type="number" class="item-text-input" value="${acc.balance}" onchange="window.updateAccountBalance(${bIdx}, ${aIdx}, this.value)" style="color: var(--accent-color); font-weight: 700; max-width: 80px;" placeholder="الرصيد">
+              <input type="text" class="item-text-input" value="${acc.name}" onchange="window.updateAccountName(${bIdx},${aIdx}, this.value)" style="font-weight: 500;" placeholder="اسم الحساب">
+              <input type="number" class="item-text-input" value="${acc.balance}" onchange="window.updateAccountBalance(${bIdx},${aIdx}, this.value)" style="color: var(--accent-color); font-weight: 700; max-width: 80px;" placeholder="الرصيد">
               <span style="font-size: 0.75rem; color: var(--text-secondary);">ر.س</span>
             </div>
-            <button class="delete-btn" onclick="window.deleteAccount(${bIdx}, ${aIdx})">&times;</button>
+            <button class="delete-btn" onclick="window.deleteAccount(${bIdx},${aIdx})">&times;</button>
           </li>
         `).join('')}
       </ul>
