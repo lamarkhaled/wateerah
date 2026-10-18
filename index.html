@@ -128,7 +128,7 @@
       <p>مساحتك الخاصة لضبط إيقاع يومك</p>
     </div>
     <div class="nav-actions">
-      <!-- زر لوحة تحكم الأدمن (يظهر فقط لـ لمار wateerahapp@gmail.com) -->
+      <!-- لوحة تحكم الأدمن الخاصة بـ لمار -->
       <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">👑 لوحة الأدمن</button>
       
       <span id="planBadge" class="pro-badge" onclick="openModal('pricingModal')">الباقة الأساسية</span>
@@ -144,7 +144,7 @@
   <main>
     <section class="hero-section">
       <div class="greeting">
-        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;" id="syncIndicator">⚪ غير متصل بالحساب</div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;" id="syncIndicator">⚪ غير متصل بالحساب (يرجى تفعيل البريد)</div>
         <h2 id="welcomeText">صباح الخير، أهلاً بك في وتيرتك.</h2>
         <p>صمّم مساحتك بالطريقة التي تشبهك.</p>
       </div>
@@ -226,7 +226,7 @@
     </div>
   </div>
 
-  <!-- نافذة استعادة كلمة المرور المستقلة (المنفصلة تماماً) -->
+  <!-- نافذة استعادة كلمة المرور المستقلة الآمنة -->
   <div id="resetModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('resetModal')">&times;</button>
@@ -237,48 +237,27 @@
     </div>
   </div>
 
-  <!-- لوحة تحكم الأدمن (خاصة بـ لمار wateerahapp@gmail.com) -->
+  <!-- لوحة تحكم الأدمن (خاصة بـ لمار) -->
   <div id="adminModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 520px;">
+    <div class="modal-box" style="max-width: 480px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
       <h3 style="margin-bottom: 6px; color: var(--admin-color);">👑 لوحة تحكم أدمن وتيرة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">تحكم كامل بإدارة المنصة، أكواد الخصم، والمشتركين.</p>
-      
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">🎟️ إنشاء كود خصم جديد</h4>
-        <div class="form-group"><label>رمز الكود (مثال: LAMAR30)</label><input type="text" id="adminCouponCode" placeholder="LAMAR"></div>
-        <div class="form-group"><label>نسبة الخصم (%)</label><input type="number" id="adminCouponDiscount" placeholder="25"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminCreateCoupon()">إضافة كود الخصم للمنصة</button>
-      </div>
-
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">التحكم بالإدارة والمستخدمين.</p>
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">⚡ إدارة اشتراكات المستخدمين</h4>
-        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px;">يمكنك ترقية أو إلغاء اشتراك أي عميل عبر البريد الإلكتروني:</p>
-        <div class="form-group"><label>إيميل المشترك</label><input type="email" id="adminTargetEmail" placeholder="client@example.com"></div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="adminUpdateSub('Pro', true)">ترقية لـ بلس</button>
-          <button class="btn btn-danger" style="flex: 1; justify-content: center;" onclick="adminUpdateSub('Basic', false)">إلغاء الاشتراك</button>
-        </div>
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">⚡ إدارة النظام</h4>
+        <p style="font-size: 0.82rem; color: var(--text-secondary);">النظام يعمل بكفاءة وأمان تام.</p>
       </div>
     </div>
   </div>
 
-  <!-- نافذة الاشتراك وتيرة بلس مع كود الخصم -->
+  <!-- نافذة الاشتراك المباشرة (بدون فورم تأكيد معقد) -->
   <div id="pricingModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px;">
+    <div class="modal-box" style="max-width: 440px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
-      <h3 style="margin-bottom: 8px;">وتيرة بلس ✨</h3>
-      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">استمتع بمزامنة كاملة وتخصيص بلا حدود.</p>
-      
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-        <div class="form-group" style="margin-bottom: 8px;"><label>هل لديك كود خصم؟</label></div>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="couponInput" placeholder="أدخل الكود هنا (مثال: LAMAR)">
-          <button class="btn" onclick="applyCoupon()">تطبيق</button>
-        </div>
-      </div>
-
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="upgradePlan()">إتمام الاشتراك (149 ر.س / سنوياً)</button>
+      <span class="pro-badge">وتيرة بلس ✨</span>
+      <h3 style="margin: 10px 0 6px;">باقة وتيرة بلس</h3>
+      <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 20px;">استمتع بمزامنة سحابية غير محدودة وتخصيص متقدم.</p>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="upgradeDirectly()">ترقية وتفعيل فوري</button>
     </div>
   </div>
 
@@ -320,9 +299,6 @@
       habits: [{ text: 'قراءة 15 صفحة', done: false }],
       tasks: [{ text: 'ترتيب الأولويات', done: false }]
     };
-
-    // أكواد الخصم المخزنة محلياً بالمنصة
-    window.platformCoupons = { "LAMAR": 25, "WATEERAH": 20 };
 
     window.showToast = function(msg) {
       const c = document.getElementById('toastContainer');
@@ -384,7 +360,11 @@
       window.appState.focusGoal = document.getElementById('focusGoalInput').value;
       window.appState.journal = document.getElementById('journalText').value;
       const user = auth.currentUser;
-      if (!user) { showToast('مفعل محلياً'); return; }
+      if (!user) { showToast('مفعل محلياً (يرجى تسجيل وتفعيل الحساب)'); return; }
+      if (!user.emailVerified && user.email !== ADMIN_EMAIL) {
+        showToast('بريدك غير مفعل! تحقق من بريدك الإلكتروني.');
+        return;
+      }
       await setDoc(doc(db, "users", user.uid), { profile: userProfile, state: appState }, { merge: true });
       if(manual) showToast('تم الحفظ سحابياً بنجاح ☁️');
     };
@@ -416,7 +396,6 @@
       } catch(e) { showToast('بيانات الدخول غير صحيحة.'); }
     };
 
-    // استعادة كلمة المرور المستقلة الآمنة
     window.handleResetPassword = async () => {
       const email = document.getElementById('resetEmail').value;
       if(!email) return showToast('أدخل البريد الإلكتروني من فضلك');
@@ -427,37 +406,12 @@
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
 
-    // ميزات الأدمن (لمار)
-    window.adminCreateCoupon = () => {
-      const code = document.getElementById('adminCouponCode').value.trim().toUpperCase();
-      const disc = document.getElementById('adminCouponDiscount').value;
-      if(!code || !disc) return showToast('أدخل بيانات كود الخصم بشكل صحيح');
-      window.platformCoupons[code] = parseInt(disc);
-      showToast(`تم إنشاء كود الخصم (${code}) بنسبة خصم ${disc}% بنجاح!`);
-    };
-
-    window.adminUpdateSub = async (planName, isPro) => {
-      const targetEmail = document.getElementById('adminTargetEmail').value.trim();
-      if(!targetEmail) return showToast('أدخل إيميل العميل المستهدف');
-      showToast(`تم تحديث باقة العميل (${targetEmail}) إلى (${planName}) بنجاح.`);
-      closeModal('adminModal');
-    };
-
-    window.applyCoupon = () => {
-      const code = document.getElementById('couponInput').value.trim().toUpperCase();
-      if(window.platformCoupons[code]) {
-        showToast(`تم تطبيق كود الخصم بنجاح! نسبة الخصم: ${window.platformCoupons[code]}%`);
-      } else {
-        showToast('كود الخصم غير صحيح أو منتهي الصلاحية.');
-      }
-    };
-
-    window.upgradePlan = async () => {
+    window.upgradeDirectly = async () => {
       userProfile.planType = 'وتيرة بلس ✨';
       document.getElementById('planBadge').innerText = userProfile.planType;
       closeModal('pricingModal');
       saveCurrentWateerah(true);
-      showToast('تم تفعيل باقة وتيرة بلس بنجاح!');
+      showToast('تم ترقية وتفعيل باقة وتيرة بلس بنجاح!');
     };
 
     window.saveProfile = async () => {
@@ -475,7 +429,6 @@
         document.getElementById('userProfilePill').style.display = 'flex';
         document.getElementById('syncIndicator').innerText = '☁️ متزامن سحابياً';
 
-        // تحقق مما إذا كانت هي الأدمن (لمار) لإظهار لوحة التحكم الخاصة بها
         if (user.email === ADMIN_EMAIL) {
           document.getElementById('adminPanelBtn').style.display = 'inline-flex';
         }
@@ -487,6 +440,7 @@
           if(d.state) appState = d.state;
         }
         document.getElementById('headerUserName').innerText = userProfile.name || user.email;
+        document.getElementById('planBadge').innerText = userProfile.planType || 'الباقة الأساسية';
         document.getElementById('focusGoalInput').value = appState.focusGoal || '';
         document.getElementById('journalText').value = appState.journal || '';
         renderLists();
