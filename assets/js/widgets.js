@@ -1,3 +1,5 @@
+// assets/js/widgets.js
+
 window.renderVisionBoard = function() {
   const board = document.getElementById('corkboardContainer');
   if (!window.appState.visionBoard || window.appState.visionBoard.length === 0) { if(board) board.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.85); padding: 60px 20px; font-size: 0.92rem;">اللوح الخشبي فارغ حالياً.</div>`; return; }
@@ -60,10 +62,88 @@ window.dragKanbanCard = (e, idx) => { e.stopPropagation(); window.draggedKanbanI
 window.allowKanbanDrop = (e) => { e.preventDefault(); };
 window.dropKanbanCard = (e, targetStatus) => { e.preventDefault(); if (window.draggedKanbanIndex === null) return; window.appState.kanbanTasks[window.draggedKanbanIndex].status = targetStatus; window.draggedKanbanIndex = null; window.renderKanbanBoard(); window.autoSave(); };
 
+// ================= نظام البنوك والحسابات الجديد المتقدم =================
+window.renderBanksList = function() {
+  const container = document.getElementById('banksContainer');
+  if (!container) return;
+  if (!window.appState.banks) window.appState.banks = [];
+
+  if (window.appState.banks.length === 0) {
+    container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.8rem; padding:10px;">لا توجد بنوك مضافة بعد.</div>`;
+    return;
+  }
+
+  container.innerHTML = window.appState.banks.map((bank, bIdx) => `
+    <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px;">
+        <input type="text" value="${bank.name}" onchange="window.updateBankName(${bIdx}, this.value)" style="font-weight: 700; border: none; background: transparent; color: var(--text-primary); outline: none; font-size: 1rem; width: 70%;" placeholder="اسم البنك...">
+        <button class="delete-btn" style="font-size: 0.75rem;" onclick="window.deleteBank(${bIdx})">حذف البنك</button>
+      </div>
+      
+      <ul class="item-list" style="margin-bottom: 12px;">
+        ${(bank.accounts || []).map((acc, aIdx) => `
+          <li class="list-item" style="padding: 8px 12px; background: transparent;">
+            <div class="item-left" style="gap: 8px;">
+              <input type="text" class="item-text-input" value="${acc.name}" onchange="window.updateAccountName(${bIdx},${aIdx}, this.value)" style="font-weight: 500;" placeholder="اسم الحساب">
+              <input type="number" class="item-text-input" value="${acc.balance}" onchange="window.updateAccountBalance(${bIdx},${aIdx}, this.value)" style="color: var(--accent-color); font-weight: 700; max-width: 80px;" placeholder="الرصيد">
+              <span style="font-size: 0.75rem; color: var(--text-secondary);">ر.س</span>
+            </div>
+            <button class="delete-btn" onclick="window.deleteAccount(${bIdx},${aIdx})">&times;</button>
+          </li>
+        `).join('')}
+      </ul>
+
+      <div class="add-row" style="margin-top: 0;">
+        <input type="text" id="newAccName_${bIdx}" placeholder="حساب جديد..." style="font-size: 0.8rem; padding: 8px;">
+        <input type="number" id="newAccBalance_${bIdx}" placeholder="الرصيد" style="font-size: 0.8rem; padding: 8px;">
+        <button class="btn btn-subtle" style="font-size: 0.8rem;" onclick="window.addAccount(${bIdx})">إضافة</button>
+      </div>
+
+    </div>
+  `).join('');
+};
+
+window.addBank = () => {
+  const name = document.getElementById('newBankName').value.trim();
+  if (!name) return window.showToast('أدخل اسم البنك');
+  if (!window.appState.banks) window.appState.banks = [];
+  window.appState.banks.push({ name, accounts: [] });
+  document.getElementById('newBankName').value = '';
+  window.renderLists(); window.autoSave(); window.showToast('تمت إضافة البنك بنجاح');
+};
+
+window.deleteBank = (bIdx) => {
+  if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) {
+    window.appState.banks.splice(bIdx, 1);
+    window.renderLists(); window.autoSave(); window.showToast('تم حذف البنك');
+  }
+};
+
+window.updateBankName = (bIdx, val) => { window.appState.banks[bIdx].name = val; window.autoSave(); };
+
+window.addAccount = (bIdx) => {
+  const nameEl = document.getElementById(`newAccName_${bIdx}`);
+  const balEl = document.getElementById(`newAccBalance_${bIdx}`);
+  const name = nameEl.value.trim(); const balance = parseFloat(balEl.value) || 0;
+  if (!name) return window.showToast('أدخل اسم الحساب');
+  window.appState.banks[bIdx].accounts.push({ name, balance });
+  nameEl.value = ''; balEl.value = '';
+  window.renderLists(); window.autoSave();
+};
+
+window.deleteAccount = (bIdx, aIdx) => { window.appState.banks[bIdx].accounts.splice(aIdx, 1); window.renderLists(); window.autoSave(); };
+window.updateAccountName = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].name = val; window.autoSave(); };
+window.updateAccountBalance = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].balance = parseFloat(val) || 0; window.autoSave(); };
+
+
+// ================= المجمّع الأساسي والقوائم =================
 window.renderLists = function() {
-  window.renderVisionBoard(); window.renderKanbanBoard();
+  window.renderVisionBoard(); 
+  window.renderKanbanBoard();
+  window.renderBanksList(); // تشغيل قائمة البنوك الجديدة المتقدمة
+
   document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
-  document.getElementById('walletsList').innerHTML = (window.appState.wallets || []).map((w, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${w.name}" onchange="window.appState.wallets[${i}].name=this.value; window.autoSave()" style="font-weight:600;"><input type="number" class="item-text-input" value="${w.balance}" onchange="window.appState.wallets[${i}].balance=parseFloat(this.value)||0; window.autoSave(); window.calculateDistribution();" style="color:var(--accent-color); font-weight:700; max-width:90px;"><span style="font-size:0.75rem; color:var(--text-secondary);">ر.س</span></div><button class="delete-btn" onclick="window.appState.wallets.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
   document.getElementById('wishlistList').innerHTML = (window.appState.wishlist || []).map((w, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${w.title}" onchange="window.appState.wishlist[${i}].title=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600; color:var(--danger-color);">${w.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.wishlist.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
   document.getElementById('subscriptionsList').innerHTML = (window.appState.subscriptions || []).map((s, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600;">${s.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
   window.calculateDistribution();
@@ -71,7 +151,6 @@ window.renderLists = function() {
 
 window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
 window.addHabit = () => { const el = document.getElementById('newHabitInput'); if(!el.value.trim())return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; window.renderLists(); window.autoSave(); };
-window.addWallet = () => { const n = document.getElementById('newWalletName'); const b = document.getElementById('newWalletBalance'); if(!n.value.trim())return; window.appState.wallets.push({name:n.value.trim(), balance:parseFloat(b.value)||0}); n.value=''; b.value=''; window.renderLists(); window.autoSave(); };
 window.addWishlistItem = () => { const t = document.getElementById('newWishTitle'); const c = document.getElementById('newWishCost'); if(!t.value.trim())return; window.appState.wishlist.push({title:t.value.trim(), cost:parseFloat(c.value)||0}); t.value=''; c.value=''; window.renderLists(); window.autoSave(); };
 window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; window.renderLists(); window.autoSave(); };
 
