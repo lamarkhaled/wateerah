@@ -43,7 +43,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'IBM Plex Sans Arabic', sans-serif; }
     body { background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.65; transition: background-color 0.3s ease; min-height: 100vh; padding-bottom: 80px; }
 
-    header { max-width: 1140px; margin: 0 auto; padding: 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 16px; }
+    header { max-width: 1200px; margin: 0 auto; padding: 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 16px; }
     .brand { display: flex; align-items: baseline; gap: 10px; }
     .brand h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
     .brand span.dot { color: var(--accent-color); font-size: 2.5rem; line-height: 0; }
@@ -72,7 +72,7 @@
     .widget-close { position: absolute; top: 8px; left: 8px; background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--text-secondary); }
     .widget-img { width: 100%; border-radius: 8px; margin-top: 10px; max-height: 150px; object-fit: cover; display: none; }
 
-    main { max-width: 1140px; margin: 36px auto 0; padding: 0 24px; }
+    main { max-width: 1200px; margin: 36px auto 0; padding: 0 24px; }
     .hero-section { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
     .greeting h2 { font-size: 2.1rem; font-weight: 600; }
     .greeting p { color: var(--text-secondary); font-size: 1rem; margin-top: 4px; }
@@ -107,7 +107,6 @@
     .checkbox { width: 21px; height: 21px; border-radius: 6px; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.78rem; flex-shrink: 0; }
     .list-item.completed .checkbox { background: var(--accent-color); border-color: var(--accent-color); color: #FFF; }
     .item-text-input { border: none; background: transparent; color: var(--text-primary); font-size: 0.95rem; width: 100%; outline: none; padding: 2px 4px; border-radius: 6px; }
-    .list-item.completed .item-text-input { text-decoration: line-through; color: var(--text-secondary); }
     .delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.1rem; opacity: 0.4; }
     .delete-btn:hover { opacity: 1; color: var(--danger-color); }
 
@@ -115,6 +114,10 @@
     .add-row input { flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
     .journal-area { width: 100%; min-height: 140px; border: 1px solid var(--border-color); background: var(--bg-primary); border-radius: 12px; padding: 16px; color: var(--text-primary); outline: none; resize: vertical; }
 
+    /* أقسام حصين المالية المدمجة */
+    .finance-section-title { font-size: 1.4rem; font-weight: 700; color: var(--accent-color); margin: 30px 0 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+    .sub-card { background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+    
     /* النوافذ */
     .modal-overlay { position: fixed; inset: 0; background: rgba(15, 15, 14, 0.5); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .modal-overlay.open { display: flex; }
@@ -187,7 +190,7 @@
         <button class="chip active" id="btn-widget-focus" onclick="toggleWidget('widget-focus', this)">البوصلة</button>
         <button class="chip active" id="btn-widget-habits" onclick="toggleWidget('widget-habits', this)">العادات</button>
         <button class="chip active" id="btn-widget-tasks" onclick="toggleWidget('widget-tasks', this)">الأولويات</button>
-        <button class="chip active" id="btn-widget-finance" onclick="toggleWidget('widget-finance', this)">الحسابات والمحافظ</button>
+        <button class="chip active" id="btn-widget-finance" onclick="toggleWidget('widget-finance', this)">حصين المالية 💰</button>
         <button class="chip active" id="btn-widget-journal" onclick="toggleWidget('widget-journal', this)">التدوين</button>
       </div>
     </section>
@@ -219,19 +222,62 @@
         </div>
       </div>
 
-      <!-- 4. الحسابات والمحافظ البنكية (إدارة وتعديل وإضافة المحافظ والبنوك) -->
+      <!-- ========================================== -->
+      <!-- 4. قسم حصين المالية الشامل (مدمج بالكامل هنا) -->
+      <!-- ========================================== -->
       <div id="widget-finance" class="card col-12">
         <div class="card-header">
-          <span class="card-title">💳 الحسابات والمحافظ المالية</span>
-          <span class="card-subtitle">إدارة وتعديل الأرصدة والبنوك والمحافظ بحرية</span>
+          <span class="card-title" style="font-size: 1.3rem; color: var(--accent-color);">💰 حصين المالية (إدارة الأرصدة والمحافظ والأهداف)</span>
+          <span class="card-subtitle">التحكم الكامل بالحسابات والتوزيعات الذكية والأوسمة</span>
         </div>
+
+        <!-- أ) إدارة البنوك والمحافظ المالية وإضافتها بحرية -->
+        <div class="finance-section-title">💳 الحسابات والمحافظ البنكية</div>
         <ul id="walletsList" class="item-list"></ul>
-        <div class="add-row">
-          <input type="text" id="newWalletName" placeholder="اسم البنك أو المحفظة (مثال: الراجحي، STC Pay)..." style="flex: 2;">
+        <div class="add-row" style="margin-bottom: 24px;">
+          <input type="text" id="newWalletName" placeholder="اسم البنك أو المحفظة (مثال: مصرف الراجحي، STC Pay)..." style="flex: 2;">
           <input type="number" id="newWalletBalance" placeholder="الرصيد (ر.س)" style="flex: 1;">
-          <button class="btn btn-primary" onclick="addWallet()">+ إضافة حساب/محفظة</button>
+          <button class="btn btn-primary" onclick="addWallet()">+ إضافة محفظة جديدة</button>
+        </div>
+
+        <!-- ب) حاسبة التوزيع الذكية وزد مالك -->
+        <div class="finance-section-title">📊 حاسبة التوزيع الذكية</div>
+        <div class="sub-card">
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom: 14px;">
+            <div style="flex:1;"><label style="font-size:0.85rem; color:var(--text-secondary);">دخل الشهر (ر.س):</label><input type="number" id="totalIncomeInput" value="1000" oninput="calculateDistribution()" style="padding:10px; border-radius:8px; border:1px solid var(--border-color); width:100%; background:var(--bg-primary); color:var(--text-primary);"></div>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px;" id="distributionResults">
+            <!-- تفاصيل التوزيع الذكي -->
+          </div>
+        </div>
+
+        <!-- ج) متتبع اشتراكات البرامج والعمل (SaaS Subscriptions) -->
+        <div class="finance-section-title">⚙️ متتبع اشتراكات البرامج والعمل (SaaS Subscriptions)</div>
+        <ul id="subscriptionsList" class="item-list"></ul>
+        <div class="add-row" style="margin-bottom: 24px;">
+          <input type="text" id="newSubName" placeholder="اسم الاشتراك (مثال: منصة سلة، استضافة)..." style="flex: 2;">
+          <input type="number" id="newSubCost" placeholder="التكلفة (ر.س)" style="flex: 1;">
+          <button class="btn btn-primary" onclick="addSubscription()">+ إضافة اشتراك</button>
+        </div>
+
+        <!-- د) مصاريف والتزامات الشهر (To-Do List) -->
+        <div class="finance-section-title">📝 مصاريف والتزامات الشهر (To-Do List)</div>
+        <ul id="liabilitiesList" class="item-list"></ul>
+        <div class="add-row" style="margin-bottom: 24px;">
+          <input type="text" id="newLiabilityName" placeholder="الالتزام أو المصروف الشهري..." style="flex: 2;">
+          <input type="number" id="newLiabilityCost" placeholder="المبلغ (ر.س)" style="flex: 1;">
+          <button class="btn btn-primary" onclick="addLiability()">+ إضافة التزام</button>
+        </div>
+
+        <!-- هـ) سجل أفكار المشاريع والمنتجات الرقمية -->
+        <div class="finance-section-title">💡 سجل أفكار المشاريع والمنتجات الرقمية</div>
+        <ul id="ideasVaultList" class="item-list"></ul>
+        <div class="add-row">
+          <input type="text" id="newIdeaText" placeholder="فكرة مشروع أو منتج رقمي جديد..." style="flex: 1;">
+          <button class="btn btn-primary" onclick="addIdea()">+ إضافة فكرة</button>
         </div>
       </div>
+      <!-- نهاية قسم حصين المالية -->
 
       <!-- 5. مساحة الصفاء -->
       <div id="widget-journal" class="card col-12">
@@ -375,8 +421,17 @@
       habits: [{ text: 'قراءة 15 صفحة', done: false }],
       tasks: [{ text: 'ترتيب الأولويات', done: false }],
       wallets: [
-        { name: 'بنك الراجحي', balance: 4500 },
+        { name: 'مصرف الراجحي', balance: 4500 },
         { name: 'STC Pay', balance: 850 }
+      ],
+      subscriptions: [
+        { name: 'منصة سلة', cost: 99 }
+      ],
+      liabilities: [
+        { name: 'إيجار المنزل', cost: 2500 }
+      ],
+      ideasVault: [
+        { text: 'خدمة تصميم قوالب سلة' }
       ]
     };
 
@@ -437,20 +492,69 @@
           <button class="delete-btn" onclick="window.appState.tasks.splice(${i},1); renderLists(); autoSave()">&times;</button>
         </li>`).join('');
 
-      // الحسابات والمحافظ البنكية (إضافة وتعديل وحذف بحرية)
+      // 1. المحافظ والبنوك المالية
       const walletsList = document.getElementById('walletsList');
       if (!window.appState.wallets || window.appState.wallets.length === 0) {
-        walletsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد حسابات أو محافظ مضافة. ابدأ بإضافة محفظتك أو بنكك.</div>`;
+        walletsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد حسابات مضافة.</div>`;
       } else {
         walletsList.innerHTML = window.appState.wallets.map((w, i) => `
           <li class="list-item">
             <div class="item-left" style="gap: 8px;">
-              <span style="font-size: 1.1rem;">🏛️</span>
+              <span>💳</span>
               <input type="text" class="item-text-input" value="${w.name}" onchange="window.appState.wallets[${i}].name=this.value; autoSave()" style="font-weight:600; max-width: 150px;">
-              <input type="number" class="item-text-input" value="${w.balance}" onchange="window.appState.wallets[${i}].balance=parseFloat(this.value)||0; autoSave()" style="color:var(--accent-color); font-weight:700;">
+              <input type="number" class="item-text-input" value="${w.balance}" onchange="window.appState.wallets[${i}].balance=parseFloat(this.value)||0; autoSave(); calculateDistribution();" style="color:var(--accent-color); font-weight:700;">
               <span style="font-size: 0.82rem; color:var(--text-secondary);">ر.س</span>
             </div>
-            <button class="delete-btn" onclick="removeWallet(${i})" title="حذف الحساب">&times;</button>
+            <button class="delete-btn" onclick="removeWallet(${i})">&times;</button>
+          </li>`).join('');
+      }
+
+      // 2. متتبع الاشتراكات
+      const subsList = document.getElementById('subscriptionsList');
+      if (!window.appState.subscriptions || window.appState.subscriptions.length === 0) {
+        subsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد اشتراكات مضافة.</div>`;
+      } else {
+        subsList.innerHTML = window.appState.subscriptions.map((s, i) => `
+          <li class="list-item">
+            <div class="item-left" style="gap: 8px;">
+              <span>⚙️</span>
+              <input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; autoSave()" style="font-weight:600; max-width: 150px;">
+              <input type="number" class="item-text-input" value="${s.cost}" onchange="window.appState.subscriptions[${i}].cost=parseFloat(this.value)||0; autoSave()" style="color:var(--danger-color); font-weight:700;">
+              <span style="font-size: 0.82rem; color:var(--text-secondary);">ر.س</span>
+            </div>
+            <button class="delete-btn" onclick="removeSubscription(${i})">&times;</button>
+          </li>`).join('');
+      }
+
+      // 3. مصاريف والتزامات الشهر
+      const liabList = document.getElementById('liabilitiesList');
+      if (!window.appState.liabilities || window.appState.liabilities.length === 0) {
+        liabList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد التزامات شهرية مضافة.</div>`;
+      } else {
+        liabList.innerHTML = window.appState.liabilities.map((l, i) => `
+          <li class="list-item">
+            <div class="item-left" style="gap: 8px;">
+              <span>📝</span>
+              <input type="text" class="item-text-input" value="${l.name}" onchange="window.appState.liabilities[${i}].name=this.value; autoSave()" style="font-weight:600; max-width: 150px;">
+              <input type="number" class="item-text-input" value="${l.cost}" onchange="window.appState.liabilities[${i}].cost=parseFloat(this.value)||0; autoSave()" style="color:var(--danger-color); font-weight:700;">
+              <span style="font-size: 0.82rem; color:var(--text-secondary);">ر.س</span>
+            </div>
+            <button class="delete-btn" onclick="removeLiability(${i})">&times;</button>
+          </li>`).join('');
+      }
+
+      // 4. سجل أفكار المشاريع والمنتجات الرقمية
+      const ideasList = document.getElementById('ideasVaultList');
+      if (!window.appState.ideasVault || window.appState.ideasVault.length === 0) {
+        ideasList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد أفكار مسجلة.</div>`;
+      } else {
+        ideasList.innerHTML = window.appState.ideasVault.map((id, i) => `
+          <li class="list-item">
+            <div class="item-left" style="gap: 8px;">
+              <span>💡</span>
+              <input type="text" class="item-text-input" value="${id.text}" onchange="window.appState.ideasVault[${i}].text=this.value; autoSave()">
+            </div>
+            <button class="delete-btn" onclick="removeIdea(${i})">&times;</button>
           </li>`).join('');
       }
 
@@ -459,34 +563,95 @@
       const pct = all.length ? Math.round((done/all.length)*100) : 0;
       document.getElementById('progressPercentText').innerText = pct + '%';
       document.getElementById('progressBarFill').style.width = pct + '%';
+
+      calculateDistribution();
     };
 
     window.toggle = (type, i) => { window.appState[type][i].done = !window.appState[type][i].done; renderLists(); autoSave(); };
     window.addHabit = () => { const i = document.getElementById('newHabitInput'); if(!i.value)return; window.appState.habits.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
     window.addTask = () => { const i = document.getElementById('newTaskInput'); if(!i.value)return; window.appState.tasks.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
 
-    // إضافة محفظة أو بنك جديد بحرية
+    // ميزات حصين المالية البرمجية
     window.addWallet = () => {
-      const nameInput = document.getElementById('newWalletName');
-      const balanceInput = document.getElementById('newWalletBalance');
-      if(!nameInput.value.trim()) return showToast('أدخل اسم المحفظة أو البنك');
-      const balance = parseFloat(balanceInput.value) || 0;
-      
+      const name = document.getElementById('newWalletName').value.trim();
+      const balance = parseFloat(document.getElementById('newWalletBalance').value) || 0;
+      if(!name) return showToast('أدخل اسم المحفظة أو البنك');
       if(!window.appState.wallets) window.appState.wallets = [];
-      window.appState.wallets.push({ name: nameInput.value.trim(), balance: balance });
-      
-      nameInput.value = '';
-      balanceInput.value = '';
-      renderLists();
-      autoSave();
-      showToast('تمت إضافة الحساب المالي بنجاح 💳');
+      window.appState.wallets.push({ name, balance });
+      document.getElementById('newWalletName').value = '';
+      document.getElementById('newWalletBalance').value = '';
+      renderLists(); autoSave(); showToast('تمت إضافة الحساب بنجاح 💳');
     };
+    window.removeWallet = i => { window.appState.wallets.splice(i, 1); renderLists(); autoSave(); };
 
-    window.removeWallet = (i) => {
-      window.appState.wallets.splice(i, 1);
-      renderLists();
-      autoSave();
-      showToast('تم حذف الحساب');
+    window.addSubscription = () => {
+      const name = document.getElementById('newSubName').value.trim();
+      const cost = parseFloat(document.getElementById('newSubCost').value) || 0;
+      if(!name) return showToast('أدخل اسم الاشتراك');
+      if(!window.appState.subscriptions) window.appState.subscriptions = [];
+      window.appState.subscriptions.push({ name, cost });
+      document.getElementById('newSubName').value = '';
+      document.getElementById('newSubCost').value = '';
+      renderLists(); autoSave(); showToast('تمت إضافة الاشتراك ⚙️');
+    };
+    window.removeSubscription = i => { window.appState.subscriptions.splice(i, 1); renderLists(); autoSave(); };
+
+    window.addLiability = () => {
+      const name = document.getElementById('newLiabilityName').value.trim();
+      const cost = parseFloat(document.getElementById('newLiabilityCost').value) || 0;
+      if(!name) return showToast('أدخل اسم الالتزام');
+      if(!window.appState.liabilities) window.appState.liabilities = [];
+      window.appState.liabilities.push({ name, cost });
+      document.getElementById('newLiabilityName').value = '';
+      document.getElementById('newLiabilityCost').value = '';
+      renderLists(); autoSave(); showToast('تمت إضافة الالتزام 📝');
+    };
+    window.removeLiability = i => { window.appState.liabilities.splice(i, 1); renderLists(); autoSave(); };
+
+    window.addIdea = () => {
+      const text = document.getElementById('newIdeaText').value.trim();
+      if(!text) return showToast('أدخل فكرة المشروع');
+      if(!window.appState.ideasVault) window.appState.ideasVault = [];
+      window.appState.ideasVault.push({ text });
+      document.getElementById('newIdeaText').value = '';
+      renderLists(); autoSave(); showToast('تمت إضافة الفكرة للسجل 💡');
+    };
+    window.removeIdea = i => { window.appState.ideasVault.splice(i, 1); renderLists(); autoSave(); };
+
+    // حاسبة التوزيع الذكية
+    window.calculateDistribution = () => {
+      const income = parseFloat(document.getElementById('totalIncomeInput')?.value) || 1000;
+      const t1 = income * 0.10; // التزامات
+      const t2 = income * 0.25; // معيشة
+      const t3 = income * 0.25; // أعمال
+      const t4 = income * 0.30; // استثمار
+      const t5 = income * 0.10; // صدقات
+      
+      const container = document.getElementById('distributionResults');
+      if(container) {
+        container.innerHTML = `
+          <div style="background:var(--bg-card); padding:12px; border-radius:10px; border:1px solid var(--border-color); text-align:center;">
+            <div style="font-size:0.78rem; color:var(--text-secondary);">التزامات (10%)</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--accent-color);">${t1} ر.س</div>
+          </div>
+          <div style="background:var(--bg-card); padding:12px; border-radius:10px; border:1px solid var(--border-color); text-align:center;">
+            <div style="font-size:0.78rem; color:var(--text-secondary);">معيشة (25%)</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--accent-color);">${t2} ر.س</div>
+          </div>
+          <div style="background:var(--bg-card); padding:12px; border-radius:10px; border:1px solid var(--border-color); text-align:center;">
+            <div style="font-size:0.78rem; color:var(--text-secondary);">أعمال (25%)</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--accent-color);">${t3} ر.س</div>
+          </div>
+          <div style="background:var(--bg-card); padding:12px; border-radius:10px; border:1px solid var(--border-color); text-align:center;">
+            <div style="font-size:0.78rem; color:var(--text-secondary);">استثمار (30%)</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--accent-color);">${t4} ر.س</div>
+          </div>
+          <div style="background:var(--bg-card); padding:12px; border-radius:10px; border:1px solid var(--border-color); text-align:center;">
+            <div style="font-size:0.78rem; color:var(--text-secondary);">صدقات (10%)</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--accent-color);">${t5} ر.س</div>
+          </div>
+        `;
+      }
     };
 
     window.setTheme = (name, btn) => {
