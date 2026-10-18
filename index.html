@@ -93,6 +93,7 @@
     .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow-sm); }
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
     .card-title { font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .card-subtitle { font-size: 0.82rem; color: var(--text-secondary); }
     .col-6 { grid-column: span 6; }
     .col-12 { grid-column: span 12; }
     @media (max-width: 900px) { .col-6 { grid-column: span 12; } }
@@ -218,17 +219,17 @@
         </div>
       </div>
 
-      <!-- 4. الحسابات والمحافظ البنكية (إدارة البنوك والمحافظ وإضافتها بحرية) -->
+      <!-- 4. الحسابات والمحافظ البنكية (إدارة وتعديل وإضافة المحافظ والبنوك) -->
       <div id="widget-finance" class="card col-12">
         <div class="card-header">
           <span class="card-title">💳 الحسابات والمحافظ المالية</span>
-          <span class="card-subtitle">إدارة وتعديل الأرصدة والبنوك</span>
+          <span class="card-subtitle">إدارة وتعديل الأرصدة والبنوك والمحافظ بحرية</span>
         </div>
         <ul id="walletsList" class="item-list"></ul>
         <div class="add-row">
           <input type="text" id="newWalletName" placeholder="اسم البنك أو المحفظة (مثال: الراجحي، STC Pay)..." style="flex: 2;">
-          <input type="number" id="newWalletBalance" placeholder="الرصد (ر.س)" style="flex: 1;">
-          <button class="btn btn-primary" onclick="addWallet()">+ إضافة محفظة</button>
+          <input type="number" id="newWalletBalance" placeholder="الرصيد (ر.س)" style="flex: 1;">
+          <button class="btn btn-primary" onclick="addWallet()">+ إضافة حساب/محفظة</button>
         </div>
       </div>
 
@@ -436,7 +437,7 @@
           <button class="delete-btn" onclick="window.appState.tasks.splice(${i},1); renderLists(); autoSave()">&times;</button>
         </li>`).join('');
 
-      // المحافظ والبنوك المالية
+      // الحسابات والمحافظ البنكية (إضافة وتعديل وحذف بحرية)
       const walletsList = document.getElementById('walletsList');
       if (!window.appState.wallets || window.appState.wallets.length === 0) {
         walletsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد حسابات أو محافظ مضافة. ابدأ بإضافة محفظتك أو بنكك.</div>`;
@@ -464,7 +465,7 @@
     window.addHabit = () => { const i = document.getElementById('newHabitInput'); if(!i.value)return; window.appState.habits.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
     window.addTask = () => { const i = document.getElementById('newTaskInput'); if(!i.value)return; window.appState.tasks.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
 
-    // إضافة محفظة أو بنك جديد
+    // إضافة محفظة أو بنك جديد بحرية
     window.addWallet = () => {
       const nameInput = document.getElementById('newWalletName');
       const balanceInput = document.getElementById('newWalletBalance');
@@ -478,14 +479,14 @@
       balanceInput.value = '';
       renderLists();
       autoSave();
-      showToast('تمت إضافة الحساب المالي بنجاح 💳', '💳');
+      showToast('تمت إضافة الحساب المالي بنجاح 💳');
     };
 
     window.removeWallet = (i) => {
       window.appState.wallets.splice(i, 1);
       renderLists();
       autoSave();
-      showToast('تم حذف الحساب', '🗑️');
+      showToast('تم حذف الحساب');
     };
 
     window.setTheme = (name, btn) => {
