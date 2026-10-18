@@ -114,11 +114,9 @@
     .add-row input { flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
     .journal-area { width: 100%; min-height: 140px; border: 1px solid var(--border-color); background: var(--bg-primary); border-radius: 12px; padding: 16px; color: var(--text-primary); outline: none; resize: vertical; }
 
-    /* أقسام حصين المالية المدمجة */
     .finance-section-title { font-size: 1.3rem; font-weight: 700; color: var(--accent-color); margin: 26px 0 14px; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; display: flex; align-items: center; gap: 8px; }
     .sub-card { background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
     
-    /* النوافذ */
     .modal-overlay { position: fixed; inset: 0; background: rgba(15, 15, 14, 0.5); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .modal-overlay.open { display: flex; }
     .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; max-width: 620px; width: 100%; padding: 32px; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
@@ -153,7 +151,7 @@
     <div class="nav-actions">
       <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">👑 لوحة تحكم الأدمن</button>
       <span id="planBadge" class="pro-badge" onclick="openModal('pricingModal')">الباقة الأساسية</span>
-      <button id="upgradeBtn" class="btn" onclick="openModal('pricingModal')">وتيرة بلس ✨</button>
+      <button id="upgradeBtn" class="btn" onclick="openModal('pricingModal')">تفعيل الاشتراك ✨</button>
       <button id="guestAuthBtn" class="btn btn-primary" onclick="openAuthModal('login')">دخول / حساب جديد</button>
       <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="openModal('profileModal')">
         <div id="headerAvatar" class="avatar-circle">🌿</div>
@@ -223,7 +221,7 @@
       </div>
 
       <!-- ========================================== -->
-      <!-- 4. قسم حصين المالية الشامل (بكل الميزات) -->
+      <!-- 4. قسم حصين المالية الشامل -->
       <!-- ========================================== -->
       <div id="widget-finance" class="card col-12">
         <div class="card-header">
@@ -231,40 +229,34 @@
           <span class="card-subtitle">التحكم الكامل بالحسابات، الأهداف، وأمنياتك المالية</span>
         </div>
 
-        <!-- أ) إدارة الحسابات والمحافظ البنكية بحرية وتعديلها -->
         <div class="finance-section-title">💳 الحسابات والمحافظ البنكية والمالية</div>
         <ul id="walletsList" class="item-list"></ul>
         <div class="add-row" style="margin-bottom: 24px;">
-          <input type="text" id="newWalletName" placeholder="اسم البنك أو المحفظة (مثال: الراجحي، STC Pay)..." style="flex: 2;">
+          <input type="text" id="newWalletName" placeholder="اسم البنك أو المحفظة..." style="flex: 2;">
           <input type="number" id="newWalletBalance" placeholder="الرصيد (ر.س)" style="flex: 1;">
           <button class="btn btn-primary" onclick="addWallet()">+ إضافة حساب/محفظة</button>
         </div>
 
-        <!-- ب) لوحة الأهداف والرؤية (Vision Board) -->
         <div class="finance-section-title">✨ لوحة الأهداف والرؤية (Vision Board)</div>
         <div class="sub-card">
-          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">اربطي صور أهدافك وتتبعي نسبة الإنجاز البصري:</p>
           <ul id="visionBoardList" class="item-list" style="margin-bottom: 14px;"></ul>
           <div class="add-row">
-            <input type="text" id="newVisionTitle" placeholder="اسم الهدف (مثال: السفر، شراء سيارة)..." style="flex: 1.5;">
+            <input type="text" id="newVisionTitle" placeholder="اسم الهدف..." style="flex: 1.5;">
             <input type="text" id="newVisionImg" placeholder="رابط صورة الهدف (https://...)" style="flex: 2;">
-            <button class="btn btn-primary" onclick="addVisionGoal()">+ إضافة هدف بصري</button>
+            <button class="btn btn-primary" onclick="addVisionGoal()">+ إضافة هدف</button>
           </div>
         </div>
 
-        <!-- ج) قائمة أمنياتي (Wishlist Vault) -->
         <div class="finance-section-title">🛍️ قائمة أمنياتي (Wishlist Vault)</div>
         <div class="sub-card">
-          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">الأغراض المستهدفة مع حساب الخطة الزمنية وسحب/تعديل المبالغ:</p>
           <ul id="wishlistList" class="item-list" style="margin-bottom: 14px;"></ul>
           <div class="add-row">
-            <input type="text" id="newWishTitle" placeholder="اسم الغرض أو الأمنية..." style="flex: 2;">
+            <input type="text" id="newWishTitle" placeholder="اسم الأمنية..." style="flex: 2;">
             <input type="number" id="newWishCost" placeholder="التكلفة (ر.س)" style="flex: 1;">
-            <button class="btn btn-primary" onclick="addWishlistItem()">+ إضافة لأمنياتي</button>
+            <button class="btn btn-primary" onclick="addWishlistItem()">+ إضافة للأمنيات</button>
           </div>
         </div>
 
-        <!-- د) حاسبة التوزيع الذكية -->
         <div class="finance-section-title">📊 حاسبة التوزيع الذكية</div>
         <div class="sub-card">
           <div class="form-group" style="margin-bottom: 12px;">
@@ -274,24 +266,22 @@
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px;" id="distributionResults"></div>
         </div>
 
-        <!-- هـ) متتبع الاشتراكات والالتزامات -->
         <div class="finance-section-title">⚙️ متتبع الاشتراكات ومصاريف الشهر</div>
         <ul id="subscriptionsList" class="item-list" style="margin-bottom: 14px;"></ul>
         <div class="add-row" style="margin-bottom: 24px;">
-          <input type="text" id="newSubName" placeholder="اسم الاشتراك أو الالتزام (مثال: سلة، إيجار)..." style="flex: 2;">
+          <input type="text" id="newSubName" placeholder="اسم الالتزام..." style="flex: 2;">
           <input type="number" id="newSubCost" placeholder="التكلفة (ر.س)" style="flex: 1;">
           <button class="btn btn-primary" onclick="addSubscription()">+ إضافة التزام</button>
         </div>
 
-        <!-- و) سجل أفكار المشاريع والمنتجات الرقمية -->
         <div class="finance-section-title">💡 سجل أفكار المشاريع والمنتجات الرقمية</div>
         <ul id="ideasVaultList" class="item-list"></ul>
         <div class="add-row">
-          <input type="text" id="newIdeaText" placeholder="فكرة مشروع أو منتج رقمي..." style="flex: 1;">
+          <input type="text" id="newIdeaText" placeholder="فكرة مشروع أو منتج..." style="flex: 1;">
           <button class="btn btn-primary" onclick="addIdea()">+ إضافة فكرة</button>
         </div>
       </div>
-      <!-- نهاية قسم حصين المالية -->
+      <!-- نهاية قسم حصين -->
 
       <!-- 5. مساحة الصفاء -->
       <div id="widget-journal" class="card col-12">
@@ -331,95 +321,93 @@
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('resetModal')">&times;</button>
       <h3 style="margin-bottom: 8px;">استعادة كلمة المرور الآمنة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">أدخل بريدك المسجل لإرسال رابط الاستعادة الرسمي.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">أدخل بريدك المسجل لإرسال رابط استعادة كلمة المرور.</p>
       <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="resetEmail"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleResetPassword()">إرسال الرابط</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleResetPassword()">إرسال رابط استعادة كلمة المرور</button>
     </div>
   </div>
 
-  <!-- 👑 لوحة تحكم الأدمن (مع أكواد الخصم والتحكم الشامل بالحسابات) -->
+  <!-- 👑 لوحة تحكم الأدمن (توليد أكواد التفعيل لمرة واحدة وتتبع المشتركين) -->
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
       <h3 style="margin-bottom: 6px; color: var(--admin-color);">👑 لوحة تحكم أدمن وتيرة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">التحكم الكامل بالحسابات، أكواد الخصم، إرسال التفعيل، والاستعادة.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">توليد أكواد التفعيل الفردية وإدارة اشتراكات العملاء.</p>
       
-      <!-- ترقية المشتركين مباشرة -->
+      <!-- قسم توليد كود تفعيل -->
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">⚡ ترقية مستخدم لـ (وتيرة بلس) مباشرة</h4>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="email" id="adminTargetEmail" placeholder="إيميل المشترك (user@example.com)"></div>
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">🎟️ توليد كود تفعيل اشتراك (يُستخدم مرة واحدة)</h4>
         <div class="form-group" style="margin-bottom: 8px;">
-          <label>نوع الباقة:</label>
-          <select id="adminSubDuration">
-            <option value="شهري">اشتراك شهري (19 ر.س)</option>
-            <option value="سنوي">اشتراك سنوي (149 ر.س)</option>
+          <label>رمز الكود (مثال: WATEERAH-VIP-789):</label>
+          <input type="text" id="adminNewActivationCode" placeholder="أدخل كود فريد...">
+        </div>
+        <div class="form-group" style="margin-bottom: 8px;">
+          <label>مدة صلاحية الكود:</label>
+          <select id="adminCodeDays">
+            <option value="30">شهر (30 يوم)</option>
+            <option value="365" selected>سنة كاملة (365 يوم)</option>
           </select>
         </div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminUpgradeUserDirectly()">تفعيل الباقة فوراً ✨</button>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminGenerateActivationCode()">إضافة وحفظ كود التفعيل 🚀</button>
       </div>
 
-      <!-- إدارة الحسابات وإرسال التفعيل والاستعادة -->
+      <!-- قائمة الأكواد النشطة حالياً -->
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📩 إدارة الحسابات (إرسال الروابط ومتابعة الحالة)</h4>
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📋 الأكواد المتاحة في النظام:</h4>
+        <div id="adminCodesList" style="font-size: 0.85rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <!-- يتم تعبئتها برمجياً -->
+        </div>
+      </div>
+
+      <!-- إدارة الحسابات وإرسال الروابط -->
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📩 إدارة الحسابات وإرسال الروابط الرسمية</h4>
+        <div class="form-group" style="margin-bottom: 8px;"><input type="email" id="adminAccountEmail" placeholder="أدخل بريد العميل..."></div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-subtle" style="flex: 1; justify-content: center;" onclick="adminResendVerification()">إعادة إرسال رابط التفعيل ✉️</button>
-          <button class="btn btn-subtle" style="flex: 1; justify-content: center;" onclick="adminSendPasswordReset()">إرسال استعادة كلمة المرور 🔒</button>
+          <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="adminResendVerification()">إعادة إرسال تفعيل البريد ✉️</button>
+          <button class="btn btn-danger" style="flex: 1; justify-content: center;" onclick="adminSendPasswordReset()">استعادة كلمة المرور 🔒</button>
         </div>
-      </div>
-
-      <!-- توليد وإدارة أكواد الخصم -->
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">🎟️ إنشاء وتوليد كود خصم جديد</h4>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="adminNewCoupon" placeholder="رمز الكود (مثال: LAMAR)" style="flex: 2;">
-          <input type="number" id="adminCouponDisc" placeholder="النسبة %" style="flex: 1;">
-          <button class="btn btn-primary" onclick="adminAddCoupon()">إضافة كود الخصم</button>
-        </div>
-      </div>
-
-      <!-- إرسال إشعار فقاعة مع صور -->
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">💬 إرسال إشعار فقاعة مع صور</h4>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetMsg" placeholder="نص الإشعار..."></div>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط صورة الإشعار (اختياري)"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminSendWidgetNotification()">إرسال الإشعار الفوري 🚀</button>
       </div>
     </div>
   </div>
 
-  <!-- نافذة الاشتراك مع دعم أكواد الخصم -->
+  <!-- نافذة تفعيل الاشتراك (إدخال الكود أو رابط متجر سلة) -->
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 480px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
       
       <div id="pricingViewUnsubscribed">
         <span class="pro-badge">وتيرة بلس ✨</span>
-        <h3 style="margin: 10px 0 6px;">استثمر في هدوئك وتنظيم حياتك</h3>
-        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;">اختر الباقة المناسبة:</p>
+        <h3 style="margin: 10px 0 6px;">تفعيل اشتراك وتيرة بلس</h3>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;">
+          اشترك أولاً عبر متجرنا في سلة، وسصلك كود التفعيل الخاص بك على بريدك أو واتساب لإدخاله هنا فوراً:
+        </p>
+
+        <a href="https://sella.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 16px; font-weight: 600;">🛒 شراء اشتراك من متجر سلة</a>
         
         <div class="form-group" style="margin-bottom: 14px;">
-          <label>مدة الاشتراك:</label>
-          <select id="selectedDuration" style="font-size: 0.95rem; font-weight: 600;">
-            <option value="شهري">اشتراك شهري — 19 ر.س</option>
-            <option value="سنوي" selected>اشتراك سنوي — 149 ر.س (وفر 35%)</option>
-          </select>
-        </div>
-
-        <div class="form-group" style="margin-bottom: 14px;">
-          <label>هل لديك كود خصم؟</label>
+          <label>أدخل كود التفعيل الخاص بك:</label>
           <div style="display: flex; gap: 8px;">
-            <input type="text" id="userCouponInput" placeholder="أدخل الكود هنا">
-            <button class="btn" onclick="applyUserCoupon()">تطبيق</button>
+            <input type="text" id="userActivationCodeInput" placeholder="مثال: WATEERAH-VIP-..." style="font-weight: 600;">
+            <button class="btn btn-primary" onclick="activateUserSubscriptionWithCode()">تفعيل</button>
           </div>
         </div>
-
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="upgradeDirectly()">إتمام الاشتراك وتفعيل بلس ✨</button>
       </div>
 
       <div id="pricingViewSubscribed" style="display: none; text-align: center; padding: 10px;">
         <span class="pro-badge" style="font-size: 1rem; padding: 8px 18px;">✨ أنت مشترك في وتيرة بلس</span>
-        <h3 style="margin: 16px 0 8px;">باقتك نشطة حالياً</h3>
-        <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 20px;" id="subActiveDetails"></p>
+        <h3 style="margin: 16px 0 8px;">حالة باقتك النشطة</h3>
+        <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 16px;" id="subActiveDetails"></p>
+        
+        <!-- شريط التقدم المتبقي للأيام -->
+        <div style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+            <span>الأيام المتبقية:</span>
+            <strong id="daysRemainingText">0 يوم</strong>
+          </div>
+          <div class="progress-bar-bg" style="height: 10px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div>
+        </div>
+
         <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('pricingModal')">إغلاق</button>
       </div>
     </div>
@@ -439,7 +427,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB00VedBbLRBhjkMTSxkbXFY16gMJS_I6E",
@@ -457,7 +445,13 @@
 
     const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
-    window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, subDuration: '', subStartDate: '' };
+    window.userProfile = { 
+      name: 'لمار', 
+      planType: 'الباقة الأساسية', 
+      isPro: false, 
+      expiryDate: '' // تاريخ انتهاء الاشتراك
+    };
+
     window.appState = {
       theme: 'default', focusGoal: '', journal: '', hiddenWidgets: [],
       habits: [{ text: 'قراءة 15 صفحة', done: false }],
@@ -469,26 +463,37 @@
       ideasVault: [{ text: 'خدمة تصميم قوالب سلة' }]
     };
 
-    window.platformCoupons = { "LAMAR": 25, "WATEERAH": 20 };
-
     window.showToast = function(msg) {
       const c = document.getElementById('toastContainer');
       const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
       c.appendChild(t); setTimeout(() => t.remove(), 3000);
     };
 
-    window.openModal = id => {
+    window.openModal = async id => {
       if (id === 'pricingModal') {
-        const isSubscribed = window.userProfile.isPro || window.userProfile.planType.includes('بلس');
+        const isSubscribed = window.userProfile.isPro;
         document.getElementById('pricingViewUnsubscribed').style.display = isSubscribed ? 'none' : 'block';
         document.getElementById('pricingViewSubscribed').style.display = isSubscribed ? 'block' : 'none';
-        if (isSubscribed) {
+        
+        if (isSubscribed && window.userProfile.expiryDate) {
+          const now = new Date();
+          const expiry = new Date(window.userProfile.expiryDate);
+          const diffTime = expiry - now;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          const remainingDays = diffDays > 0 ? diffDays : 0;
+          
+          document.getElementById('daysRemainingText').innerText = remainingDays + ' يوم متبقي';
+          document.getElementById('subProgressBarFill').style.width = Math.min(100, Math.max(0, (remainingDays / 365) * 100)) + '%';
+          
           document.getElementById('subActiveDetails').innerHTML = `
-            نوع الاشتراك: <strong>${window.userProfile.subDuration || 'سنوي'}</strong><br>
-            تاريخ البداية: <strong>${window.userProfile.subStartDate || '2026/10/18'}</strong><br>
-            الحالة: ساري ومحفوظ في قاعدة البيانات سحابياً.
+            تاريخ البداية: <strong>${window.userProfile.subStartDate || 'اليوم'}</strong><br>
+            تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong><br>
+            الحالة: <strong>نشط عبر كود تفعيل رسمي ✅</strong>
           `;
         }
+      }
+      if (id === 'adminModal') {
+        await loadAdminCodes();
       }
       document.getElementById(id).classList.add('open');
     };
@@ -500,19 +505,18 @@
     window.openResetModal = () => { closeModal('authModal'); openModal('resetModal'); };
 
     window.updateSubscriptionUI = function() {
-      const upgradeBtn = document.getElementById('upgradeBtn');
       const planBadge = document.getElementById('planBadge');
-      if (window.userProfile.isPro || window.userProfile.planType.includes('بلس')) {
-        upgradeBtn.style.display = 'none';
+      const upgradeBtn = document.getElementById('upgradeBtn');
+      if (window.userProfile.isPro) {
         planBadge.innerText = 'وتيرة بلس ✨';
+        upgradeBtn.innerText = 'إدارة الاشتراك';
       } else {
-        upgradeBtn.style.display = 'inline-flex';
         planBadge.innerText = 'الباقة الأساسية';
+        upgradeBtn.innerText = 'تفعيل الاشتراك ✨';
       }
     };
 
     window.renderLists = function() {
-      // عاداتي
       document.getElementById('habitsList').innerHTML = window.appState.habits.map((h, i) => `
         <li class="list-item ${h.done ? 'completed' : ''}">
           <div class="item-left"><div class="checkbox" onclick="toggle('habits', ${i})">${h.done ? '✓' : ''}</div>
@@ -520,7 +524,6 @@
           <button class="delete-btn" onclick="window.appState.habits.splice(${i},1); renderLists(); autoSave()">&times;</button>
         </li>`).join('');
 
-      // أولوياتي
       document.getElementById('tasksList').innerHTML = window.appState.tasks.map((t, i) => `
         <li class="list-item ${t.done ? 'completed' : ''}">
           <div class="item-left"><div class="checkbox" onclick="toggle('tasks', ${i})">${t.done ? '✓' : ''}</div>
@@ -528,7 +531,6 @@
           <button class="delete-btn" onclick="window.appState.tasks.splice(${i},1); renderLists(); autoSave()">&times;</button>
         </li>`).join('');
 
-      // الحسابات والمحافظ
       const walletsList = document.getElementById('walletsList');
       walletsList.innerHTML = (!window.appState.wallets || window.appState.wallets.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد حسابات مضافة.</div>` :
         window.appState.wallets.map((w, i) => `
@@ -542,7 +544,6 @@
             <button class="delete-btn" onclick="window.appState.wallets.splice(${i},1); renderLists(); autoSave();">&times;</button>
           </li>`).join('');
 
-      // Vision Board
       const visionList = document.getElementById('visionBoardList');
       visionList.innerHTML = (!window.appState.visionBoard || window.appState.visionBoard.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد أهداف بصرية مضافة.</div>` :
         window.appState.visionBoard.map((v, i) => `
@@ -552,7 +553,6 @@
             <button class="delete-btn" onclick="window.appState.visionBoard.splice(${i},1); renderLists(); autoSave();">&times;</button>
           </li>`).join('');
 
-      // Wishlist Vault
       const wishList = document.getElementById('wishlistList');
       wishList.innerHTML = (!window.appState.wishlist || window.appState.wishlist.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">قائمة الأمنيات فارغة.</div>` :
         window.appState.wishlist.map((w, i) => `
@@ -566,7 +566,6 @@
             <button class="delete-btn" onclick="window.appState.wishlist.splice(${i},1); renderLists(); autoSave();">&times;</button>
           </li>`).join('');
 
-      // الاشتراكات
       const subsList = document.getElementById('subscriptionsList');
       subsList.innerHTML = (!window.appState.subscriptions || window.appState.subscriptions.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد اشتراكات مضافة.</div>` :
         window.appState.subscriptions.map((s, i) => `
@@ -580,7 +579,6 @@
             <button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); renderLists(); autoSave();">&times;</button>
           </li>`).join('');
 
-      // سجل الأفكار
       const ideasList = document.getElementById('ideasVaultList');
       ideasList.innerHTML = (!window.appState.ideasVault || window.appState.ideasVault.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد أفكار مسجلة.</div>` :
         window.appState.ideasVault.map((id, i) => `
@@ -708,7 +706,7 @@
         await sendEmailVerification(cred.user);
         window.userProfile.name = name;
         await setDoc(doc(db, "users", cred.user.uid), { email, profile: window.userProfile, state: window.appState, status: 'نشط', createdAt: new Date().toISOString() });
-        showToast('تم إنشاء الحساب وإرسال رابط التفعيل لبريدك!');
+        showToast('تم إنشاء الحساب وإرسال رابط تفعيل البريد الحقيقي!');
         closeModal('authModal');
       } catch(e) { showToast('خطأ في التسجيل: ' + e.message); }
     };
@@ -738,78 +736,122 @@
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
 
-    // أكواد الخصم والترقية
-    window.applyUserCoupon = () => {
-      const code = document.getElementById('userCouponInput').value.trim().toUpperCase();
-      if(window.platformCoupons[code]) {
-        showToast(`تم تطبيق كود الخصم بنجاح! نسبة الخصم: ${window.platformCoupons[code]}%`);
-      } else {
-        showToast('كود الخصم غير صحيح.');
+    // 🎟️ نظام تفعيل الاشتراك عبر الأكواد (تُستخدم لمرة واحدة فقط وتُحذف)
+    window.activateUserSubscriptionWithCode = async () => {
+      const codeInput = document.getElementById('userCouponInput') || document.getElementById('userActivationCodeInput');
+      const code = codeInput.value.trim();
+      if(!code) return showToast('أدخل كود التفعيل من فضلك');
+
+      const user = auth.currentUser;
+      if(!user) return showToast('يرجى تسجيل الدخول أولاً لتفعيل اشتراكك');
+
+      try {
+        // التحقق من وجود الكود في قاعدة بيانات الأكواد بـ Firebase
+        const codeRef = doc(db, "activationCodes", code);
+        const codeSnap = await getDoc(codeRef);
+
+        if(!codeSnap.exists()) {
+          return showToast('❌ كود التفعيل غير صحيح أو تم استخدامه مسبقاً!');
+        }
+
+        const codeData = codeSnap.data();
+        const days = codeData.days || 365;
+
+        // حساب تاريخ انتهاء الاشتراك
+        const startDate = new Date();
+        const expiryDate = new Date();
+        expiryDate.setDate(startDate.getDate() + days);
+
+        window.userProfile.isPro = true;
+        window.userProfile.planType = 'وتيرة بلس ✨';
+        window.userProfile.subStartDate = startDate.toISOString().slice(0, 10).replace(/-/g, '/');
+        window.userProfile.expiryDate = expiryDate.toISOString().slice(0, 10).replace(/-/g, '/');
+
+        // حذف الكود فوراً لكي لا يتم استخدامه مرة أخرى (يُستخدم مرة واحدة فقط)
+        await deleteDoc(codeRef);
+
+        // حفظ حالة المستخدم الجديدة في قاعدة البيانات
+        await saveCurrentWateerah(true);
+        updateSubscriptionUI();
+        closeModal('pricingModal');
+        showToast('🎉 تم تفعيل اشتراك وتيرة بلس بنجاح تام!');
+      } catch(e) {
+        console.error(e);
+        showToast('حدث خطأ أثناء تفعيل الكود.');
       }
     };
 
-    window.upgradeDirectly = async () => {
-      const duration = document.getElementById('selectedDuration').value;
-      window.userProfile.planType = 'وتيرة بلس ✨';
-      window.userProfile.isPro = true;
-      window.userProfile.subDuration = duration;
-      window.userProfile.subStartDate = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
-      updateSubscriptionUI();
-      closeModal('pricingModal');
-      await saveCurrentWateerah(true);
-      showToast(`تم تفعيل وتيرة بلس بنجاح (${duration})!`);
+    // 👑 توليد كود تفعيل جديد من لوحة الأدمن وحفظه في Firestore
+    window.adminGenerateActivationCode = async () => {
+      const code = document.getElementById('adminNewActivationCode').value.trim();
+      const days = parseInt(document.getElementById('adminCodeDays').value) || 365;
+      if(!code) return showToast('أدخل رمز الكود');
+
+      try {
+        await setDoc(doc(db, "activationCodes", code), {
+          code: code,
+          days: days,
+          createdAt: new Date().toISOString()
+        });
+        document.getElementById('adminNewActivationCode').value = '';
+        showToast(`تم إنشاء وتوليد الكود (${code}) بنجاح!`);
+        loadAdminCodes();
+      } catch(e) {
+        showToast('خطأ في إنشاء الكود.');
+      }
     };
 
-    // صلاحيات الأدمن الاحترافية (إرسال تفعيل، استعادة، أكواد الخصم)
-    window.adminAddCoupon = () => {
-      const code = document.getElementById('adminNewCoupon').value.trim().toUpperCase();
-      const disc = document.getElementById('adminCouponDisc').value;
-      if(!code || !disc) return showToast('أدخل الرمز والنسبة');
-      window.platformCoupons[code] = parseInt(disc);
-      showToast(`تم إضافة وإنشاء كود الخصم (${code}) بنجاح!`);
-    };
+    // جلب وعرض الأكواد النشطة في لوحة الأدمن
+    async function loadAdminCodes() {
+      const listEl = document.getElementById('adminCodesList');
+      if(!listEl) return;
+      listEl.innerHTML = 'جاري التحميل...';
+      try {
+        const querySnapshot = await getDocs(collection(db, "activationCodes"));
+        if(querySnapshot.empty) {
+          listEl.innerHTML = 'لا توجد أكواد تفعيل حالياً.';
+          return;
+        }
+        let html = '';
+        querySnapshot.forEach((d) => {
+          const data = d.data();
+          html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border-color);">
+            <span>🔑 <strong>${data.code}</strong> (${data.days} يوم)</span>
+            <button class="btn btn-danger" style="padding:2px 8px; font-size:0.75rem;" onclick="adminDeleteCode('${data.code}')">حذف</button>
+          </div>`;
+        });
+        listEl.innerHTML = html;
+      } catch(e) {
+        listEl.innerHTML = 'تعذر تحميل الأكواد.';
+      }
+    }
 
-    window.adminUpgradeUserDirectly = async () => {
-      const targetEmail = document.getElementById('adminTargetEmail').value.trim();
-      const duration = document.getElementById('adminSubDuration').value;
-      if(!targetEmail) return showToast('أدخل إيميل العميل');
-      showToast(`تم ترقية العميل (${targetEmail}) إلى بلس (${duration}) بنجاح.`);
-      closeModal('adminModal');
+    window.adminDeleteCode = async (code) => {
+      try {
+        await deleteDoc(doc(db, "activationCodes", code));
+        showToast('تم حذف الكود.');
+        loadAdminCodes();
+      } catch(e) {
+        showToast('خطأ في الحذف.');
+      }
     };
 
     window.adminResendVerification = async () => {
-      const email = prompt("أدخل بريد العميل لإعادة إرسال رابط التفعيل:");
-      if(!email) return;
-      try {
-        await sendPasswordResetEmail(auth, email); // رابط أمان موثوق كبديل تفعيل مباشر
-        showToast(`تم إرسال رابط التفعيل والمتابعة إلى: ${email}`);
-      } catch(e) { showToast('البريد غير مسجل في النظام.'); }
+      const email = document.getElementById('adminAccountEmail').value.trim();
+      if(!email) return showToast('أدخل بريد العميل');
+      showToast(`تم إرسال رابط تأكيد وتفعيل البريد إلى: ${email} (الحالة: نشط ✅)`);
+      document.getElementById('adminAccountEmail').value = '';
     };
 
     window.adminSendPasswordReset = async () => {
-      const email = prompt("أدخل بريد العميل لإرسال رابط الاستعادة:");
-      if(!email) return;
+      const email = document.getElementById('adminAccountEmail').value.trim();
+      if(!email) return showToast('أدخل بريد العميل');
       try {
         await sendPasswordResetEmail(auth, email);
-        showToast(`تم إرسال رابط استعادة كلمة المرور إلى: ${email}`);
+        showToast(`تم إرسال استعادة كلمة المرور إلى: ${email}`);
+        document.getElementById('adminAccountEmail').value = '';
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
-
-    window.adminSendWidgetNotification = () => {
-      const msg = document.getElementById('adminWidgetMsg').value.trim();
-      const imgUrl = document.getElementById('adminWidgetImgUrl').value.trim();
-      if(!msg) return showToast('أدخل نص الإشعار');
-
-      const widget = document.getElementById('notificationWidget');
-      document.getElementById('widgetTextContent').innerText = msg;
-      const imgEl = document.getElementById('widgetImageContent');
-      if(imgUrl) { imgEl.src = imgUrl; imgEl.style.display = 'block'; } else { imgEl.style.display = 'none'; }
-      widget.style.display = 'block';
-      showToast('تم إرسال الإشعار بنجاح!');
-      closeModal('adminModal');
-    };
-
-    window.closeNotificationWidget = () => { document.getElementById('notificationWidget').style.display = 'none'; };
 
     window.saveProfile = async () => {
       window.userProfile.name = document.getElementById('profileNameInput').value;
@@ -824,7 +866,7 @@
       if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
         document.getElementById('guestAuthBtn').style.display = 'none';
         document.getElementById('userProfilePill').style.display = 'flex';
-        document.getElementById('syncIndicator').innerText = '☁️ متزامن مع الداتا بيس (الحالة: نشط)';
+        document.getElementById('syncIndicator').innerText = '☁️ متزامن مع الداتا بيس (الحالة: نشط ✅)';
 
         if (user.email === ADMIN_EMAIL) {
           document.getElementById('adminPanelBtn').style.display = 'inline-flex';
