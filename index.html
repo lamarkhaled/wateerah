@@ -61,6 +61,7 @@
     .profile-pill { display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 8px; border-radius: 100px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; }
     .avatar-circle { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 600; }
 
+    /* فقاعة الإشعارات (فكرة تطبيق بابل) */
     #notificationWidget {
       position: fixed; bottom: 24px; right: 24px; max-width: 320px;
       background: var(--bg-card); border: 1px solid var(--border-color);
@@ -118,12 +119,12 @@
     
     .modal-overlay { position: fixed; inset: 0; background: rgba(15, 15, 14, 0.5); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .modal-overlay.open { display: flex; }
-    .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; max-width: 620px; width: 100%; padding: 32px; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+    .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; max-width: 650px; width: 100%; padding: 32px; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
     .modal-close { position: absolute; top: 22px; left: 22px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg-subtle); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 0.83rem; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
-    .form-group input, .form-group select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
 
     #toastContainer { position: fixed; bottom: 24px; left: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
     .toast { background: var(--text-primary); color: var(--bg-primary); padding: 12px 20px; border-radius: 12px; font-size: 0.88rem; box-shadow: var(--shadow-lg); }
@@ -132,10 +133,10 @@
 </head>
 <body>
 
-  <!-- فقاعة الإشعارات العائمة -->
+  <!-- فقاعة الإشعارات العائمة (بابل) -->
   <div id="notificationWidget">
     <button class="widget-close" onclick="closeNotificationWidget()">&times;</button>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--admin-color); margin-bottom: 4px;">📌 إشعار إداري من وتيرة</div>
+    <div style="font-size: 0.8rem; font-weight: 700; color: var(--admin-color); margin-bottom: 4px;">📌 إشعار إداري</div>
     <p id="widgetTextContent" style="font-size: 0.9rem; color: var(--text-primary); line-height: 1.5;"></p>
     <img id="widgetImageContent" class="widget-img" src="" alt="صورة الإشعار">
   </div>
@@ -193,13 +194,11 @@
     </section>
 
     <div class="bento-grid">
-      <!-- 1. البوصلة اليومية -->
       <div id="widget-focus" class="card col-12">
         <div class="card-header"><span class="card-title">🧭 بوصلة اليوم</span></div>
         <input type="text" id="focusGoalInput" class="focus-input" placeholder="اكتب تركيزك الأساسي..." oninput="autoSave()">
       </div>
 
-      <!-- 2. عاداتي اليومية -->
       <div id="widget-habits" class="card col-6">
         <div class="card-header"><span class="card-title">🌱 عاداتي اليومية</span></div>
         <ul id="habitsList" class="item-list"></ul>
@@ -209,7 +208,6 @@
         </div>
       </div>
 
-      <!-- 3. أولويات اليوم -->
       <div id="widget-tasks" class="card col-6">
         <div class="card-header"><span class="card-title">⚡ أولويات اليوم</span></div>
         <ul id="tasksList" class="item-list"></ul>
@@ -219,9 +217,6 @@
         </div>
       </div>
 
-      <!-- ========================================== -->
-      <!-- 4. قسم حصين المالية الشامل -->
-      <!-- ========================================== -->
       <div id="widget-finance" class="card col-12">
         <div class="card-header">
           <span class="card-title" style="font-size: 1.3rem; color: var(--accent-color);">💰 حصين المالية (المحافظ، Vision Board، و Wishlist)</span>
@@ -280,9 +275,7 @@
           <button class="btn btn-primary" onclick="addIdea()">+ إضافة فكرة</button>
         </div>
       </div>
-      <!-- نهاية قسم حصين -->
 
-      <!-- 5. مساحة الصفاء -->
       <div id="widget-journal" class="card col-12">
         <div class="card-header"><span class="card-title">✒️ مساحة الصفاء</span></div>
         <textarea id="journalText" class="journal-area" placeholder="فرّغ أفكارك هنا..." oninput="autoSave()"></textarea>
@@ -305,7 +298,7 @@
         </div>
       </div>
       <div id="viewRegister" style="display: none;">
-        <h3 style="margin-bottom: 16px;">انضم إلى منصة وتيرة (تحصل على يومين تجربة مجانية ✨)</h3>
+        <h3 style="margin-bottom: 16px;">انضم إلى وتيرة (تحصل على يومين تجربة مجانية تلقائياً ✨)</h3>
         <div class="form-group"><label>الاسم المعروض</label><input type="text" id="regName"></div>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="regEmail"></div>
         <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div>
@@ -320,7 +313,7 @@
     <div class="modal-box" style="text-align: center; max-width: 440px;">
       <h3 style="margin-bottom: 12px; color: var(--danger-color);">⚠️ بريدك الإلكتروني غير مفعل</h3>
       <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
-        عذراً، يرجى تفعيل بريدك الإلكتروني أولاً لتتمكن من الدخول. شيك على صندوق الوارد أو الـ Spam، أو اضغط أدناه لإعادة إرسال الرابط.
+        يرجى تفعيل بريدك الإلكتروني أولاً لتتمكن من الدخول. شيك على صندوق الوارد أو الـ Spam، أو اضغط أدناه لإعادة إرسال الرابط.
       </p>
       <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px; padding: 12px;" onclick="resendVerificationEmailDirectly()">إعادة إرسال رابط التفعيل الآن ✉️</button>
       <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('verificationNoticeModal')">إغلاق</button>
@@ -332,35 +325,59 @@
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('resetModal')">&times;</button>
       <h3 style="margin-bottom: 8px;">استعادة كلمة المرور الآمنة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">أدخل بريدك المسجل لإرسال رابط استعادة كلمة المرور.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">أدخل بريدك المسجل لإرسال رابط الاستعادة.</p>
       <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="resetEmail"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleResetPassword()">إرسال رابط استعادة كلمة المرور</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleResetPassword()">إرسال الرابط</button>
     </div>
   </div>
 
-  <!-- 👑 لوحة تحكم الأدمن (مع تحديد الأيام بحرية للأكواد) -->
+  <!-- 👑 لوحة تحكم الأدمن (مع إدارة المشتركين وإرسال إشعارات بابل للكل أو لشخص معين) -->
   <div id="adminModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 620px;">
+    <div class="modal-box" style="max-width: 650px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
       <h3 style="margin-bottom: 6px; color: var(--admin-color);">👑 لوحة تحكم أدمن وتيرة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">توليد أكواد التفعيل وتحديد مدتها بالريال أو الأيام.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">إدارة المشتركين، الأكواد، وإرسال إشعارات فوريّة للعملاء.</p>
       
+      <!-- أ) قسم إرسال الإشعارات (فكرة تطبيق بابل مع تحديد المدة والهدف) -->
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">🎟️ توليد كود تفعيل وتحديد عدد الأيام بحرية</h4>
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">💬 إرسال إشعار فقاعة (بابل) للعملاء</h4>
         <div class="form-group" style="margin-bottom: 8px;">
-          <label>رمز الكود (مثال: LAMAR-PRO-90):</label>
-          <input type="text" id="adminNewActivationCode" placeholder="أدخل الكود...">
+          <label>إرسال إلى:</label>
+          <select id="adminNotifTarget">
+            <option value="ALL">جميع المشتركين (الكل)</option>
+            <option value="SPECIFIC">مستخدم معين (بالإيميل)</option>
+          </select>
         </div>
-        <div class="form-group" style="margin-bottom: 8px;">
-          <label>حدد مدة الأيام لهذا الكود:</label>
-          <input type="number" id="adminCodeCustomDays" value="365" placeholder="عدد الأيام (مثال: 30، 90، 365)">
+        <div class="form-group" style="margin-bottom: 8px;" id="adminSpecificEmailBox" style="display:none;">
+          <input type="email" id="adminTargetUserEmail" placeholder="إيميل المستخدم المستهدف...">
         </div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminGenerateActivationCode()">إضافة وحفظ الكود 🚀</button>
+        <div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الإشعار..."></textarea></div>
+        <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط صورة الإشعار (اختياري https://...)"></div>
+        <div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="مدة الظهور (بالدقائق قبل الاختفاء التلقائي)"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminSendBubbleNotification()">إرسال الإشعار الآن 🚀</button>
       </div>
 
+      <!-- ب) قائمة المستخدمين المسجلين وإدارتهم -->
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📋 الأكواد المتاحة في النظام:</h4>
-        <div id="adminCodesList" style="font-size: 0.85rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">👥 قائمة المستخدمين المسجلين في النظام</h4>
+        <div id="adminUsersList" style="font-size: 0.85rem; max-height: 150px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+          جاري التحميل...
+        </div>
+      </div>
+
+      <!-- ج) قسم توليد كود تفعيل -->
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">🎟️ توليد كود تفعيل اشتراك (يُستخدم مرة واحدة)</h4>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;">
+          <input type="number" id="adminCodeCustomDays" value="365" placeholder="عدد الأيام" style="flex:1;">
+        </div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminGenerateActivationCode()">إضافة كود التفعيل 🚀</button>
+      </div>
+
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📋 الأكواد المتاحة:</h4>
+        <div id="adminCodesList" style="font-size: 0.85rem; max-height: 100px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
           جاري التحميل...
         </div>
       </div>
@@ -441,7 +458,7 @@
     const ADMIN_EMAIL = "wateerahapp@gmail.com";
     let unverifiedUserObject = null;
 
-    window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '' };
+    window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', trialUsed: false };
     window.appState = {
       theme: 'default', focusGoal: '', journal: '', hiddenWidgets: [],
       habits: [{ text: 'قراءة 15 صفحة', done: false }],
@@ -476,12 +493,16 @@
           document.getElementById('subProgressBarFill').style.width = Math.min(100, Math.max(0, (remainingDays / 365) * 100)) + '%';
           
           document.getElementById('subActiveDetails').innerHTML = `
+            نوع الباقة: <strong>${window.userProfile.planType}</strong><br>
             تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong><br>
             الحالة: <strong>نشط ✨</strong>
           `;
         }
       }
-      if (id === 'adminModal') { await loadAdminCodes(); }
+      if (id === 'adminModal') { 
+        await loadAdminCodes(); 
+        await loadAdminUsers();
+      }
       document.getElementById(id).classList.add('open');
     };
     window.closeModal = id => document.getElementById(id).classList.remove('open');
@@ -493,24 +514,23 @@
 
     window.updateSubscriptionUI = function() {
       const planBadge = document.getElementById('planBadge');
-      const upgradeBtn = document.getElementById('upgradeBtn');
+      const upgradeBtn =/span/ ? document.getElementById('upgradeBtn') : null;
       
-      // التحقق من انتهاء صلاحية الاشتراك أو التجربة المجانية تلقائياً
       if (window.userProfile.isPro && window.userProfile.expiryDate) {
         const now = new Date();
         const expiry = new Date(window.userProfile.expiryDate);
-        if (now > expiry && window.userProfile.expiryDate !== 'دائم') {
+        if (now > expiry) {
           window.userProfile.isPro = false;
           window.userProfile.planType = 'الباقة الأساسية';
         }
       }
 
       if (window.userProfile.isPro) {
-        planBadge.innerText = 'وتيرة بلس ✨';
-        upgradeBtn.innerText = 'إدارة الاشتراك';
+        planBadge.innerText = window.userProfile.planType || 'وتيرة بلس ✨';
+        if(upgradeBtn) upgradeBtn.innerText = 'إدارة الاشتراك';
       } else {
         planBadge.innerText = 'الباقة الأساسية';
-        upgradeBtn.innerText = 'تفعيل الاشتراك ✨';
+        if(upgradeBtn) upgradeBtn.innerText = 'تفعيل الاشتراك ✨';
       }
     };
 
@@ -695,7 +715,7 @@
       } catch(err) { console.error(err); }
     };
 
-    // 🎁 منح يومين تجربة مجانية تلقائياً عند التسجيل الجديد
+    // 🎁 منح يومين تجربة مجانية لمرة واحدة فقط لكل حساب جديد
     window.handleRegister = async () => {
       const name = document.getElementById('regName').value;
       const email = document.getElementById('regEmail').value;
@@ -705,11 +725,12 @@
         await sendEmailVerification(cred.user);
         
         window.userProfile.name = name;
-        window.userProfile.isPro = true; // تفعيل بلس تلقائياً للتجربة
-        window.userProfile.planType = 'تجربة مجانية ✨';
+        window.userProfile.isPro = true;
+        window.userProfile.planType = 'تجربة مجانية (يومين) ✨';
+        window.userProfile.trialUsed = true; // تم استهلاك التجربة
         
         const trialExpiry = new Date();
-        trialExpiry.setDate(trialExpiry.getDate() + 2); // إضافة يومين بالضبط
+        trialExpiry.setDate(trialExpiry.getDate() + 2); // يومين بالضبط
         window.userProfile.expiryDate = trialExpiry.toISOString().slice(0, 10).replace(/-/g, '/');
 
         await setDoc(doc(db, "users", cred.user.uid), { 
@@ -720,7 +741,7 @@
           createdAt: new Date().toISOString() 
         });
 
-        showToast('🎉 أهلاً بك! تم منحك يومين تجربة مجانية وإرسال رابط تفعيل البريد.');
+        showToast('🎉 تم إنشاء حسابك ومنحك يومين تجربة مجانية!');
         closeModal('authModal');
       } catch(e) { showToast('خطأ في التسجيل: ' + e.message); }
     };
@@ -765,7 +786,7 @@
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
 
-    // 🎟️ تفعيل كود الاشتراك وتحديد مدته بالأيام التي حددها الأدمن
+    // 🎟️ تفعيل كود الاشتراك باليوم المحدّد من الأدمن
     window.activateUserSubscriptionWithCode = async () => {
       const codeInput = document.getElementById('userActivationCodeInput');
       const code = codeInput ? codeInput.value.trim() : '';
@@ -805,7 +826,7 @@
       }
     };
 
-    // 👑 توليد الكود من الأدمن وتحديد عدد الأيام بحرية
+    // 👑 الأدمن: توليد كود وتحديد الأيام بحرية
     window.adminGenerateActivationCode = async () => {
       const code = document.getElementById('adminNewActivationCode').value.trim();
       const days = parseInt(document.getElementById('adminCodeCustomDays').value) || 365;
@@ -820,9 +841,7 @@
         document.getElementById('adminNewActivationCode').value = '';
         showToast(`تم إنشاء الكود (${code}) بمدة ${days} يوم بنجاح!`);
         loadAdminCodes();
-      } catch(e) {
-        showToast('خطأ في إنشاء الكود.');
-      }
+      } catch(e) { showToast('خطأ في إنشاء الكود.'); }
     };
 
     async function loadAdminCodes() {
@@ -844,9 +863,7 @@
           </div>`;
         });
         listEl.innerHTML = html;
-      } catch(e) {
-        listEl.innerHTML = 'تعذر تحميل الأكواد.';
-      }
+      } catch(e) { listEl.innerHTML = 'تعذر تحميل الأكواد.'; }
     }
 
     window.adminDeleteCode = async (code) => {
@@ -854,10 +871,110 @@
         await deleteDoc(doc(db, "activationCodes", code));
         showToast('تم حذف الكود.');
         loadAdminCodes();
+      } catch(e) { showToast('خطأ في الحذف.'); }
+    };
+
+    // 👥 جلب قائمة المستخدمين في لوحة الأدمن لتعديل اشتراكاتهم يدوياً
+    async function loadAdminUsers() {
+      const listEl = document.getElementById('adminUsersList');
+      if(!listEl) return;
+      listEl.innerHTML = 'جاري التحميل...';
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        if(querySnapshot.empty) {
+          listEl.innerHTML = 'لا توجد حسابات مسجلة.';
+          return;
+        }
+        let html = '';
+        querySnapshot.forEach((d) => {
+          const data = d.data();
+          const email = data.email || d.id;
+          const plan = data.profile?.planType || 'أساسي';
+          const expiry = data.profile?.expiryDate || 'منتهي';
+          html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border-color); gap:8px;">
+            <div style="font-size:0.8rem; overflow:hidden; text-overflow:ellipsis;">👤 <strong>${email}</strong><br><span style="color:var(--text-secondary);">(${plan} - ينتهي: ${expiry})</span></div>
+            <button class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="adminEditUserSubscription('${d.id}')">تعديل الاشتراك</button>
+          </div>`;
+        });
+        listEl.innerHTML = html;
       } catch(e) {
-        showToast('خطأ في الحذف.');
+        listEl.innerHTML = 'تعذر تحميل المستخدمين.';
+      }
+    }
+
+    // 🛠️ تعديل اشتراك مستخدم محدد من الأدمن
+    window.adminEditUserSubscription = async (uid) => {
+      const newExpiry = prompt("أدخل تاريخ الانتهاء الجديد (صيغة YYYY/MM/DD) أو اكتب 'دائم':");
+      if(!newExpiry) return;
+      try {
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if(userSnap.exists()) {
+          let p = userSnap.data().profile || {};
+          p.isPro = true;
+          p.expiryDate = newExpiry;
+          p.planType = 'وتيرة بلس ✨ (مُعدل من الأدمن)';
+          await setDoc(userRef, { profile: p }, { merge: true });
+          showToast('تم تعديل اشتراك المستخدم بنجاح ✅');
+          loadAdminUsers();
+        }
+      } catch(e) {
+        showToast('خطأ في تعديل الاشتراك.');
       }
     };
+
+    // 💬 إرسال إشعار بابل (للجميع أو لمستخدم معين مع تحديد المدة)
+    window.adminSendBubbleNotification = async () => {
+      const target = document.getElementById('adminNotifTarget').value;
+      const specificEmail = document.getElementById('adminTargetUserEmail').value.trim();
+      const msg = document.getElementById('adminWidgetMsg').value.trim();
+      const imgUrl = document.getElementById('adminWidgetImgUrl').value.trim();
+      const durationMin = parseInt(document.getElementById('adminWidgetDuration').value) || 0;
+
+      if(!msg) return showToast('أدخل نص الإشعار');
+
+      const notifData = { message: msg, imageUrl: imgUrl, duration: durationMin, timestamp: Date.now() };
+
+      if(target === 'ALL') {
+        // إرسال للجميع عبر تخزين إشعار عام أو حفظه
+        localStorage.setItem('wateerah_broadcast_notif', JSON.stringify(notifData));
+        showToast('تم إرسال الإشعار لجميع المشتركين بنجاح 🚀');
+      } else {
+        if(!specificEmail) return showToast('أدخل إيميل المستخدم المستهدف');
+        // إرسال إشعار خاص
+        localStorage.setItem(`wateerah_notif_${specificEmail}`, JSON.stringify(notifData));
+        showToast(`تم إرسال الإشعار للمستخدم (${specificEmail}) بنجاح 🚀`);
+      }
+      closeModal('adminModal');
+    };
+
+    // فحص ظهور إشعار البابل لدى المستخدم
+    function checkBubbleNotification() {
+      const broadcast = localStorage.getItem('wateerah_broadcast_notif');
+      const userEmail = auth.currentUser ? auth.currentUser.email : null;
+      const personal = userEmail ? localStorage.getItem(`wateerah_notif_${userEmail}`) : null;
+
+      let activeNotif = personal ? JSON.parse(personal) : (broadcast ? JSON.parse(broadcast) : null);
+
+      if(activeNotif && activeNotif.message) {
+        // التحقق من مدة الانتهاء
+        const elapsedMin = (Date.now() - activeNotif.timestamp) / (1000 * 60);
+        if(activeNotif.duration === 0 || elapsedMin < activeNotif.duration) {
+          const widget = document.getElementById('notificationWidget');
+          document.getElementById('widgetTextContent').innerText = activeNotif.message;
+          const imgEl = document.getElementById('widgetImageContent');
+          if(activeNotif.imageUrl) {
+            imgEl.src = activeNotif.imageUrl;
+            imgEl.style.display = 'block';
+          } else {
+            imgEl.style.display = 'none';
+          }
+          widget.style.display = 'block';
+        }
+      }
+    }
+
+    window.closeNotificationWidget = () => { document.getElementById('notificationWidget').style.display = 'none'; };
 
     window.saveProfile = async () => {
       window.userProfile.name = document.getElementById('profileNameInput').value;
@@ -892,6 +1009,7 @@
         document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
         document.getElementById('journalText').value = window.appState.journal || '';
         renderLists();
+        checkBubbleNotification(); // فحص الإشعارات عند الدخول
       } else {
         updateSubscriptionUI();
         renderLists();
