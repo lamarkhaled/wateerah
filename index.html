@@ -43,91 +43,91 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'IBM Plex Sans Arabic', sans-serif; }
     body { background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.65; transition: background-color 0.3s ease; min-height: 100vh; padding-bottom: 80px; }
 
-    header { max-width: 1200px; margin: 0 auto; padding: 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 16px; }
+    header { max-width: 1200px; margin: 0 auto; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 16px; }
     .brand { display: flex; align-items: baseline; gap: 10px; }
-    .brand h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
-    .brand span.dot { color: var(--accent-color); font-size: 2.5rem; line-height: 0; }
-    .brand p { font-size: 0.9rem; color: var(--text-secondary); margin-right: 8px; padding-right: 12px; border-right: 1px solid var(--border-color); }
+    .brand h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
+    .brand span.dot { color: var(--accent-color); font-size: 2.2rem; line-height: 0; }
+    .brand p { font-size: 0.85rem; color: var(--text-secondary); margin-right: 8px; padding-right: 12px; border-right: 1px solid var(--border-color); }
 
-    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .btn { padding: 9px 18px; border-radius: 100px; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: var(--transition); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+    .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn { padding: 8px 16px; border-radius: 100px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: var(--transition); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
     .btn:hover { border-color: var(--text-primary); transform: translateY(-1px); }
     .btn-primary { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
     .btn-subtle { background: var(--bg-subtle); border-color: transparent; }
     .btn-danger { background: var(--danger-light); color: var(--danger-color); border-color: transparent; }
     .btn-admin { background: var(--admin-light); color: var(--admin-color); border-color: #D8B4FE; font-weight: 600; }
-    .pro-badge { background: var(--accent-light); color: var(--accent-color); padding: 6px 14px; border-radius: 100px; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+    .pro-badge { background: var(--accent-light); color: var(--accent-color); padding: 5px 12px; border-radius: 100px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
 
-    .profile-pill { display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 8px; border-radius: 100px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; }
-    .avatar-circle { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    .profile-pill { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 6px; border-radius: 100px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; }
+    .avatar-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; }
 
-    /* فقاعة الإشعارات (فكرة تطبيق بابل) */
+    /* فقاعة الإشعارات العائمة (بابل) */
     #notificationWidget {
-      position: fixed; bottom: 24px; right: 24px; max-width: 320px;
+      position: fixed; bottom: 20px; right: 20px; max-width: 300px; width: 90%;
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-lg);
+      border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow-lg);
       z-index: 2500; display: none; animation: slideInRight 0.3s ease;
     }
     @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-    .widget-close { position: absolute; top: 8px; left: 8px; background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--text-secondary); }
-    .widget-img { width: 100%; border-radius: 8px; margin-top: 10px; max-height: 150px; object-fit: cover; display: none; }
+    .widget-close { position: absolute; top: 6px; left: 6px; background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--text-secondary); }
+    .widget-img { width: 100%; border-radius: 8px; margin-top: 8px; max-height: 140px; object-fit: cover; display: none; }
 
-    main { max-width: 1200px; margin: 36px auto 0; padding: 0 24px; }
-    .hero-section { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
-    .greeting h2 { font-size: 2.1rem; font-weight: 600; }
-    .greeting p { color: var(--text-secondary); font-size: 1rem; margin-top: 4px; }
+    main { max-width: 1200px; margin: 28px auto 0; padding: 0 20px; }
+    .hero-section { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
+    .greeting h2 { font-size: 1.8rem; font-weight: 600; }
+    .greeting p { color: var(--text-secondary); font-size: 0.95rem; margin-top: 4px; }
 
-    .hero-stats { display: flex; align-items: center; gap: 16px; background: var(--bg-card); border: 1px solid var(--border-color); padding: 14px 20px; border-radius: var(--radius); box-shadow: var(--shadow-sm); }
-    .progress-ring-box { display: flex; flex-direction: column; gap: 6px; min-width: 170px; }
-    .progress-top { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-secondary); }
-    .progress-bar-bg { width: 100%; height: 7px; background: var(--bg-subtle); border-radius: 10px; overflow: hidden; }
+    .hero-stats { display: flex; align-items: center; gap: 14px; background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 18px; border-radius: var(--radius); box-shadow: var(--shadow-sm); width: 100%; max-width: 350px; }
+    .progress-ring-box { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .progress-top { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); }
+    .progress-bar-bg { width: 100%; height: 6px; background: var(--bg-subtle); border-radius: 10px; overflow: hidden; }
     .progress-bar-fill { height: 100%; background: var(--accent-color); width: 0%; transition: width 0.4s ease; }
 
-    .customizer-bar { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 22px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-    .customizer-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .customizer-label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-left: 6px; }
-    .chip { padding: 6px 14px; border-radius: 100px; font-size: 0.82rem; font-weight: 500; border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer; transition: var(--transition); }
+    .customizer-bar { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+    .customizer-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .customizer-label { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-left: 4px; }
+    .chip { padding: 5px 12px; border-radius: 100px; font-size: 0.78rem; font-weight: 500; border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer; transition: var(--transition); }
     .chip.active { background: var(--accent-color); color: #FFF; border-color: var(--accent-color); }
 
-    .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 22px; }
-    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow-sm); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-    .card-title { font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .card-subtitle { font-size: 0.82rem; color: var(--text-secondary); }
+    .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-title { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .card-subtitle { font-size: 0.78rem; color: var(--text-secondary); }
     .col-6 { grid-column: span 6; }
     .col-12 { grid-column: span 12; }
     @media (max-width: 900px) { .col-6 { grid-column: span 12; } }
 
-    .focus-input { width: 100%; border: 1px solid transparent; background: var(--bg-primary); padding: 16px 20px; border-radius: 12px; font-size: 1.08rem; color: var(--text-primary); outline: none; transition: var(--transition); }
+    .focus-input { width: 100%; border: 1px solid transparent; background: var(--bg-primary); padding: 14px 18px; border-radius: 12px; font-size: 1rem; color: var(--text-primary); outline: none; transition: var(--transition); }
     .focus-input:focus { border-color: var(--accent-color); background: var(--bg-card); }
 
-    .item-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .list-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; background: var(--bg-primary); border: 1px solid transparent; border-radius: 12px; gap: 12px; }
-    .item-left { display: flex; align-items: center; gap: 12px; flex: 1; }
-    .checkbox { width: 21px; height: 21px; border-radius: 6px; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.78rem; flex-shrink: 0; }
+    .item-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg-primary); border: 1px solid transparent; border-radius: 10px; gap: 10px; }
+    .item-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+    .checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; flex-shrink: 0; }
     .list-item.completed .checkbox { background: var(--accent-color); border-color: var(--accent-color); color: #FFF; }
-    .item-text-input { border: none; background: transparent; color: var(--text-primary); font-size: 0.95rem; width: 100%; outline: none; padding: 2px 4px; border-radius: 6px; }
-    .delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.1rem; opacity: 0.4; }
+    .item-text-input { border: none; background: transparent; color: var(--text-primary); font-size: 0.92rem; width: 100%; outline: none; padding: 2px 4px; border-radius: 6px; }
+    .delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem; opacity: 0.4; }
     .delete-btn:hover { opacity: 1; color: var(--danger-color); }
 
-    .add-row { display: flex; gap: 8px; margin-top: 14px; }
-    .add-row input { flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
-    .journal-area { width: 100%; min-height: 140px; border: 1px solid var(--border-color); background: var(--bg-primary); border-radius: 12px; padding: 16px; color: var(--text-primary); outline: none; resize: vertical; }
+    .add-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .add-row input { flex: 1; min-width: 130px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
+    .journal-area { width: 100%; min-height: 120px; border: 1px solid var(--border-color); background: var(--bg-primary); border-radius: 12px; padding: 14px; color: var(--text-primary); outline: none; resize: vertical; }
 
-    .finance-section-title { font-size: 1.3rem; font-weight: 700; color: var(--accent-color); margin: 26px 0 14px; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-    .sub-card { background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+    .finance-section-title { font-size: 1.2rem; font-weight: 700; color: var(--accent-color); margin: 24px 0 12px; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .sub-card { background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
     
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 15, 14, 0.5); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 15, 14, 0.5); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
     .modal-overlay.open { display: flex; }
-    .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; max-width: 650px; width: 100%; padding: 32px; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
-    .modal-close { position: absolute; top: 22px; left: 22px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg-subtle); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; max-width: 600px; width: 100%; padding: 28px; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+    .modal-close { position: absolute; top: 18px; left: 18px; width: 30px; height: 30px; border-radius: 50%; background: var(--bg-subtle); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.83rem; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 5px; color: var(--text-secondary); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
 
-    #toastContainer { position: fixed; bottom: 24px; left: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
-    .toast { background: var(--text-primary); color: var(--bg-primary); padding: 12px 20px; border-radius: 12px; font-size: 0.88rem; box-shadow: var(--shadow-lg); }
+    #toastContainer { position: fixed; bottom: 20px; left: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+    .toast { background: var(--text-primary); color: var(--bg-primary); padding: 10px 18px; border-radius: 10px; font-size: 0.85rem; box-shadow: var(--shadow-lg); }
     .hidden-widget { display: none !important; }
   </style>
 </head>
@@ -136,8 +136,8 @@
   <!-- فقاعة الإشعارات العائمة (بابل) -->
   <div id="notificationWidget">
     <button class="widget-close" onclick="closeNotificationWidget()">&times;</button>
-    <div style="font-size: 0.8rem; font-weight: 700; color: var(--admin-color); margin-bottom: 4px;">📌 إشعار إداري</div>
-    <p id="widgetTextContent" style="font-size: 0.9rem; color: var(--text-primary); line-height: 1.5;"></p>
+    <div style="font-size: 0.78rem; font-weight: 700; color: var(--admin-color); margin-bottom: 4px;">📌 إشعار إداري</div>
+    <p id="widgetTextContent" style="font-size: 0.88rem; color: var(--text-primary); line-height: 1.5;"></p>
     <img id="widgetImageContent" class="widget-img" src="" alt="صورة الإشعار">
   </div>
 
@@ -149,7 +149,7 @@
       <p>مساحتك الخاصة لضبط إيقاع يومك</p>
     </div>
     <div class="nav-actions">
-      <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">👑 لوحة تحكم الأدمن</button>
+      <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">👑 لوحة التحكم</button>
       <span id="planBadge" class="pro-badge" onclick="openModal('pricingModal')">الباقة الأساسية</span>
       <button id="upgradeBtn" class="btn" onclick="openModal('pricingModal')">تفعيل الاشتراك ✨</button>
       <button id="guestAuthBtn" class="btn btn-primary" onclick="openAuthModal('login')">دخول / حساب جديد</button>
@@ -163,14 +163,14 @@
   <main>
     <section class="hero-section">
       <div class="greeting">
-        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;" id="syncIndicator">⚪ غير متصل بالحساب</div>
-        <h2 id="welcomeText">صباح الخير، أهلاً بك في وتيرتك.</h2>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px;" id="syncIndicator">⚪ غير متصل بالحساب</div>
+        <h2 id="welcomeText">صباح الخير، أهلاً بك يا لمار.</h2>
         <p>صمّم مساحتك بالطريقة التي تشبهك.</p>
       </div>
       <div class="hero-stats">
         <div class="progress-ring-box">
-          <div class="progress-top"><span>إنجاز اليوم</span><strong id="progressPercentText">0%</strong></div>
-          <div class="progress-bar-bg"><div id="progressBarFill" class="progress-bar-fill"></div></div>
+          <div class="progress-top"><span>سجل محطات الحياة</span><strong id="lifeEventsCount">0 محطات</strong></div>
+          <div class="progress-bar-bg"><div id="progressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div>
         </div>
         <button class="btn btn-subtle" onclick="saveCurrentWateerah(true)">☁️ حفظ</button>
       </div>
@@ -188,17 +188,20 @@
         <button class="chip active" id="btn-widget-focus" onclick="toggleWidget('widget-focus', this)">البوصلة</button>
         <button class="chip active" id="btn-widget-habits" onclick="toggleWidget('widget-habits', this)">العادات</button>
         <button class="chip active" id="btn-widget-tasks" onclick="toggleWidget('widget-tasks', this)">الأولويات</button>
-        <button class="chip active" id="btn-widget-finance" onclick="toggleWidget('widget-finance', this)">حصين المالية 💰</button>
+        <button class="chip active" id="btn-widget-finance" onclick="toggleWidget('widget-finance', this)">المالية 💰</button>
+        <button class="chip active" id="btn-widget-timeline" onclick="toggleWidget('widget-timeline', this)">سجل الحياة 📖</button>
         <button class="chip active" id="btn-widget-journal" onclick="toggleWidget('widget-journal', this)">التدوين</button>
       </div>
     </section>
 
     <div class="bento-grid">
+      <!-- 1. البوصلة اليومية -->
       <div id="widget-focus" class="card col-12">
         <div class="card-header"><span class="card-title">🧭 بوصلة اليوم</span></div>
         <input type="text" id="focusGoalInput" class="focus-input" placeholder="اكتب تركيزك الأساسي..." oninput="autoSave()">
       </div>
 
+      <!-- 2. عاداتي اليومية -->
       <div id="widget-habits" class="card col-6">
         <div class="card-header"><span class="card-title">🌱 عاداتي اليومية</span></div>
         <ul id="habitsList" class="item-list"></ul>
@@ -208,6 +211,7 @@
         </div>
       </div>
 
+      <!-- 3. أولويات اليوم -->
       <div id="widget-tasks" class="card col-6">
         <div class="card-header"><span class="card-title">⚡ أولويات اليوم</span></div>
         <ul id="tasksList" class="item-list"></ul>
@@ -217,23 +221,38 @@
         </div>
       </div>
 
+      <!-- 4. سجل الحياة والتواريخ (بدل إنجاز اليوم) -->
+      <div id="widget-timeline" class="card col-12">
+        <div class="card-header">
+          <span class="card-title">📖 سجل محطات الحياة (التواريخ والذكريات)</span>
+          <span class="card-subtitle">سجل زمني يوثق مسيرتك وأهم محطات حياتك</span>
+        </div>
+        <ul id="timelineList" class="item-list"></ul>
+        <div class="add-row">
+          <input type="date" id="newEventDate" style="flex: 1;">
+          <input type="text" id="newEventTitle" placeholder="حدث أو محطة فارقة في حياتك..." style="flex: 2;">
+          <button class="btn btn-primary" onclick="addTimelineEvent()">+ إضافة حدث</button>
+        </div>
+      </div>
+
+      <!-- 5. قسم حصين المالية الشامل -->
       <div id="widget-finance" class="card col-12">
         <div class="card-header">
-          <span class="card-title" style="font-size: 1.3rem; color: var(--accent-color);">💰 حصين المالية (المحافظ، Vision Board، و Wishlist)</span>
+          <span class="card-title" style="font-size: 1.2rem; color: var(--accent-color);">💰 حصين المالية (المحافظ، Vision Board، و Wishlist)</span>
           <span class="card-subtitle">التحكم الكامل بالحسابات، الأهداف، وأمنياتك المالية</span>
         </div>
 
         <div class="finance-section-title">💳 الحسابات والمحافظ البنكية والمالية</div>
         <ul id="walletsList" class="item-list"></ul>
-        <div class="add-row" style="margin-bottom: 24px;">
+        <div class="add-row" style="margin-bottom: 20px;">
           <input type="text" id="newWalletName" placeholder="اسم البنك أو المحفظة..." style="flex: 2;">
           <input type="number" id="newWalletBalance" placeholder="الرصيد (ر.س)" style="flex: 1;">
-          <button class="btn btn-primary" onclick="addWallet()">+ إضافة حساب/محفظة</button>
+          <button class="btn btn-primary" onclick="addWallet()">+ إضافة حساب</button>
         </div>
 
         <div class="finance-section-title">✨ لوحة الأهداف والرؤية (Vision Board)</div>
         <div class="sub-card">
-          <ul id="visionBoardList" class="item-list" style="margin-bottom: 14px;"></ul>
+          <ul id="visionBoardList" class="item-list" style="margin-bottom: 12px;"></ul>
           <div class="add-row">
             <input type="text" id="newVisionTitle" placeholder="اسم الهدف..." style="flex: 1.5;">
             <input type="text" id="newVisionImg" placeholder="رابط صورة الهدف (https://...)" style="flex: 2;">
@@ -243,7 +262,7 @@
 
         <div class="finance-section-title">🛍️ قائمة أمنياتي (Wishlist Vault)</div>
         <div class="sub-card">
-          <ul id="wishlistList" class="item-list" style="margin-bottom: 14px;"></ul>
+          <ul id="wishlistList" class="item-list" style="margin-bottom: 12px;"></ul>
           <div class="add-row">
             <input type="text" id="newWishTitle" placeholder="اسم الأمنية..." style="flex: 2;">
             <input type="number" id="newWishCost" placeholder="التكلفة (ر.س)" style="flex: 1;">
@@ -253,16 +272,16 @@
 
         <div class="finance-section-title">📊 حاسبة التوزيع الذكية</div>
         <div class="sub-card">
-          <div class="form-group" style="margin-bottom: 12px;">
+          <div class="form-group" style="margin-bottom: 10px;">
             <label>إجمالي الدخل الشهري (ر.س):</label>
             <input type="number" id="totalIncomeInput" value="5000" oninput="calculateDistribution()">
           </div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px;" id="distributionResults"></div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px;" id="distributionResults"></div>
         </div>
 
         <div class="finance-section-title">⚙️ متتبع الاشتراكات ومصاريف الشهر</div>
-        <ul id="subscriptionsList" class="item-list" style="margin-bottom: 14px;"></ul>
-        <div class="add-row" style="margin-bottom: 24px;">
+        <ul id="subscriptionsList" class="item-list" style="margin-bottom: 12px;"></ul>
+        <div class="add-row" style="margin-bottom: 20px;">
           <input type="text" id="newSubName" placeholder="اسم الالتزام..." style="flex: 2;">
           <input type="number" id="newSubCost" placeholder="التكلفة (ر.س)" style="flex: 1;">
           <button class="btn btn-primary" onclick="addSubscription()">+ إضافة التزام</button>
@@ -276,6 +295,7 @@
         </div>
       </div>
 
+      <!-- 6. مساحة الصفاء -->
       <div id="widget-journal" class="card col-12">
         <div class="card-header"><span class="card-title">✒️ مساحة الصفاء</span></div>
         <textarea id="journalText" class="journal-area" placeholder="فرّغ أفكارك هنا..." oninput="autoSave()"></textarea>
@@ -288,34 +308,34 @@
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
       <div id="viewLogin">
-        <h3 style="margin-bottom: 16px;">تسجيل الدخول إلى وتيرة</h3>
+        <h3 style="margin-bottom: 14px;">تسجيل الدخول إلى وتيرة</h3>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="loginEmail"></div>
         <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px;" onclick="handleLogin()">دخول</button>
-        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="handleLogin()">دخول</button>
+        <div style="display: flex; justify-content: space-between; font-size: 0.82rem;">
           <span style="color: var(--accent-color); cursor: pointer; text-decoration: underline;" onclick="openResetModal()">نسيت كلمة المرور؟</span>
           <span style="color: var(--text-secondary); cursor: pointer;" onclick="switchToRegister()">ليس لديك حساب؟ سجل الآن</span>
         </div>
       </div>
       <div id="viewRegister" style="display: none;">
-        <h3 style="margin-bottom: 16px;">انضم إلى وتيرة (تحصل على يومين تجربة مجانية تلقائياً ✨)</h3>
+        <h3 style="margin-bottom: 14px;">انضم إلى وتيرة (تحصل على يومين تجربة مجانية ✨)</h3>
         <div class="form-group"><label>الاسم المعروض</label><input type="text" id="regName"></div>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="regEmail"></div>
         <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px;" onclick="handleRegister()">إنشاء حساب</button>
-        <span style="color: var(--text-secondary); cursor: pointer; font-size: 0.85rem;" onclick="switchToLogin()">لديك حساب بالفعل؟ سجل دخول</span>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="handleRegister()">إنشاء حساب</button>
+        <span style="color: var(--text-secondary); cursor: pointer; font-size: 0.82rem;" onclick="switchToLogin()">لديك حساب بالفعل؟ سجل دخول</span>
       </div>
     </div>
   </div>
 
   <!-- نافذة التنبيه بحالة البريد غير المفعل -->
   <div id="verificationNoticeModal" class="modal-overlay">
-    <div class="modal-box" style="text-align: center; max-width: 440px;">
-      <h3 style="margin-bottom: 12px; color: var(--danger-color);">⚠️ بريدك الإلكتروني غير مفعل</h3>
-      <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+    <div class="modal-box" style="text-align: center; max-width: 420px;">
+      <h3 style="margin-bottom: 10px; color: var(--danger-color);">⚠️ بريدك الإلكتروني غير مفعل</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 18px;">
         يرجى تفعيل بريدك الإلكتروني أولاً لتتمكن من الدخول. شيك على صندوق الوارد أو الـ Spam، أو اضغط أدناه لإعادة إرسال الرابط.
       </p>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px; padding: 12px;" onclick="resendVerificationEmailDirectly()">إعادة إرسال رابط التفعيل الآن ✉️</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 8px; padding: 11px;" onclick="resendVerificationEmailDirectly()">إعادة إرسال رابط التفعيل الآن ✉️</button>
       <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('verificationNoticeModal')">إغلاق</button>
     </div>
   </div>
@@ -325,59 +345,59 @@
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('resetModal')">&times;</button>
       <h3 style="margin-bottom: 8px;">استعادة كلمة المرور الآمنة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">أدخل بريدك المسجل لإرسال رابط الاستعادة.</p>
+      <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 14px;">أدخل بريدك المسجل لإرسال رابط الاستعادة.</p>
       <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="resetEmail"></div>
       <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleResetPassword()">إرسال الرابط</button>
     </div>
   </div>
 
-  <!-- 👑 لوحة تحكم الأدمن (مع إدارة المشتركين وإرسال إشعارات بابل للكل أو لشخص معين) -->
+  <!-- 👑 لوحة تحكم الأدمن (إدارة المشتركين، الإشعارات بابل، والأكواد) -->
   <div id="adminModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 650px;">
+    <div class="modal-box" style="max-width: 620px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
       <h3 style="margin-bottom: 6px; color: var(--admin-color);">👑 لوحة تحكم أدمن وتيرة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">إدارة المشتركين، الأكواد، وإرسال إشعارات فوريّة للعملاء.</p>
+      <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 18px;">إدارة المشتركين، إرسال الإشعارات، وتوليد الأكواد.</p>
       
-      <!-- أ) قسم إرسال الإشعارات (فكرة تطبيق بابل مع تحديد المدة والهدف) -->
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">💬 إرسال إشعار فقاعة (بابل) للعملاء</h4>
-        <div class="form-group" style="margin-bottom: 8px;">
+      <!-- أ) قسم إرسال الإشعارات (فكرة تطبيق بابل) -->
+      <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; margin-bottom: 12px;">
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">💬 إرسال إشعار فقاعة (بابل) للعملاء</h4>
+        <div class="form-group" style="margin-bottom: 6px;">
           <label>إرسال إلى:</label>
-          <select id="adminNotifTarget">
+          <select id="adminNotifTarget" onchange="toggleTargetEmailBox(this.value)">
             <option value="ALL">جميع المشتركين (الكل)</option>
             <option value="SPECIFIC">مستخدم معين (بالإيميل)</option>
           </select>
         </div>
-        <div class="form-group" style="margin-bottom: 8px;" id="adminSpecificEmailBox" style="display:none;">
+        <div class="form-group" id="adminSpecificEmailBox" style="display:none; margin-bottom: 6px;">
           <input type="email" id="adminTargetUserEmail" placeholder="إيميل المستخدم المستهدف...">
         </div>
-        <div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الإشعار..."></textarea></div>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط صورة الإشعار (اختياري https://...)"></div>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="مدة الظهور (بالدقائق قبل الاختفاء التلقائي)"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminSendBubbleNotification()">إرسال الإشعار الآن 🚀</button>
+        <div class="form-group" style="margin-bottom: 6px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الإشعار..."></textarea></div>
+        <div class="form-group" style="margin-bottom: 6px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط صورة الإشعار (اختياري)"></div>
+        <div class="form-group" style="margin-bottom: 6px;"><input type="number" id="adminWidgetDuration" placeholder="مدة الظهور بالدقائق (0 يعني دائم حتى الإغلاق)"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminSendBubbleNotification()">إرسال الإشعار الفوري 🚀</button>
       </div>
 
-      <!-- ب) قائمة المستخدمين المسجلين وإدارتهم -->
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">👥 قائمة المستخدمين المسجلين في النظام</h4>
-        <div id="adminUsersList" style="font-size: 0.85rem; max-height: 150px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+      <!-- ب) قائمة المستخدمين المسجلين وتعديلهم -->
+      <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; margin-bottom: 12px;">
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">👥 قائمة المستخدمين والتحكم باشتراكاتهم</h4>
+        <div id="adminUsersList" style="font-size: 0.82rem; max-height: 130px; overflow-y: auto; background: var(--bg-card); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
           جاري التحميل...
         </div>
       </div>
 
-      <!-- ج) قسم توليد كود تفعيل -->
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">🎟️ توليد كود تفعيل اشتراك (يُستخدم مرة واحدة)</h4>
-        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+      <!-- ج) توليد أكواد التفعيل -->
+      <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; margin-bottom: 12px;">
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">🎟️ توليد كود تفعيل اشتراك</h4>
+        <div style="display: flex; gap: 8px; margin-bottom: 6px;">
           <input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;">
-          <input type="number" id="adminCodeCustomDays" value="365" placeholder="عدد الأيام" style="flex:1;">
+          <input type="number" id="adminCodeCustomDays" value="365" placeholder="الأيام" style="flex:1;">
         </div>
         <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminGenerateActivationCode()">إضافة كود التفعيل 🚀</button>
       </div>
 
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📋 الأكواد المتاحة:</h4>
-        <div id="adminCodesList" style="font-size: 0.85rem; max-height: 100px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
+      <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px;">
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">📋 الأكواد المتاحة:</h4>
+        <div id="adminCodesList" style="font-size: 0.82rem; max-height: 90px; overflow-y: auto; background: var(--bg-card); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
           جاري التحميل...
         </div>
       </div>
@@ -386,19 +406,19 @@
 
   <!-- نافذة تفعيل الاشتراك -->
   <div id="pricingModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 480px;">
+    <div class="modal-box" style="max-width: 450px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
       
       <div id="pricingViewUnsubscribed">
         <span class="pro-badge">وتيرة بلس ✨</span>
         <h3 style="margin: 10px 0 6px;">تفعيل اشتراك وتيرة بلس</h3>
-        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;">
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 14px;">
           اشترك عبر متجرنا في سلة، وسصلك كود التفعيل الخاص بك لإدخاله هنا فوراً:
         </p>
 
-        <a href="https://sella.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 16px; font-weight: 600;">🛒 شراء اشتراك من متجر سلة</a>
+        <a href="https://sella.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 14px; font-weight: 600;">🛒 شراء اشتراك من متجر سلة</a>
         
-        <div class="form-group" style="margin-bottom: 14px;">
+        <div class="form-group" style="margin-bottom: 12px;">
           <label>أدخل كود التفعيل:</label>
           <div style="display: flex; gap: 8px;">
             <input type="text" id="userActivationCodeInput" placeholder="أدخل الكود هنا..." style="font-weight: 600;">
@@ -407,17 +427,17 @@
         </div>
       </div>
 
-      <div id="pricingViewSubscribed" style="display: none; text-align: center; padding: 10px;">
-        <span class="pro-badge" style="font-size: 1rem; padding: 8px 18px;">✨ أنت مشترك في وتيرة بلس</span>
-        <h3 style="margin: 16px 0 8px;">حالة باقتك النشطة</h3>
-        <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 16px;" id="subActiveDetails"></p>
+      <div id="pricingViewSubscribed" style="display: none; text-align: center; padding: 8px;">
+        <span class="pro-badge" style="font-size: 0.95rem; padding: 6px 16px;">✨ أنت مشترك في وتيرة بلس</span>
+        <h3 style="margin: 14px 0 6px;">حالة باقتك النشطة</h3>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5; margin-bottom: 14px;" id="subActiveDetails"></p>
         
-        <div style="margin-bottom: 20px;">
-          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+        <div style="margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 5px;">
             <span>الأيام المتبقية:</span>
             <strong id="daysRemainingText">0 يوم</strong>
           </div>
-          <div class="progress-bar-bg" style="height: 10px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div>
+          <div class="progress-bar-bg" style="height: 8px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div>
         </div>
 
         <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('pricingModal')">إغلاق</button>
@@ -427,11 +447,11 @@
 
   <!-- نافذة الملف الشخصي -->
   <div id="profileModal" class="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 420px;">
       <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
-      <h3 style="margin-bottom: 16px;">إعدادات الحساب</h3>
+      <h3 style="margin-bottom: 14px;">إعدادات الحساب</h3>
       <div class="form-group"><label>الاسم المعروض</label><input type="text" id="profileNameInput"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px;" onclick="saveProfile()">حفظ التعديلات</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="saveProfile()">حفظ التعديلات</button>
       <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="handleLogout()">تسجيل الخروج</button>
     </div>
   </div>
@@ -463,6 +483,7 @@
       theme: 'default', focusGoal: '', journal: '', hiddenWidgets: [],
       habits: [{ text: 'قراءة 15 صفحة', done: false }],
       tasks: [{ text: 'ترتيب الأولويات', done: false }],
+      timeline: [{ date: '2026-10-18', title: 'انطلاق وتيرة رسمياً 🚀' }],
       wallets: [{ name: 'مصرف الراجحي', balance: 4500 }],
       visionBoard: [{ title: 'السفر والاسترخاء', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500' }],
       wishlist: [{ title: 'شاشة ديل احترافية', cost: 1800 }],
@@ -514,9 +535,9 @@
 
     window.updateSubscriptionUI = function() {
       const planBadge = document.getElementById('planBadge');
-      const upgradeBtn =/span/ ? document.getElementById('upgradeBtn') : null;
+      const upgradeBtn = document.getElementById('upgradeBtn');
       
-      if (window.userProfile.isPro && window.userProfile.expiryDate) {
+      if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
         const now = new Date();
         const expiry = new Date(window.userProfile.expiryDate);
         if (now > expiry) {
@@ -532,6 +553,10 @@
         planBadge.innerText = 'الباقة الأساسية';
         if(upgradeBtn) upgradeBtn.innerText = 'تفعيل الاشتراك ✨';
       }
+      
+      // تحديث اسم المشترك في ترويسة الترحيب
+      const userName = window.userProfile.name || 'صديقنا';
+      document.getElementById('welcomeText').innerText = `صباح الخير، أهلاً بك يا ${userName}.`;
     };
 
     window.renderLists = function() {
@@ -548,6 +573,20 @@
           <input type="text" class="item-text-input" value="${t.text}" onchange="window.appState.tasks[${i}].text=this.value; autoSave()"></div>
           <button class="delete-btn" onclick="window.appState.tasks.splice(${i},1); renderLists(); autoSave()">&times;</button>
         </li>`).join('');
+
+      // سجل الحياة والتواريخ (Timeline)
+      const timelineList = document.getElementById('timelineList');
+      if (!window.appState.timeline) window.appState.timeline = [];
+      timelineList.innerHTML = window.appState.timeline.length === 0 ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد محطات مسجلة في سجل الحياة.</div>` :
+        window.appState.timeline.map((ev, i) => `
+          <li class="list-item">
+            <div class="item-left" style="gap: 10px;">
+              <span style="font-size: 0.8rem; background: var(--accent-light); color: var(--accent-color); padding: 3px 8px; border-radius: 6px; font-weight: 600;">${ev.date}</span>
+              <input type="text" class="item-text-input" value="${ev.title}" onchange="window.appState.timeline[${i}].title=this.value; autoSave()" style="font-weight:500;">
+            </div>
+            <button class="delete-btn" onclick="window.appState.timeline.splice(${i},1); renderLists(); autoSave();">&times;</button>
+          </li>`).join('');
+      document.getElementById('lifeEventsCount').innerText = window.appState.timeline.length + ' محطات';
 
       const walletsList = document.getElementById('walletsList');
       walletsList.innerHTML = (!window.appState.wallets || window.appState.wallets.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد حسابات مضافة.</div>` :
@@ -566,7 +605,7 @@
       visionList.innerHTML = (!window.appState.visionBoard || window.appState.visionBoard.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد أهداف بصرية مضافة.</div>` :
         window.appState.visionBoard.map((v, i) => `
           <li class="list-item" style="display:flex; align-items:center; gap:12px;">
-            <img src="${v.img}" alt="goal" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">
+            <img src="${v.img}" alt="goal" style="width:45px; height:45px; border-radius:8px; object-fit:cover;">
             <input type="text" class="item-text-input" value="${v.title}" onchange="window.appState.visionBoard[${i}].title=this.value; autoSave()" style="font-weight:600;">
             <button class="delete-btn" onclick="window.appState.visionBoard.splice(${i},1); renderLists(); autoSave();">&times;</button>
           </li>`).join('');
@@ -608,18 +647,25 @@
             <button class="delete-btn" onclick="window.appState.ideasVault.splice(${i},1); renderLists(); autoSave();">&times;</button>
           </li>`).join('');
 
-      const all = [...window.appState.habits, ...window.appState.tasks];
-      const done = all.filter(x => x.done).length;
-      const pct = all.length ? Math.round((done/all.length)*100) : 0;
-      document.getElementById('progressPercentText').innerText = pct + '%';
-      document.getElementById('progressBarFill').style.width = pct + '%';
-
       calculateDistribution();
     };
 
     window.toggle = (type, i) => { window.appState[type][i].done = !window.appState[type][i].done; renderLists(); autoSave(); };
     window.addHabit = () => { const i = document.getElementById('newHabitInput'); if(!i.value)return; window.appState.habits.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
     window.addTask = () => { const i = document.getElementById('newTaskInput'); if(!i.value)return; window.appState.tasks.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
+    
+    window.addTimelineEvent = () => {
+      const dateInput = document.getElementById('newEventDate');
+      const titleInput = document.getElementById('newEventTitle');
+      if(!titleInput.value.trim()) return showToast('أدخل عنوان الحدث أو المحطة');
+      const date = dateInput.value || new Date().toISOString().slice(0, 10);
+      if(!window.appState.timeline) window.appState.timeline = [];
+      window.appState.timeline.push({ date, title: titleInput.value.trim() });
+      titleInput.value = '';
+      renderLists();
+      autoSave();
+      showToast('تمت إضافة المحطة بنجاح 📖');
+    };
 
     window.addWallet = () => {
       const name = document.getElementById('newWalletName').value.trim();
@@ -679,11 +725,11 @@
       const container = document.getElementById('distributionResults');
       if(container) {
         container.innerHTML = `
-          <div style="background:var(--bg-card); padding:10px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.75rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>
-          <div style="background:var(--bg-card); padding:10px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.75rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div>
-          <div style="background:var(--bg-card); padding:10px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.75rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div>
-          <div style="background:var(--bg-card); padding:10px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.75rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div>
-          <div style="background:var(--bg-card); padding:10px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.75rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>
+          <div style="background:var(--bg-card); padding:8px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>
+          <div style="background:var(--bg-card); padding:8px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div>
+          <div style="background:var(--bg-card); padding:8px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div>
+          <div style="background:var(--bg-card); padding:8px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div>
+          <div style="background:var(--bg-card); padding:8px; border-radius:8px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>
         `;
       }
     };
@@ -715,7 +761,7 @@
       } catch(err) { console.error(err); }
     };
 
-    // 🎁 منح يومين تجربة مجانية لمرة واحدة فقط لكل حساب جديد
+    // 🎁 منح التجربة المجانية مرة واحدة فقط لكل حساب جديد
     window.handleRegister = async () => {
       const name = document.getElementById('regName').value;
       const email = document.getElementById('regEmail').value;
@@ -727,10 +773,10 @@
         window.userProfile.name = name;
         window.userProfile.isPro = true;
         window.userProfile.planType = 'تجربة مجانية (يومين) ✨';
-        window.userProfile.trialUsed = true; // تم استهلاك التجربة
+        window.userProfile.trialUsed = true;
         
         const trialExpiry = new Date();
-        trialExpiry.setDate(trialExpiry.getDate() + 2); // يومين بالضبط
+        trialExpiry.setDate(trialExpiry.getDate() + 2);
         window.userProfile.expiryDate = trialExpiry.toISOString().slice(0, 10).replace(/-/g, '/');
 
         await setDoc(doc(db, "users", cred.user.uid), { 
@@ -741,7 +787,7 @@
           createdAt: new Date().toISOString() 
         });
 
-        showToast('🎉 تم إنشاء حسابك ومنحك يومين تجربة مجانية!');
+        showToast('🎉 أهلاً بك! تم منحك يومين تجربة مجانية وإرسال رابط التفعيل.');
         closeModal('authModal');
       } catch(e) { showToast('خطأ في التسجيل: ' + e.message); }
     };
@@ -786,7 +832,6 @@
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
 
-    // 🎟️ تفعيل كود الاشتراك باليوم المحدّد من الأدمن
     window.activateUserSubscriptionWithCode = async () => {
       const codeInput = document.getElementById('userActivationCodeInput');
       const code = codeInput ? codeInput.value.trim() : '';
@@ -815,7 +860,7 @@
         window.userProfile.subStartDate = startDate.toISOString().slice(0, 10).replace(/-/g, '/');
         window.userProfile.expiryDate = expiryDate.toISOString().slice(0, 10).replace(/-/g, '/');
 
-        await deleteDoc(codeRef); // حذف الكود لكي يُستخدم لمرة واحدة فقط
+        await deleteDoc(codeRef);
         await saveCurrentWateerah(true);
         updateSubscriptionUI();
         closeModal('pricingModal');
@@ -826,7 +871,6 @@
       }
     };
 
-    // 👑 الأدمن: توليد كود وتحديد الأيام بحرية
     window.adminGenerateActivationCode = async () => {
       const code = document.getElementById('adminNewActivationCode').value.trim();
       const days = parseInt(document.getElementById('adminCodeCustomDays').value) || 365;
@@ -863,7 +907,9 @@
           </div>`;
         });
         listEl.innerHTML = html;
-      } catch(e) { listEl.innerHTML = 'تعذر تحميل الأكواد.'; }
+      } catch(e) {
+        listEl.innerHTML = 'تعذر تحميل الأكواد.';
+      }
     }
 
     window.adminDeleteCode = async (code) => {
@@ -871,10 +917,11 @@
         await deleteDoc(doc(db, "activationCodes", code));
         showToast('تم حذف الكود.');
         loadAdminCodes();
-      } catch(e) { showToast('خطأ في الحذف.'); }
+      } catch(e) {
+        showToast('خطأ في الحذف.');
+      }
     };
 
-    // 👥 جلب قائمة المستخدمين في لوحة الأدمن لتعديل اشتراكاتهم يدوياً
     async function loadAdminUsers() {
       const listEl = document.getElementById('adminUsersList');
       if(!listEl) return;
@@ -893,7 +940,7 @@
           const expiry = data.profile?.expiryDate || 'منتهي';
           html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border-color); gap:8px;">
             <div style="font-size:0.8rem; overflow:hidden; text-overflow:ellipsis;">👤 <strong>${email}</strong><br><span style="color:var(--text-secondary);">(${plan} - ينتهي: ${expiry})</span></div>
-            <button class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="adminEditUserSubscription('${d.id}')">تعديل الاشتراك</button>
+            <button class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem;" onclick="adminEditUserSubscription('${d.id}')">تعديل</button>
           </div>`;
         });
         listEl.innerHTML = html;
@@ -902,7 +949,6 @@
       }
     }
 
-    // 🛠️ تعديل اشتراك مستخدم محدد من الأدمن
     window.adminEditUserSubscription = async (uid) => {
       const newExpiry = prompt("أدخل تاريخ الانتهاء الجديد (صيغة YYYY/MM/DD) أو اكتب 'دائم':");
       if(!newExpiry) return;
@@ -913,7 +959,7 @@
           let p = userSnap.data().profile || {};
           p.isPro = true;
           p.expiryDate = newExpiry;
-          p.planType = 'وتيرة بلس ✨ (مُعدل من الأدمن)';
+          p.planType = 'وتيرة بلس ✨';
           await setDoc(userRef, { profile: p }, { merge: true });
           showToast('تم تعديل اشتراك المستخدم بنجاح ✅');
           loadAdminUsers();
@@ -923,7 +969,11 @@
       }
     };
 
-    // 💬 إرسال إشعار بابل (للجميع أو لمستخدم معين مع تحديد المدة)
+    window.toggleTargetEmailBox = (val) => {
+      document.getElementById('adminSpecificEmailBox').style.display = val === 'SPECIFIC' ? 'block' : 'none';
+    };
+
+    // إرسال إشعار بابل (للجميع أو لشخص معين)
     window.adminSendBubbleNotification = async () => {
       const target = document.getElementById('adminNotifTarget').value;
       const specificEmail = document.getElementById('adminTargetUserEmail').value.trim();
@@ -936,19 +986,16 @@
       const notifData = { message: msg, imageUrl: imgUrl, duration: durationMin, timestamp: Date.now() };
 
       if(target === 'ALL') {
-        // إرسال للجميع عبر تخزين إشعار عام أو حفظه
         localStorage.setItem('wateerah_broadcast_notif', JSON.stringify(notifData));
         showToast('تم إرسال الإشعار لجميع المشتركين بنجاح 🚀');
       } else {
         if(!specificEmail) return showToast('أدخل إيميل المستخدم المستهدف');
-        // إرسال إشعار خاص
         localStorage.setItem(`wateerah_notif_${specificEmail}`, JSON.stringify(notifData));
         showToast(`تم إرسال الإشعار للمستخدم (${specificEmail}) بنجاح 🚀`);
       }
       closeModal('adminModal');
     };
 
-    // فحص ظهور إشعار البابل لدى المستخدم
     function checkBubbleNotification() {
       const broadcast = localStorage.getItem('wateerah_broadcast_notif');
       const userEmail = auth.currentUser ? auth.currentUser.email : null;
@@ -957,7 +1004,6 @@
       let activeNotif = personal ? JSON.parse(personal) : (broadcast ? JSON.parse(broadcast) : null);
 
       if(activeNotif && activeNotif.message) {
-        // التحقق من مدة الانتهاء
         const elapsedMin = (Date.now() - activeNotif.timestamp) / (1000 * 60);
         if(activeNotif.duration === 0 || elapsedMin < activeNotif.duration) {
           const widget = document.getElementById('notificationWidget');
@@ -978,7 +1024,7 @@
 
     window.saveProfile = async () => {
       window.userProfile.name = document.getElementById('profileNameInput').value;
-      document.getElementById('headerUserName').innerText = window.userProfile.name;
+      updateSubscriptionUI();
       closeModal('profileModal');
       saveCurrentWateerah(true);
     };
@@ -1009,7 +1055,7 @@
         document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
         document.getElementById('journalText').value = window.appState.journal || '';
         renderLists();
-        checkBubbleNotification(); // فحص الإشعارات عند الدخول
+        checkBubbleNotification();
       } else {
         updateSubscriptionUI();
         renderLists();
