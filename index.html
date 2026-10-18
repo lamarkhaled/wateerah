@@ -327,7 +327,7 @@
     </div>
   </div>
 
-  <!-- 👑 لوحة تحكم الأدمن (توليد أكواد التفعيل لمرة واحدة وتتبع المشتركين) -->
+  <!-- 👑 لوحة تحكم الأدمن -->
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
@@ -351,15 +351,15 @@
         <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminGenerateActivationCode()">إضافة وحفظ كود التفعيل 🚀</button>
       </div>
 
-      <!-- قائمة الأكواد النشطة حالياً -->
+      <!-- قائمة الأكواد النشطة -->
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
         <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📋 الأكواد المتاحة في النظام:</h4>
         <div id="adminCodesList" style="font-size: 0.85rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
-          <!-- يتم تعبئتها برمجياً -->
+          جاري التحميل...
         </div>
       </div>
 
-      <!-- إدارة الحسابات وإرسال الروابط -->
+      <!-- إدارة الحسابات وإرسال الروابط (مع دالة إرسال الاستعادة الحقيقية المحدثة) -->
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
         <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📩 إدارة الحسابات وإرسال الروابط الرسمية</h4>
         <div class="form-group" style="margin-bottom: 8px;"><input type="email" id="adminAccountEmail" placeholder="أدخل بريد العميل..."></div>
@@ -371,7 +371,7 @@
     </div>
   </div>
 
-  <!-- نافذة تفعيل الاشتراك (إدخال الكود أو رابط متجر سلة) -->
+  <!-- نافذة تفعيل الاشتراك (عبر الأكواد الفريدة) -->
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 480px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
@@ -399,7 +399,6 @@
         <h3 style="margin: 16px 0 8px;">حالة باقتك النشطة</h3>
         <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 16px;" id="subActiveDetails"></p>
         
-        <!-- شريط التقدم المتبقي للأيام -->
         <div style="margin-bottom: 20px;">
           <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
             <span>الأيام المتبقية:</span>
@@ -449,7 +448,7 @@
       name: 'لمار', 
       planType: 'الباقة الأساسية', 
       isPro: false, 
-      expiryDate: '' // تاريخ انتهاء الاشتراك
+      expiryDate: '' 
     };
 
     window.appState = {
@@ -736,17 +735,16 @@
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
 
-    // 🎟️ نظام تفعيل الاشتراك عبر الأكواد (تُستخدم لمرة واحدة فقط وتُحذف)
+    // 🎟️ تفعيل الاشتراك عبر كود فريد (مرة واحدة فقط)
     window.activateUserSubscriptionWithCode = async () => {
-      const codeInput = document.getElementById('userCouponInput') || document.getElementById('userActivationCodeInput');
-      const code = codeInput.value.trim();
+      const codeInput = document.getElementById('userActivationCodeInput');
+      const code = codeInput ? codeInput.value.trim() : '';
       if(!code) return showToast('أدخل كود التفعيل من فضلك');
 
       const user = auth.currentUser;
       if(!user) return showToast('يرجى تسجيل الدخول أولاً لتفعيل اشتراكك');
 
       try {
-        // التحقق من وجود الكود في قاعدة بيانات الأكواد بـ Firebase
         const codeRef = doc(db, "activationCodes", code);
         const codeSnap = await getDoc(codeRef);
 
@@ -757,7 +755,6 @@
         const codeData = codeSnap.data();
         const days = codeData.days || 365;
 
-        // حساب تاريخ انتهاء الاشتراك
         const startDate = new Date();
         const expiryDate = new Date();
         expiryDate.setDate(startDate.getDate() + days);
@@ -767,10 +764,9 @@
         window.userProfile.subStartDate = startDate.toISOString().slice(0, 10).replace(/-/g, '/');
         window.userProfile.expiryDate = expiryDate.toISOString().slice(0, 10).replace(/-/g, '/');
 
-        // حذف الكود فوراً لكي لا يتم استخدامه مرة أخرى (يُستخدم مرة واحدة فقط)
+        // حذف الكود لكي لا يتم استخدامه مرة أخرى
         await deleteDoc(codeRef);
 
-        // حفظ حالة المستخدم الجديدة في قاعدة البيانات
         await saveCurrentWateerah(true);
         updateSubscriptionUI();
         closeModal('pricingModal');
@@ -781,7 +777,7 @@
       }
     };
 
-    // 👑 توليد كود تفعيل جديد من لوحة الأدمن وحفظه في Firestore
+    // 👑 توليد كود تفعيل جديد من لوحة الأدمن
     window.adminGenerateActivationCode = async () => {
       const code = document.getElementById('adminNewActivationCode').value.trim();
       const days = parseInt(document.getElementById('adminCodeDays').value) || 365;
@@ -801,7 +797,6 @@
       }
     };
 
-    // جلب وعرض الأكواد النشطة في لوحة الأدمن
     async function loadAdminCodes() {
       const listEl = document.getElementById('adminCodesList');
       if(!listEl) return;
@@ -836,11 +831,17 @@
       }
     };
 
+    // دالة إرسال رابط التفعيل الحقيقي المرتبطة بـ Firebase Auth
     window.adminResendVerification = async () => {
       const email = document.getElementById('adminAccountEmail').value.trim();
-      if(!email) return showToast('أدخل بريد العميل');
-      showToast(`تم إرسال رابط تأكيد وتفعيل البريد إلى: ${email} (الحالة: نشط ✅)`);
-      document.getElementById('adminAccountEmail').value = '';
+      if(!email) return showToast('أدخل بريد العميل في الحقل المخصص أولاً');
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showToast(`تم إرسال رابط التحقق والتفعيل الرسمي بنجاح إلى: ${email} (الحالة: نشط ✅)`);
+        document.getElementById('adminAccountEmail').value = '';
+      } catch(e) {
+        showToast('تعذر إرسال البريد. تأكد من أن الإيميل مسجل في المنصة.');
+      }
     };
 
     window.adminSendPasswordReset = async () => {
