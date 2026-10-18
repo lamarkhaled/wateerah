@@ -61,7 +61,6 @@
     .profile-pill { display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 8px; border-radius: 100px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; }
     .avatar-circle { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 600; }
 
-    /* فقاعة الإشعارات العائمة */
     #notificationWidget {
       position: fixed; bottom: 24px; right: 24px; max-width: 320px;
       background: var(--bg-card); border: 1px solid var(--border-color);
@@ -316,6 +315,18 @@
     </div>
   </div>
 
+  <!-- نافذة التنبيه بحالة البريد غير المفعل (تظهر للعميل فوراً عند محاولة الدخول بإيميل غير مفعل) -->
+  <div id="verificationNoticeModal" class="modal-overlay">
+    <div class="modal-box" style="text-align: center; max-width: 440px;">
+      <h3 style="margin-bottom: 12px; color: var(--danger-color);">⚠️ بريدك الإلكتروني غير مفعل</h3>
+      <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+        عذراً، لا يمكنك الدخول حتى تقوم بتفعيل بريدك الإلكتروني. يرجى التحقق من صندوق الوارد (أو الـ Spam)، وإذا لم تستلم الرابط اضغط على الزر أدناه لإعادة إرساله فوراً.
+      </p>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px; padding: 12px;" onclick="resendVerificationEmailDirectly()">إعادة إرسال رابط التفعيل الآن ✉️</button>
+      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('verificationNoticeModal')">إغلاق</button>
+    </div>
+  </div>
+
   <!-- نافذة استعادة كلمة المرور -->
   <div id="resetModal" class="modal-overlay">
     <div class="modal-box">
@@ -356,16 +367,6 @@
         <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📋 الأكواد المتاحة في النظام:</h4>
         <div id="adminCodesList" style="font-size: 0.85rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
           جاري التحميل...
-        </div>
-      </div>
-
-      <!-- إدارة الحسابات وإرسال الروابط (مع دالة إرسال الاستعادة الحقيقية المحدثة) -->
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📩 إدارة الحسابات وإرسال الروابط الرسمية</h4>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="email" id="adminAccountEmail" placeholder="أدخل بريد العميل..."></div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="adminResendVerification()">إعادة إرسال تفعيل البريد ✉️</button>
-          <button class="btn btn-danger" style="flex: 1; justify-content: center;" onclick="adminSendPasswordReset()">استعادة كلمة المرور 🔒</button>
         </div>
       </div>
     </div>
@@ -443,14 +444,9 @@
     const db = getFirestore(app);
 
     const ADMIN_EMAIL = "wateerahapp@gmail.com";
+    let unverifiedUserObject = null; // الاحتفاظ بالمستخدم غير المفعل لإعادة إرسال التفعيل له
 
-    window.userProfile = { 
-      name: 'لمار', 
-      planType: 'الباقة الأساسية', 
-      isPro: false, 
-      expiryDate: '' 
-    };
-
+    window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '' };
     window.appState = {
       theme: 'default', focusGoal: '', journal: '', hiddenWidgets: [],
       habits: [{ text: 'قراءة 15 صفحة', done: false }],
@@ -491,9 +487,7 @@
           `;
         }
       }
-      if (id === 'adminModal') {
-        await loadAdminCodes();
-      }
+      if (id === 'adminModal') { await loadAdminCodes(); }
       document.getElementById(id).classList.add('open');
     };
     window.closeModal = id => document.getElementById(id).classList.remove('open');
@@ -702,7 +696,7 @@
       const pass = document.getElementById('regPassword').value;
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        await sendEmailVerification(cred.user);
+        await sendEmailVerification(cred.user); // إرسال إيميل التفعيل الحقيقي
         window.userProfile.name = name;
         await setDoc(doc(db, "users", cred.user.uid), { email, profile: window.userProfile, state: window.appState, status: 'نشط', createdAt: new Date().toISOString() });
         showToast('تم إنشاء الحساب وإرسال رابط تفعيل البريد الحقيقي!');
@@ -710,19 +704,39 @@
       } catch(e) { showToast('خطأ في التسجيل: ' + e.message); }
     };
 
+    // فحص تفعيل الإيميل لحظة دخول العميل وإظهار نافذة إعادة الترسيل إن لم يكن مفعلاً
     window.handleLogin = async () => {
       const email = document.getElementById('loginEmail').value;
       const pass = document.getElementById('loginPassword').value;
       try {
         const cred = await signInWithEmailAndPassword(auth, email, pass);
+        
+        // التحقق مما إذا كان البريد غير مفعل ولم يكن هو حساب الأدمن
         if (!cred.user.emailVerified && cred.user.email !== ADMIN_EMAIL) {
-          showToast('حسابك غير مفعل! يرجى التحقق من بريدك.');
-          await signOut(auth);
+          unverifiedUserObject = cred.user; // حفظ الكائن لإعادة الإرسال
+          closeModal('authModal');
+          document.getElementById('verificationNoticeModal').classList.add('open'); // إظهار نافذة التنبيه للعميل
+          await signOut(auth); // إبقاء الحساب مقفلاً لحين التفعيل
           return;
         }
+
         closeModal('authModal');
         showToast('أهلاً بك بعودتك!');
       } catch(e) { showToast('بيانات الدخول غير صحيحة.'); }
+    };
+
+    // زر إعادة إرسال رابط التفعيل المباشر للعميل من النافذة المنبثقة
+    window.resendVerificationEmailDirectly = async () => {
+      if(!unverifiedUserObject) {
+        return showToast('يرجى محاولة تسجيل الدخول مرة أخرى أولاً.');
+      }
+      try {
+        await sendEmailVerification(unverifiedUserObject);
+        showToast('✉️ تم إرسال رابط تفعيل البريد الإلكتروني الجديد بنجاح! تحقق من بريدك.');
+        closeModal('verificationNoticeModal');
+      } catch(e) {
+        showToast('يرجى الانتظار قليلاً قبل إعادة محاولة الإرسال.');
+      }
     };
 
     window.handleResetPassword = async () => {
@@ -735,7 +749,6 @@
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
 
-    // 🎟️ تفعيل الاشتراك عبر كود فريد (مرة واحدة فقط)
     window.activateUserSubscriptionWithCode = async () => {
       const codeInput = document.getElementById('userActivationCodeInput');
       const code = codeInput ? codeInput.value.trim() : '';
@@ -764,9 +777,7 @@
         window.userProfile.subStartDate = startDate.toISOString().slice(0, 10).replace(/-/g, '/');
         window.userProfile.expiryDate = expiryDate.toISOString().slice(0, 10).replace(/-/g, '/');
 
-        // حذف الكود لكي لا يتم استخدامه مرة أخرى
         await deleteDoc(codeRef);
-
         await saveCurrentWateerah(true);
         updateSubscriptionUI();
         closeModal('pricingModal');
@@ -777,7 +788,6 @@
       }
     };
 
-    // 👑 توليد كود تفعيل جديد من لوحة الأدمن
     window.adminGenerateActivationCode = async () => {
       const code = document.getElementById('adminNewActivationCode').value.trim();
       const days = parseInt(document.getElementById('adminCodeDays').value) || 365;
@@ -792,9 +802,7 @@
         document.getElementById('adminNewActivationCode').value = '';
         showToast(`تم إنشاء وتوليد الكود (${code}) بنجاح!`);
         loadAdminCodes();
-      } catch(e) {
-        showToast('خطأ في إنشاء الكود.');
-      }
+      } catch(e) { showToast('خطأ في إنشاء الكود.'); }
     };
 
     async function loadAdminCodes() {
@@ -816,9 +824,7 @@
           </div>`;
         });
         listEl.innerHTML = html;
-      } catch(e) {
-        listEl.innerHTML = 'تعذر تحميل الأكواد.';
-      }
+      } catch(e) { listEl.innerHTML = 'تعذر تحميل الأكواد.'; }
     }
 
     window.adminDeleteCode = async (code) => {
@@ -826,32 +832,7 @@
         await deleteDoc(doc(db, "activationCodes", code));
         showToast('تم حذف الكود.');
         loadAdminCodes();
-      } catch(e) {
-        showToast('خطأ في الحذف.');
-      }
-    };
-
-    // دالة إرسال رابط التفعيل الحقيقي المرتبطة بـ Firebase Auth
-    window.adminResendVerification = async () => {
-      const email = document.getElementById('adminAccountEmail').value.trim();
-      if(!email) return showToast('أدخل بريد العميل في الحقل المخصص أولاً');
-      try {
-        await sendPasswordResetEmail(auth, email);
-        showToast(`تم إرسال رابط التحقق والتفعيل الرسمي بنجاح إلى: ${email} (الحالة: نشط ✅)`);
-        document.getElementById('adminAccountEmail').value = '';
-      } catch(e) {
-        showToast('تعذر إرسال البريد. تأكد من أن الإيميل مسجل في المنصة.');
-      }
-    };
-
-    window.adminSendPasswordReset = async () => {
-      const email = document.getElementById('adminAccountEmail').value.trim();
-      if(!email) return showToast('أدخل بريد العميل');
-      try {
-        await sendPasswordResetEmail(auth, email);
-        showToast(`تم إرسال استعادة كلمة المرور إلى: ${email}`);
-        document.getElementById('adminAccountEmail').value = '';
-      } catch(e) { showToast('البريد غير مسجل.'); }
+      } catch(e) { showToast('خطأ في الحذف.'); }
     };
 
     window.saveProfile = async () => {
