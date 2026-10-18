@@ -1,6 +1,11 @@
 import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
-import { doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+import { doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import './ui.js';
+import './widgets.js';
+import './auth.js';
+import './admin.js';
 
 window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
