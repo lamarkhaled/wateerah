@@ -1,249 +1,82 @@
-// assets/js/widgets.js
-        <input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()">
-      </div>
-      <button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button>
-    </li>`).join('');
-
-  document.getElementById('walletsList').innerHTML = (window.appState.wallets || []).map((w, i) => `
-    <li class="list-item">
-      <div class="item-left">
-        <input type="text" class="item-text-input" value="${w.name}" onchange="window.appState.wallets[${i}].name=this.value; window.autoSave()" style="font-weight:600;">
-        <input type="number" class="item-text-input" value="${w.balance}" onchange="window.appState.wallets[${i}].balance=parseFloat(this.value)||0; window.autoSave(); window.calculateDistribution();" style="color:var(--accent-color); font-weight:700; max-width:90px;">
-        <span style="font-size:0.75rem; color:var(--text-secondary);">ر.س</span>
-      </div>
-      <button class="delete-btn" onclick="window.appState.wallets.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button>
-    </li>`).join('');
-
-  document.getElementById('wishlistList').innerHTML = (window.appState.wishlist || []).map((w, i) => `
-    <li class="list-item">
-      <div class="item-left">
-        <input type="text" class="item-text-input" value="${w.title}" onchange="window.appState.wishlist[${i}].title=this.value; window.autoSave()">
-        <span style="font-size:0.8rem; font-weight:600; color:var(--danger-color);">${w.cost} ر.س</span>
-      </div>
-      <button class="delete-btn" onclick="window.appState.wishlist.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button>
-    </li>`).join('');
-
-  document.getElementById('subscriptionsList').innerHTML = (window.appState.subscriptions || []).map((s, i) => `
-    <li class="list-item">
-      <div class="item-left">
-        <input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; window.autoSave()">
-        <span style="font-size:0.8rem; font-weight:600;">${s.cost} ر.س</span>
-      </div>
-      <button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button>
-    </li>`).join('');
-
-  window.calculateDistribution();
-};
-
-window.calculateDistribution = () => {
-  const income = parseFloat(document.getElementById('totalIncomeInput')?.value) || 5000;
-  const container = document.getElementById('distributionResults');
-  if(container) {
-    container.innerHTML = `
-      <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>
-      <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div>
-      <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div>
-      <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div>
-      <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>
-    `;
-  }
-};
-
-window.renderWidgetLibraryModal = function() {
-  const AVAILABLE_WIDGETS = [
-    { id: 'widget-vision', name: 'لوحة الأهداف', desc: 'بورد واقعي مع صور وخطط' },
-    { id: 'widget-kanban', name: 'المهام المتنقلة', desc: 'أعمدة للحالات مع الأولوية' },
-    { id: 'widget-focus', name: 'بوصلة التركيز', desc: 'تحديد الهدف الأهم لليوم' },
-    { id: 'widget-habits', name: 'متتبع العادات', desc: 'قائمة العادات اليومية' },
-    { id: 'widget-finance', name: 'إدارة المالية', desc: 'المحافظ، والاشتراكات، والتوزيع' },
-    { id: 'widget-journal', name: 'مساحة التدوين', desc: 'تدوين حر للأفكار' }
-  ];
-  const active = window.appState.activeWidgets || [];
-  document.getElementById('widgetLibraryList').innerHTML = AVAILABLE_WIDGETS.map(w => {
-    const isAdded = active.includes(w.id);
-    return `
-      <div class="list-item" style="padding: 12px 16px;">
-        <div>
-          <div style="font-weight: 600; font-size: 0.9rem;">${w.name}</div>
-          <div style="font-size: 0.76rem; color: var(--text-secondary);">${w.desc}</div>
-        </div>
-        ${isAdded ? `<button class="btn btn-danger" onclick="removeWidget('${w.id}')">إزالة</button>` : `<button class="btn btn-primary" onclick="addWidgetToWorkspace('${w.id}')">إضافة</button>`}
-      </div>
-    `;
-  }).join('');
-};
-
-window.addWidgetToWorkspace = (wId) => {
-  if (!window.appState.activeWidgets) window.appState.activeWidgets = [];
-  if (!window.appState.activeWidgets.includes(wId)) window.appState.activeWidgets.push(wId);
-  window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave();
-};
-
-window.removeWidget = (wId) => {
-  window.appState.activeWidgets = (window.appState.activeWidgets || []).filter(id => id !== wId);
-  window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave();
-};
-
-// وظائف الفجن بورد
 window.renderVisionBoard = function() {
   const board = document.getElementById('corkboardContainer');
-  if (!window.appState.visionBoard || window.appState.visionBoard.length === 0) {
-    if(board) board.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.85); padding: 60px 20px; font-size: 0.92rem;">اللوح الخشبي فارغ حالياً. أضف أول صورة لهدفك لتثبيتها هنا.</div>`;
-    return;
-  }
+  if (!window.appState.visionBoard || window.appState.visionBoard.length === 0) { if(board) board.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.85); padding: 60px 20px; font-size: 0.92rem;">اللوح الخشبي فارغ حالياً.</div>`; return; }
   if(board) board.innerHTML = window.appState.visionBoard.map((item, idx) => {
-    const tasks = item.tasks || [];
-    const doneCount = tasks.filter(t => t.done).length;
-    const pct = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : (item.manualPct || 0);
-    return `
-      <div class="polaroid-item" onclick="openVisionDetail(${idx})">
-        <div class="board-pin"></div>
-        <img class="polaroid-img" src="${item.img}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500'">
-        <div class="polaroid-caption">
-          <span>${item.title}</span><span style="font-size: 0.78rem; font-weight: 700; color: #1F4E3D;">${pct}%</span>
-        </div>
-        <div class="polaroid-meta"><span>${item.targetDate || 'بدون تاريخ'}</span><span>${tasks.length} مهام</span></div>
-        <div class="polaroid-progress-bg"><div class="polaroid-progress-fill" style="width: ${pct}%;"></div></div>
-      </div>
-    `;
+    const tasks = item.tasks || []; const doneCount = tasks.filter(t => t.done).length; const pct = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : (item.manualPct || 0);
+    return `<div class="polaroid-item" onclick="window.openVisionDetail(${idx})"><div class="board-pin"></div><img class="polaroid-img" src="${item.img}" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500'"><div class="polaroid-caption"><span>${item.title}</span><span style="font-size: 0.78rem; font-weight: 700; color: #1F4E3D;">${pct}%</span></div><div class="polaroid-meta"><span>${item.targetDate || 'بدون تاريخ'}</span><span>${tasks.length} مهام</span></div><div class="polaroid-progress-bg"><div class="polaroid-progress-fill" style="width: ${pct}%;"></div></div></div>`;
   }).join('');
 };
 
 window.addVisionItem = () => {
-  const title = document.getElementById('newVisionTitle').value.trim();
-  const img = document.getElementById('newVisionImg').value.trim();
-  const targetDate = document.getElementById('newVisionDate').value;
-  if (!title) return window.showToast('أدخل عنوان الهدف أولاً');
+  const title = document.getElementById('newVisionTitle').value.trim(); const img = document.getElementById('newVisionImg').value.trim(); const targetDate = document.getElementById('newVisionDate').value;
+  if (!title) return window.showToast('أدخل عنوان الهدف');
   if (!window.appState.visionBoard) window.appState.visionBoard = [];
   window.appState.visionBoard.push({ title, img: img || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500', targetDate: targetDate || '', plan: '', tasks: [] });
-  document.getElementById('newVisionTitle').value = ''; document.getElementById('newVisionImg').value = ''; document.getElementById('newVisionDate').value = '';
-  window.renderVisionBoard(); window.autoSave(); window.showToast('تم تثبيت الهدف');
+  document.getElementById('newVisionTitle').value = ''; document.getElementById('newVisionImg').value = ''; document.getElementById('newVisionDate').value = ''; window.renderVisionBoard(); window.autoSave(); window.showToast('تم تثبيت الهدف');
 };
 
 window.openVisionDetail = (idx) => {
-  window.activeVisionIndex = idx;
-  const item = window.appState.visionBoard[idx];
-  if (!item) return;
-  document.getElementById('vModalImg').src = item.img;
-  document.getElementById('vModalTitle').innerText = item.title;
-  document.getElementById('vModalDate').value = item.targetDate || '';
-  document.getElementById('vModalPlan').value = item.plan || '';
-  window.renderVisionModalTasks();
-  window.openModal('visionDetailModal');
+  window.activeVisionIndex = idx; const item = window.appState.visionBoard[idx]; if (!item) return;
+  document.getElementById('vModalImg').src = item.img; document.getElementById('vModalTitle').innerText = item.title; document.getElementById('vModalDate').value = item.targetDate || ''; document.getElementById('vModalPlan').value = item.plan || '';
+  window.renderVisionModalTasks(); window.openModal('visionDetailModal');
 };
 
 window.renderVisionModalTasks = function() {
-  if (window.activeVisionIndex === null) return;
-  const item = window.appState.visionBoard[window.activeVisionIndex];
-  if (!item.tasks) item.tasks = [];
-  const doneCount = item.tasks.filter(t => t.done).length;
-  const pct = item.tasks.length > 0 ? Math.round((doneCount / item.tasks.length) * 100) : 0;
-  document.getElementById('vModalPercentBadge').innerText = `${pct}% مكتمل`;
-  document.getElementById('vModalProgressBar').style.width = `${pct}%`;
-  document.getElementById('vModalTasksList').innerHTML = item.tasks.map((t, tIdx) => `
-    <li class="list-item ${t.done ? 'completed' : ''}">
-      <div class="item-left"><div class="checkbox" onclick="toggleVisionSubTask(${tIdx})">${t.done ? '✓' : ''}</div><span style="font-size: 0.86rem;">${t.text}</span></div>
-      <button class="delete-btn" onclick="deleteVisionSubTask(${tIdx})">&times;</button>
-    </li>
-  `).join('');
+  if (window.activeVisionIndex === null) return; const item = window.appState.visionBoard[window.activeVisionIndex]; if (!item.tasks) item.tasks = [];
+  const doneCount = item.tasks.filter(t => t.done).length; const pct = item.tasks.length > 0 ? Math.round((doneCount / item.tasks.length) * 100) : 0;
+  document.getElementById('vModalPercentBadge').innerText = `${pct}% مكتمل`; document.getElementById('vModalProgressBar').style.width = `${pct}%`;
+  document.getElementById('vModalTasksList').innerHTML = item.tasks.map((t, tIdx) => `<li class="list-item ${t.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleVisionSubTask(${tIdx})">${t.done ? '✓' : ''}</div><span style="font-size: 0.86rem;">${t.text}</span></div><button class="delete-btn" onclick="window.deleteVisionSubTask(${tIdx})">&times;</button></li>`).join('');
 };
 
-window.addVisionSubTask = () => {
-  if (window.activeVisionIndex === null) return;
-  const input = document.getElementById('vModalNewTaskInput');
-  if (!input.value.trim()) return;
-  window.appState.visionBoard[window.activeVisionIndex].tasks.push({ text: input.value.trim(), done: false });
-  input.value = ''; window.renderVisionModalTasks(); window.renderVisionBoard(); window.autoSave();
-};
+window.addVisionSubTask = () => { if (window.activeVisionIndex === null) return; const input = document.getElementById('vModalNewTaskInput'); if (!input.value.trim()) return; window.appState.visionBoard[window.activeVisionIndex].tasks.push({ text: input.value.trim(), done: false }); input.value = ''; window.renderVisionModalTasks(); window.renderVisionBoard(); window.autoSave(); };
+window.toggleVisionSubTask = (tIdx) => { const item = window.appState.visionBoard[window.activeVisionIndex]; item.tasks[tIdx].done = !item.tasks[tIdx].done; window.renderVisionModalTasks(); window.renderVisionBoard(); window.autoSave(); };
+window.deleteVisionSubTask = (tIdx) => { window.appState.visionBoard[window.activeVisionIndex].tasks.splice(tIdx, 1); window.renderVisionModalTasks(); window.renderVisionBoard(); window.autoSave(); };
+window.saveVisionModalChanges = () => { if (window.activeVisionIndex === null) return; const item = window.appState.visionBoard[window.activeVisionIndex]; item.targetDate = document.getElementById('vModalDate').value; item.plan = document.getElementById('vModalPlan').value; window.renderVisionBoard(); window.autoSave(); };
+window.deleteCurrentVisionItem = () => { if (window.activeVisionIndex === null) return; window.appState.visionBoard.splice(window.activeVisionIndex, 1); window.activeVisionIndex = null; window.closeModal('visionDetailModal'); window.renderVisionBoard(); window.autoSave(); };
 
-window.toggleVisionSubTask = (tIdx) => {
-  const item = window.appState.visionBoard[window.activeVisionIndex];
-  item.tasks[tIdx].done = !item.tasks[tIdx].done;
-  window.renderVisionModalTasks(); window.renderVisionBoard(); window.autoSave();
-};
-
-window.deleteVisionSubTask = (tIdx) => {
-  window.appState.visionBoard[window.activeVisionIndex].tasks.splice(tIdx, 1);
-  window.renderVisionModalTasks(); window.renderVisionBoard(); window.autoSave();
-};
-
-window.saveVisionModalChanges = () => {
-  if (window.activeVisionIndex === null) return;
-  const item = window.appState.visionBoard[window.activeVisionIndex];
-  item.targetDate = document.getElementById('vModalDate').value;
-  item.plan = document.getElementById('vModalPlan').value;
-  window.renderVisionBoard(); window.autoSave();
-};
-
-window.deleteCurrentVisionItem = () => {
-  if (window.activeVisionIndex === null) return;
-  window.appState.visionBoard.splice(window.activeVisionIndex, 1);
-  window.activeVisionIndex = null;
-  window.closeModal('visionDetailModal'); window.renderVisionBoard(); window.autoSave();
-};
-
-// وظائف الكانبان
 window.renderKanbanBoard = function() {
   if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
   const cols = { idea: [], scheduled: [], progress: [], done: [] };
-  window.appState.kanbanTasks.forEach((task, idx) => {
-    const st = cols[task.status] ? task.status : 'idea';
-    cols[st].push({ ...task, idx });
-  });
-  const priorityLabel = { urgent: 'عاجل', normal: 'غير عاجل', low: 'غير مهم' };
-  const priorityClass = { urgent: 'p-urgent', normal: 'p-normal', low: 'p-low' };
+  window.appState.kanbanTasks.forEach((task, idx) => { const st = cols[task.status] ? task.status : 'idea'; cols[st].push({ ...task, idx }); });
+  const priorityLabel = { urgent: 'عاجل', normal: 'غير عاجل', low: 'غير مهم' }; const priorityClass = { urgent: 'p-urgent', normal: 'p-normal', low: 'p-low' };
 
   ['idea', 'scheduled', 'progress', 'done'].forEach(colKey => {
-    const countEl = document.getElementById(`count-${colKey}`);
-    const wrapEl = document.getElementById(`col-${colKey}`);
+    const countEl = document.getElementById(`count-${colKey}`); const wrapEl = document.getElementById(`col-${colKey}`);
     if(countEl) countEl.innerText = cols[colKey].length;
-    if(wrapEl) wrapEl.innerHTML = cols[colKey].map(item => `
-      <div class="kanban-card" draggable="true" ondragstart="dragKanbanCard(event, ${item.idx})">
-        <div class="kanban-card-title">${item.title}</div>
-        <div class="kanban-badges">
-          <span class="priority-badge ${priorityClass[item.priority] || 'p-normal'}">${priorityLabel[item.priority] || 'غير عاجل'}</span>
-          ${item.date ? `<span class="date-badge">${item.date}</span>` : ''}
-        </div>
-        <div class="kanban-card-footer">
-          <select onchange="changeKanbanStatus(${item.idx}, this.value)">
-            <option value="idea" ${item.status==='idea'?'selected':''}>فكرة</option>
-            <option value="scheduled" ${item.status==='scheduled'?'selected':''}>مجدول</option>
-            <option value="progress" ${item.status==='progress'?'selected':''}>قيد التنفيذ</option>
-            <option value="done" ${item.status==='done'?'selected':''}>مكتمل</option>
-          </select>
-          <button class="delete-btn" onclick="deleteKanbanTask(${item.idx})">&times;</button>
-        </div>
-      </div>
-    `).join('');
+    if(wrapEl) wrapEl.innerHTML = cols[colKey].map(item => `<div class="kanban-card" draggable="true" ondragstart="window.dragKanbanCard(event, ${item.idx})"><div class="kanban-card-title">${item.title}</div><div class="kanban-badges"><span class="priority-badge ${priorityClass[item.priority] || 'p-normal'}">${priorityLabel[item.priority] || 'غير عاجل'}</span>${item.date ? `<span class="date-badge">${item.date}</span>` : ''}</div><div class="kanban-card-footer"><select onchange="window.changeKanbanStatus(${item.idx}, this.value)"><option value="idea" ${item.status==='idea'?'selected':''}>فكرة</option><option value="scheduled" ${item.status==='scheduled'?'selected':''}>مجدول</option><option value="progress" ${item.status==='progress'?'selected':''}>قيد التنفيذ</option><option value="done" ${item.status==='done'?'selected':''}>مكتمل</option></select><button class="delete-btn" onclick="window.deleteKanbanTask(${item.idx})">&times;</button></div></div>`).join('');
   });
 };
 
 window.addKanbanTask = () => {
-  const title = document.getElementById('newKanbanTitle').value.trim();
-  const status = document.getElementById('newKanbanStatus').value;
-  const priority = document.getElementById('newKanbanPriority').value;
-  const date = document.getElementById('newKanbanDate').value;
+  const title = document.getElementById('newKanbanTitle').value.trim(); const status = document.getElementById('newKanbanStatus').value; const priority = document.getElementById('newKanbanPriority').value; const date = document.getElementById('newKanbanDate').value;
   if (!title) return window.showToast('أدخل عنوان المهمة');
   if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
-  window.appState.kanbanTasks.push({ title, status, priority, date });
-  document.getElementById('newKanbanTitle').value = '';
-  window.renderKanbanBoard(); window.autoSave();
+  window.appState.kanbanTasks.push({ title, status, priority, date }); document.getElementById('newKanbanTitle').value = ''; window.renderKanbanBoard(); window.autoSave();
 };
 
 window.changeKanbanStatus = (idx, newStatus) => { window.appState.kanbanTasks[idx].status = newStatus; window.renderKanbanBoard(); window.autoSave(); };
 window.deleteKanbanTask = (idx) => { window.appState.kanbanTasks.splice(idx, 1); window.renderKanbanBoard(); window.autoSave(); };
 window.dragKanbanCard = (e, idx) => { e.stopPropagation(); window.draggedKanbanIndex = idx; };
 window.allowKanbanDrop = (e) => { e.preventDefault(); };
-window.dropKanbanCard = (e, targetStatus) => {
-  e.preventDefault();
-  if (window.draggedKanbanIndex === null) return;
-  window.appState.kanbanTasks[window.draggedKanbanIndex].status = targetStatus;
-  window.draggedKanbanIndex = null; window.renderKanbanBoard(); window.autoSave();
+window.dropKanbanCard = (e, targetStatus) => { e.preventDefault(); if (window.draggedKanbanIndex === null) return; window.appState.kanbanTasks[window.draggedKanbanIndex].status = targetStatus; window.draggedKanbanIndex = null; window.renderKanbanBoard(); window.autoSave(); };
+
+window.renderLists = function() {
+  window.renderVisionBoard(); window.renderKanbanBoard();
+  document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
+  document.getElementById('walletsList').innerHTML = (window.appState.wallets || []).map((w, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${w.name}" onchange="window.appState.wallets[${i}].name=this.value; window.autoSave()" style="font-weight:600;"><input type="number" class="item-text-input" value="${w.balance}" onchange="window.appState.wallets[${i}].balance=parseFloat(this.value)||0; window.autoSave(); window.calculateDistribution();" style="color:var(--accent-color); font-weight:700; max-width:90px;"><span style="font-size:0.75rem; color:var(--text-secondary);">ر.س</span></div><button class="delete-btn" onclick="window.appState.wallets.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
+  document.getElementById('wishlistList').innerHTML = (window.appState.wishlist || []).map((w, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${w.title}" onchange="window.appState.wishlist[${i}].title=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600; color:var(--danger-color);">${w.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.wishlist.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
+  document.getElementById('subscriptionsList').innerHTML = (window.appState.subscriptions || []).map((s, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600;">${s.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
+  window.calculateDistribution();
 };
 
-// وظائف الإضافة السريعة
 window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
 window.addHabit = () => { const el = document.getElementById('newHabitInput'); if(!el.value.trim())return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; window.renderLists(); window.autoSave(); };
 window.addWallet = () => { const n = document.getElementById('newWalletName'); const b = document.getElementById('newWalletBalance'); if(!n.value.trim())return; window.appState.wallets.push({name:n.value.trim(), balance:parseFloat(b.value)||0}); n.value=''; b.value=''; window.renderLists(); window.autoSave(); };
 window.addWishlistItem = () => { const t = document.getElementById('newWishTitle'); const c = document.getElementById('newWishCost'); if(!t.value.trim())return; window.appState.wishlist.push({title:t.value.trim(), cost:parseFloat(c.value)||0}); t.value=''; c.value=''; window.renderLists(); window.autoSave(); };
 window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; window.renderLists(); window.autoSave(); };
+
+window.calculateDistribution = () => {
+  const income = parseFloat(document.getElementById('totalIncomeInput')?.value) || 5000;
+  const container = document.getElementById('distributionResults');
+  if(container) container.innerHTML = `<div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>`;
+};
