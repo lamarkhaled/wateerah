@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>وتيرة — صمّم إيقاع يومك</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* ثيم الورق الدافئ (الافتراضي - فايب ثمانية) */
+      --bg-primary: #F9F8F6;
+      --bg-card: #FFFFFF;
+      --text-primary: #141413;
+      --text-secondary: #6E6D6A;
+      --border-color: #E6E4E0;
+      --accent-color: #1F4E3D;
+      --accent-light: #EBF2EF;
+      --radius: 16px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="minimal"] {
+      --bg-primary: #FFFFFF;
+      --bg-card: #F7F7F8;
+      --text-primary: #09090B;
+      --text-secondary: #71717A;
+      --border-color: #E4E4E7;
+      --accent-color: #18181B;
+      --accent-light: #F4F4F5;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #111110;
+      --bg-card: #1A1A19;
+      --text-primary: #F3F2EE;
+      --text-secondary: #8E8D8A;
+      --border-color: #2A2A28;
+      --accent-color: #D4A373;
+      --accent-light: #26211C;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: var(--transition);
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* الهيدر العلوي */
+    header {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .brand h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span.dot {
+      color: var(--accent-color);
+      font-size: 2.4rem;
+      line-height: 0;
+    }
+
+    .brand p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-right: 8px;
+      padding-right: 12px;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      border-color: var(--text-primary);
+    }
+
+    .btn-primary {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      border-color: var(--text-primary);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .pro-badge {
+      background: var(--accent-light);
+      color: var(--accent-color);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* الحاوية الرئيسية */
+    main {
+      max-width: 1120px;
+      margin: 40px auto 0;
+      padding: 0 24px;
+    }
+
+    /* قسم الترحيب والتركيز اليومي */
+    .hero-section {
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .greeting h2 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .greeting p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+    }
+
+    .save-status {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* شريط تخصيص الوتيرة */
+    .customizer-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .customizer-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .customizer-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .chip {
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .chip.active {
+      background: var(--accent-color);
+      color: #FFF;
+      border-color: var(--accent-color);
+    }
+
+    /* شبكة الودجتس (Grid) */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: var(--transition);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+
+    @media (max-width: 900px) {
+      .col-6 { grid-column: span 12; }
+      .brand p { display: none; }
+    }
+
+    /* نية اليوم / التركيز */
+    .focus-input {
+      width: 100%;
+      border: none;
+      background: var(--bg-primary);
+      padding: 16px 20px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      font-weight: 500;
+      outline: none;
+      border: 1px solid transparent;
+      transition: var(--transition);
+    }
+
+    .focus-input:focus {
+      border-color: var(--accent-color);
+    }
+
+    /* قائمة العادات والمهام */
+    .item-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg-primary);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .list-item.completed span {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    .item-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 1rem;
+      opacity: 0.5;
+      transition: var(--transition);
+    }
+
+    .delete-btn:hover {
+      opacity: 1;
+      color: #d9534f;
+    }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      font-size: 0.8rem;
+    }
+
+    .list-item.completed .checkbox {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: #FFF;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .add-row input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    /* مساحة التدوين الحر */
+    .journal-area {
+      width: 100%;
+      min-height: 150px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      border-radius: 12px;
+      padding: 16px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      resize: vertical;
+      outline: none;
+    }
+
+    /* النوافذ المنبثقة (Modals) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      max-width: 440px;
+      width: 100%;
+      padding: 32px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      color: var(--text-secondary);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .status-msg {
+      font-size: 0.85rem;
+      margin-top: 12px;
+      text-align: center;
+      color: var(--accent-color);
+    }
+
+    .hidden-widget {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- الهيدر -->
+  <header>
+    <div class="brand">
+      <h1>وتيرة<span class="dot">.</span></h1>
+      <p>مساحتك الخاصة لضبط إيقاع يومك</p>
+    </div>
+    <div class="nav-actions">
+      <span id="planBadge" class="pro-badge">الباقة الأساسية</span>
+      <button class="btn" onclick="openModal('pricingModal')">ترقية لـ وتيرة بلس ✨</button>
+      <button id="authBtn" class="btn btn-primary" onclick="openModal('authModal')">تسجيل / دخول</button>
+      <button id="logoutBtn" class="btn" style="display: none;" onclick="handleLogout()">خروج</button>
+    </div>
+  </header>
+
+  <!-- المحتوى الرئيسي -->
+  <main>
+    <section class="hero-section">
+      <div class="greeting">
+        <h2 id="welcomeText">صباح الخير، أهلاً بك في وتيرتك الخاصة.</h2>
+        <p>خصص مساحتك بالطريقة التي تشبهك وتمنحك الصفاء الذهني.</p>
+      </div>
+      <div class="save-status">
+        <span id="syncIndicator">⚪ غير متصل بحساب</span>
+        <button class="btn" onclick="saveCurrentWateerah(true)">💾 حفظ الآن</button>
+      </div>
+    </section>
+
+    <!-- شريط تخصيص الواجهة والودجتس -->
+    <section class="customizer-bar">
+      <div class="customizer-group" id="themeChips">
+        <span class="customizer-label">لون المساحة:</span>
+        <button class="chip active" data-theme-val="default" onclick="setTheme('default', this)">ورق دافئ</button>
+        <button class="chip" data-theme-val="minimal" onclick="setTheme('minimal', this)">صباح نقي</button>
+        <button class="chip" data-theme-val="dark" onclick="setTheme('dark', this)">سكون ليلي</button>
+      </div>
+
+      <div class="customizer-group">
+        <span class="customizer-label">أدوات مساحتي:</span>
+        <button class="chip active" id="btn-widget-focus" onclick="toggleWidget('widget-focus', this)">البوصلة اليومية</button>
+        <button class="chip active" id="btn-widget-habits" onclick="toggleWidget('widget-habits', this)">الورد والعادات</button>
+        <button class="chip active" id="btn-widget-tasks" onclick="toggleWidget('widget-tasks', this)">أولويات اليوم</button>
+        <button class="chip active" id="btn-widget-journal" onclick="toggleWidget('widget-journal', this)">مساحة الصفاء</button>
+      </div>
+    </section>
+
+    <!-- شبكة الأدوات (قابلة للتخصيص) -->
+    <div class="bento-grid">
+      
+      <!-- 1. البوصلة اليومية -->
+      <div id="widget-focus" class="card col-12">
+        <div class="card-header">
+          <span class="card-title">🧭 بوصلة اليوم (التركيز الأهم)</span>
+          <span style="font-size: 0.85rem; color: var(--text-secondary);">ما هو الشيء الوحيد الذي سيجعل يومك راضياً؟</span>
+        </div>
+        <input type="text" id="focusGoalInput" class="focus-input" placeholder="اكتب تركيزك الأساسي لليوم هنا..." oninput="autoSave()">
+      </div>
+
+      <!-- 2. متتبع العادات والورد -->
+      <div id="widget-habits" class="card col-6">
+        <div class="card-header">
+          <span class="card-title">🌱 عاداتي ووردي اليومي</span>
+        </div>
+        <ul id="habitsList" class="item-list"></ul>
+        <div class="add-row">
+          <input type="text" id="newHabitInput" placeholder="أضف عادة جديدة لوتيرتك..." onkeypress="if(event.key==='Enter') addHabit()">
+          <button class="btn btn-primary" onclick="addHabit()">إضافة</button>
+        </div>
+      </div>
+
+      <!-- 3. أولويات اليوم -->
+      <div id="widget-tasks" class="card col-6">
+        <div class="card-header">
+          <span class="card-title">⚡ أولويات اليوم</span>
+        </div>
+        <ul id="tasksList" class="item-list"></ul>
+        <div class="add-row">
+          <input type="text" id="newTaskInput" placeholder="أضف مهمة أساسية..." onkeypress="if(event.key==='Enter') addTask()">
+          <button class="btn btn-primary" onclick="addTask()">إضافة</button>
+        </div>
+      </div>
+
+      <!-- 4. مساحة الصفاء والتدوين -->
+      <div id="widget-journal" class="card col-12">
+        <div class="card-header">
+          <span class="card-title">✒️ مساحة الصفاء (تدوين حر)</span>
+          <span style="font-size: 0.85rem; color: var(--text-secondary);">فرّغ أفكارك بلا قيود</span>
+        </div>
+        <textarea id="journalText" class="journal-area" placeholder="اكتب ما يدور في ذهنك اليوم، ملاحظاتك، أو اقتباس أعجبك..." oninput="autoSave()"></textarea>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- نافذة التسجيل وتسجيل الدخول -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+      <h3 style="font-size: 1.5rem; margin-bottom: 8px;">أهلاً بك في وتيرة.</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px;">سجّل دخولك أو أنشئ حساباً لحفظ مساحتك الخاصة ومزامنتها عبر جميع أجهزتك.</p>
+      
+      <div class="form-group">
+        <label>الاسم الأول (عند التسجيل الجديد)</label>
+        <input type="text" id="authName" placeholder="مثال: لمار">
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="authEmail" placeholder="name@example.com">
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور (6 أحرف على الأقل)</label>
+        <input type="password" id="authPassword" placeholder="••••••••">
+      </div>
+
+      <div id="authFeedback" class="status-msg"></div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="handleRegister()">إنشاء حساب جديد</button>
+        <button class="btn" style="flex: 1; justify-content: center;" onclick="handleLogin()">تسجيل دخول</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة الاشتراك (وتيرة بلس) -->
+  <div id="pricingModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 520px;">
+      <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
+      <span class="pro-badge">وتيرة بلس ✨</span>
+      <h3 style="font-size: 1.6rem; margin: 12px 0 8px;">استثمر في هدوئك وتنظيم حياتك</h3>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px;">افتح كامل إمكانيات التخصيص، القوالب المتقدمة، والمزامنة السحابية غير المحدودة.</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+        <div style="border: 1px solid var(--border-color); padding: 20px; border-radius: 14px;">
+          <h4 style="margin-bottom: 4px;">اشتراك شهري</h4>
+          <p style="font-size: 1.6rem; font-weight: 700;">19 ر.س <span style="font-size: 0.85rem; font-weight: 400; color: var(--text-secondary);">/ شهرياً</span></p>
+          <button class="btn" style="width: 100%; justify-content: center; margin-top: 16px;" onclick="upgradePlan('شهري')">اختيار الباقة</button>
+        </div>
+        <div style="border: 2px solid var(--accent-color); background: var(--accent-light); padding: 20px; border-radius: 14px;">
+          <h4 style="margin-bottom: 4px;">اشتراك سنوي (وفر 35%)</h4>
+          <p style="font-size: 1.6rem; font-weight: 700;">149 ر.س <span style="font-size: 0.85rem; font-weight: 400; color: var(--text-secondary);">/ سنوياً</span></p>
+          <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 16px;" onclick="upgradePlan('سنوي')">اختيار السنوي</button>
+        </div>
+      </div>
+      <p style="text-align: center; font-size: 0.8rem; color: var(--text-secondary);">يدعم الدفع عبر مدى، Apple Pay، والبطاقات الائتمانية</p>
+    </div>
+  </div>
+
+  <!-- سكريبت Firebase بإصدار 13.0.0 المتوافق مع مشروعك -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-analytics.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      getDoc 
+    } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB00VedBbLRBhjkMTSxkbXFY16gMJS_I6E",
+      authDomain: "wateerah-f0f36.firebaseapp.com",
+      databaseURL: "https://wateerah-f0f36-default-rtdb.firebaseio.com",
+      projectId: "wateerah-f0f36",
+      storageBucket: "wateerah-f0f36.firebasestorage.app",
+      messagingSenderId: "470896604513",
+      appId: "1:470896604513:web:2d1fe5fc94e03253f08120",
+      measurementId: "G-37W7WYNR0T"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // الحالة الافتراضية للمستخدم
+    window.appState = {
+      theme: 'default',
+      focusGoal: 'إطلاق النسخة الأولى من منصة وتيرة وتجربتها',
+      journal: '',
+      hiddenWidgets: [],
+      habits: [
+        { text: 'قراءة 15 صفحة بتأمل', done: true },
+        { text: 'شرب 2 لتر ماء', done: false },
+        { text: 'مشي 30 دقيقة بعيداً عن الشاشات', done: false }
+      ],
+      tasks: [
+        { text: 'ربط قاعدة بيانات Firebase بمشروع وتيرة', done: true },
+        { text: 'رفع الكود على GitHub وربطه بـ Vercel', done: false }
+      ]
+    };
+
+    let saveTimeout = null;
+
+    window.syncUIWithState = function() {
+      document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
+      document.getElementById('journalText').value = window.appState.journal || '';
+      
+      const themeBtn = document.querySelector(`[data-theme-val="${window.appState.theme || 'default'}"]`);
+      setTheme(window.appState.theme || 'default', themeBtn, false);
+
+      const allWidgets = ['widget-focus', 'widget-habits', 'widget-tasks', 'widget-journal'];
+      allWidgets.forEach(wId => {
+        const el = document.getElementById(wId);
+        const btn = document.getElementById('btn-' + wId);
+        if ((window.appState.hiddenWidgets || []).includes(wId)) {
+          el.classList.add('hidden-widget');
+          btn.classList.remove('active');
+        } else {
+          el.classList.remove('hidden-widget');
+          btn.classList.add('active');
+        }
+      });
+
+      renderLists();
+    };
+
+    window.renderLists = function() {
+      const habitsList = document.getElementById('habitsList');
+      habitsList.innerHTML = (window.appState.habits || []).map((h, i) => `
+        <li class="list-item ${h.done ? 'completed' : ''}" onclick="toggleItem('habits', ${i})">
+          <span>${h.text}</span>
+          <div class="item-actions">
+            <button class="delete-btn" onclick="event.stopPropagation(); removeItem('habits', ${i})" title="حذف">&times;</button>
+            <div class="checkbox">${h.done ? '✓' : ''}</div>
+          </div>
+        </li>
+      `).join('');
+
+      const tasksList = document.getElementById('tasksList');
+      tasksList.innerHTML = (window.appState.tasks || []).map((t, i) => `
+        <li class="list-item ${t.done ? 'completed' : ''}" onclick="toggleItem('tasks', ${i})">
+          <span>${t.text}</span>
+          <div class="item-actions">
+            <button class="delete-btn" onclick="event.stopPropagation(); removeItem('tasks', ${i})" title="حذف">&times;</button>
+            <div class="checkbox">${t.done ? '✓' : ''}</div>
+          </div>
+        </li>
+      `).join('');
+    };
+
+    window.toggleItem = function(type, index) {
+      window.appState[type][index].done = !window.appState[type][index].done;
+      renderLists();
+      autoSave();
+    };
+
+    window.removeItem = function(type, index) {
+      window.appState[type].splice(index, 1);
+      renderLists();
+      autoSave();
+    };
+
+    window.addHabit = function() {
+      const input = document.getElementById('newHabitInput');
+      if (!input.value.trim()) return;
+      window.appState.habits.push({ text: input.value.trim(), done: false });
+      input.value = '';
+      renderLists();
+      autoSave();
+    };
+
+    window.addTask = function() {
+      const input = document.getElementById('newTaskInput');
+      if (!input.value.trim()) return;
+      window.appState.tasks.push({ text: input.value.trim(), done: false });
+      input.value = '';
+      renderLists();
+      autoSave();
+    };
+
+    window.setTheme = function(themeName, btnElement, shouldSave = true) {
+      if (themeName === 'default') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', themeName);
+      }
+      window.appState.theme = themeName;
+      if (btnElement) {
+        btnElement.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        btnElement.classList.add('active');
+      }
+      if (shouldSave) autoSave();
+    };
+
+    window.toggleWidget = function(widgetId, btnElement) {
+      const el = document.getElementById(widgetId);
+      el.classList.toggle('hidden-widget');
+      btnElement.classList.toggle('active');
+
+      if (!window.appState.hiddenWidgets) window.appState.hiddenWidgets = [];
+      if (el.classList.contains('hidden-widget')) {
+        if (!window.appState.hiddenWidgets.includes(widgetId)) {
+          window.appState.hiddenWidgets.push(widgetId);
+        }
+      } else {
+        window.appState.hiddenWidgets = window.appState.hiddenWidgets.filter(id => id !== widgetId);
+      }
+      autoSave();
+    };
+
+    window.openModal = id => {
+      document.getElementById('authFeedback').innerText = '';
+      document.getElementById(id).classList.add('open');
+    };
+    window.closeModal = id => document.getElementById(id).classList.remove('open');
+
+    window.autoSave = function() {
+      clearTimeout(saveTimeout);
+      document.getElementById('syncIndicator').innerText = '⏳ جاري الحفظ...';
+      saveTimeout = setTimeout(() => {
+        saveCurrentWateerah(false);
+      }, 900);
+    };
+
+    window.saveCurrentWateerah = async function(showAlert = false) {
+      window.appState.focusGoal = document.getElementById('focusGoalInput').value;
+      window.appState.journal = document.getElementById('journalText').value;
+
+      const user = auth.currentUser;
+      if (!user) {
+        localStorage.setItem('wateerah_local', JSON.stringify(window.appState));
+        document.getElementById('syncIndicator').innerText = '💾 محفوظ محلياً على جهازك';
+        if (showAlert) alert("تم حفظ وتيرتك على المتصفح! سجلي دخولك لمزامنتها سحابياً.");
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, "users", user.uid), {
+          state: window.appState,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        document.getElementById('syncIndicator').innerText = '☁️ متزامن سحابياً';
+        if (showAlert) alert("تم حفظ وتيرتك في السحابة بنجاح! ☁️✨");
+      } catch (err) {
+        console.error("Save error:", err);
+        document.getElementById('syncIndicator').innerText = '⚠️ خطأ في المزامنة';
+      }
+    };
+
+    window.handleRegister = async function() {
+      const name = document.getElementById('authName').value.trim() || 'صديق وتيرة';
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPassword').value;
+      const feedback = document.getElementById('authFeedback');
+
+      if (!email || pass.length < 6) {
+        feedback.innerText = 'يرجى إدخال بريد صحيح وكلمة مرور من 6 خانات على الأقل.';
+        return;
+      }
+
+      try {
+        feedback.innerText = 'جاري إنشاء مساحتك الخاصة...';
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "users", cred.user.uid), {
+          name: name,
+          email: email,
+          isPro: false,
+          planType: 'الباقة الأساسية',
+          createdAt: new Date().toISOString(),
+          state: window.appState
+        });
+        closeModal('authModal');
+      } catch (err) {
+        feedback.innerText = 'خطأ: تأكدي من تفعيل Email/Password في قسم Authentication، أو أن الحساب مسجل مسبقاً.';
+      }
+    };
+
+    window.handleLogin = async function() {
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPassword').value;
+      const feedback = document.getElementById('authFeedback');
+
+      try {
+        feedback.innerText = 'جاري الدخول واسترجاع وتيرتك...';
+        await signInWithEmailAndPassword(auth, email, pass);
+        closeModal('authModal');
+      } catch (err) {
+        feedback.innerText = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+      }
+    };
+
+    window.handleLogout = async function() {
+      await signOut(auth);
+      location.reload();
+    };
+
+    window.upgradePlan = async function(planType) {
+      const badgeText = `وتيرة بلس (${planType}) ✨`;
+      document.getElementById('planBadge').innerText = badgeText;
+      closeModal('pricingModal');
+
+      if (auth.currentUser) {
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
+          isPro: true,
+          planType: badgeText
+        }, { merge: true });
+      }
+      alert(`تم تفعيل (${badgeText}) لحسابك! (جاهزة لربط بوابة الدفع).`);
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById('syncIndicator').innerText = '🔄 جاري استرجاع وتيرتك...';
+        document.getElementById('logoutBtn').style.display = 'inline-flex';
+        
+        try {
+          const snap = await getDoc(doc(db, "users", user.uid));
+          if (snap.exists()) {
+            const data = snap.data();
+            const userName = data.name || user.email.split('@')[0];
+            document.getElementById('welcomeText').innerText = `أهلاً بك يا ${userName} في وتيرتك الخاصة.`;
+            document.getElementById('authBtn').innerText = `👤 ${userName}`;
+            
+            if (data.planType) {
+              document.getElementById('planBadge').innerText = data.planType;
+            }
+            if (data.state) {
+              window.appState = data.state;
+            }
+          }
+          syncUIWithState();
+          document.getElementById('syncIndicator').innerText = '☁️ متزامن سحابياً';
+        } catch (err) {
+          console.error(err);
+        }
+      } else {
+        const savedLocal = localStorage.getItem('wateerah_local');
+        if (savedLocal) {
+          window.appState = JSON.parse(savedLocal);
+        }
+        syncUIWithState();
+      }
+    });
+  </script>
+</body>
+</html>
