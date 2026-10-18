@@ -1,5 +1,3 @@
-// assets/js/widgets.js
-
 window.renderVisionBoard = function() {
   const board = document.getElementById('corkboardContainer');
   if (!window.appState.visionBoard || window.appState.visionBoard.length === 0) { if(board) board.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.85); padding: 60px 20px; font-size: 0.92rem;">اللوح الخشبي فارغ حالياً.</div>`; return; }
