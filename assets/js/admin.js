@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+import { doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 window.toggleTargetEmailBox = val => { document.getElementById('adminSpecificEmailBox').style.display = val === 'SPECIFIC' ? 'block' : 'none'; };
 
