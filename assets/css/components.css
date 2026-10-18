@@ -1,6 +1,3 @@
-/* assets/css/components.css */
-
-/* ==================== الأزرار والشارات ==================== */
 .btn {
   padding: 7px 15px; border-radius: 999px; font-size: 0.82rem; font-weight: 500;
   cursor: pointer; transition: var(--transition); border: 1px solid var(--border-color);
