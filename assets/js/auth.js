@@ -1,6 +1,7 @@
-import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
-import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+import { auth, db } from './firebase-config.js';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
 window.setupPricingModal = function() {
   const isSubscribed = window.userProfile.isPro;
