@@ -114,6 +114,22 @@
     .add-row input { flex: 1; min-width: 130px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
     .journal-area { width: 100%; min-height: 120px; border: 1px solid var(--border-color); background: var(--bg-primary); border-radius: 12px; padding: 14px; color: var(--text-primary); outline: none; resize: vertical; }
 
+    /* سكشن التأثير الزجاجي الشفاف (Glassmorphism) للرسائل المؤقتة */
+    .glass-message-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+      transition: all 0.3s ease;
+    }
+    [data-theme="dark"] .glass-message-card {
+      background: rgba(26, 26, 24, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
     .finance-section-title { font-size: 1.2rem; font-weight: 700; color: var(--accent-color); margin: 24px 0 12px; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; display: flex; align-items: center; gap: 8px; }
     .sub-card { background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
     
@@ -169,8 +185,8 @@
       </div>
       <div class="hero-stats">
         <div class="progress-ring-box">
-          <div class="progress-top"><span>سجل محطات الحياة</span><strong id="lifeEventsCount">0 محطات</strong></div>
-          <div class="progress-bar-bg"><div id="progressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div>
+          <div class="progress-top"><span>إنجاز اليوم</span><strong id="progressPercentText">0%</strong></div>
+          <div class="progress-bar-bg"><div id="progressBarFill" class="progress-bar-fill"></div></div>
         </div>
         <button class="btn btn-subtle" onclick="saveCurrentWateerah(true)">☁️ حفظ</button>
       </div>
@@ -188,8 +204,8 @@
         <button class="chip active" id="btn-widget-focus" onclick="toggleWidget('widget-focus', this)">البوصلة</button>
         <button class="chip active" id="btn-widget-habits" onclick="toggleWidget('widget-habits', this)">العادات</button>
         <button class="chip active" id="btn-widget-tasks" onclick="toggleWidget('widget-tasks', this)">الأولويات</button>
+        <button class="chip active" id="btn-widget-glass" onclick="toggleWidget('widget-glass', this)">الرسائل الزجاجية ✨</button>
         <button class="chip active" id="btn-widget-finance" onclick="toggleWidget('widget-finance', this)">المالية 💰</button>
-        <button class="chip active" id="btn-widget-timeline" onclick="toggleWidget('widget-timeline', this)">سجل الحياة 📖</button>
         <button class="chip active" id="btn-widget-journal" onclick="toggleWidget('widget-journal', this)">التدوين</button>
       </div>
     </section>
@@ -221,17 +237,15 @@
         </div>
       </div>
 
-      <!-- 4. سجل الحياة والتواريخ (بدل إنجاز اليوم) -->
-      <div id="widget-timeline" class="card col-12">
-        <div class="card-header">
-          <span class="card-title">📖 سجل محطات الحياة (التواريخ والذكريات)</span>
-          <span class="card-subtitle">سجل زمني يوثق مسيرتك وأهم محطات حياتك</span>
-        </div>
-        <ul id="timelineList" class="item-list"></ul>
-        <div class="add-row">
-          <input type="date" id="newEventDate" style="flex: 1;">
-          <input type="text" id="newEventTitle" placeholder="حدث أو محطة فارقة في حياتك..." style="flex: 2;">
-          <button class="btn btn-primary" onclick="addTimelineEvent()">+ إضافة حدث</button>
+      <!-- 4. سكشن الرسائل ذات التأثير الزجاجي الشفاف (بدل محطات الحياة) -->
+      <div id="widget-glass" class="col-12">
+        <div id="glassMessageContainer" class="glass-message-card" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: var(--admin-color);">✨ رسالة وتيرة الخاصة</span>
+            <button onclick="dismissGlassMessage()" style="background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--text-secondary);">&times;</button>
+          </div>
+          <p id="glassMessageText" style="font-size: 0.98rem; line-height: 1.6; color: var(--text-primary);"></p>
+          <img id="glassMessageImg" src="" alt="صورة الرسالة" style="width: 100%; border-radius: 10px; margin-top: 12px; max-height: 180px; object-fit: cover; display: none;">
         </div>
       </div>
 
@@ -351,16 +365,16 @@
     </div>
   </div>
 
-  <!-- 👑 لوحة تحكم الأدمن (إدارة المشتركين، الإشعارات بابل، والأكواد) -->
+  <!-- 👑 لوحة تحكم الأدمن -->
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
       <h3 style="margin-bottom: 6px; color: var(--admin-color);">👑 لوحة تحكم أدمن وتيرة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 18px;">إدارة المشتركين، إرسال الإشعارات، وتوليد الأكواد.</p>
+      <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 18px;">إدارة المشتركين، إرسال الرسائل الشفافة الزجاجية، وتوليد الأكواد.</p>
       
-      <!-- أ) قسم إرسال الإشعارات (فكرة تطبيق بابل) -->
+      <!-- أ) إرسال الرسائل الزجاجية والفقاعات -->
       <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; margin-bottom: 12px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">💬 إرسال إشعار فقاعة (بابل) للعملاء</h4>
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">💬 إرسال رسالة زجاجية شفافة للعملاء</h4>
         <div class="form-group" style="margin-bottom: 6px;">
           <label>إرسال إلى:</label>
           <select id="adminNotifTarget" onchange="toggleTargetEmailBox(this.value)">
@@ -371,13 +385,13 @@
         <div class="form-group" id="adminSpecificEmailBox" style="display:none; margin-bottom: 6px;">
           <input type="email" id="adminTargetUserEmail" placeholder="إيميل المستخدم المستهدف...">
         </div>
-        <div class="form-group" style="margin-bottom: 6px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الإشعار..."></textarea></div>
-        <div class="form-group" style="margin-bottom: 6px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط صورة الإشعار (اختياري)"></div>
+        <div class="form-group" style="margin-bottom: 6px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الرسالة..."></textarea></div>
+        <div class="form-group" style="margin-bottom: 6px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط صورة الرسالة (اختياري)"></div>
         <div class="form-group" style="margin-bottom: 6px;"><input type="number" id="adminWidgetDuration" placeholder="مدة الظهور بالدقائق (0 يعني دائم حتى الإغلاق)"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminSendBubbleNotification()">إرسال الإشعار الفوري 🚀</button>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminSendBubbleNotification()">إرسال الرسالة الآن 🚀</button>
       </div>
 
-      <!-- ب) قائمة المستخدمين المسجلين وتعديلهم -->
+      <!-- ب) قائمة المستخدمين -->
       <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; margin-bottom: 12px;">
         <h4 style="font-size: 0.9rem; margin-bottom: 8px;">👥 قائمة المستخدمين والتحكم باشتراكاتهم</h4>
         <div id="adminUsersList" style="font-size: 0.82rem; max-height: 130px; overflow-y: auto; background: var(--bg-card); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -483,7 +497,6 @@
       theme: 'default', focusGoal: '', journal: '', hiddenWidgets: [],
       habits: [{ text: 'قراءة 15 صفحة', done: false }],
       tasks: [{ text: 'ترتيب الأولويات', done: false }],
-      timeline: [{ date: '2026-10-18', title: 'انطلاق وتيرة رسمياً 🚀' }],
       wallets: [{ name: 'مصرف الراجحي', balance: 4500 }],
       visionBoard: [{ title: 'السفر والاسترخاء', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500' }],
       wishlist: [{ title: 'شاشة ديل احترافية', cost: 1800 }],
@@ -554,7 +567,6 @@
         if(upgradeBtn) upgradeBtn.innerText = 'تفعيل الاشتراك ✨';
       }
       
-      // تحديث اسم المشترك في ترويسة الترحيب
       const userName = window.userProfile.name || 'صديقنا';
       document.getElementById('welcomeText').innerText = `صباح الخير، أهلاً بك يا ${userName}.`;
     };
@@ -573,20 +585,6 @@
           <input type="text" class="item-text-input" value="${t.text}" onchange="window.appState.tasks[${i}].text=this.value; autoSave()"></div>
           <button class="delete-btn" onclick="window.appState.tasks.splice(${i},1); renderLists(); autoSave()">&times;</button>
         </li>`).join('');
-
-      // سجل الحياة والتواريخ (Timeline)
-      const timelineList = document.getElementById('timelineList');
-      if (!window.appState.timeline) window.appState.timeline = [];
-      timelineList.innerHTML = window.appState.timeline.length === 0 ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد محطات مسجلة في سجل الحياة.</div>` :
-        window.appState.timeline.map((ev, i) => `
-          <li class="list-item">
-            <div class="item-left" style="gap: 10px;">
-              <span style="font-size: 0.8rem; background: var(--accent-light); color: var(--accent-color); padding: 3px 8px; border-radius: 6px; font-weight: 600;">${ev.date}</span>
-              <input type="text" class="item-text-input" value="${ev.title}" onchange="window.appState.timeline[${i}].title=this.value; autoSave()" style="font-weight:500;">
-            </div>
-            <button class="delete-btn" onclick="window.appState.timeline.splice(${i},1); renderLists(); autoSave();">&times;</button>
-          </li>`).join('');
-      document.getElementById('lifeEventsCount').innerText = window.appState.timeline.length + ' محطات';
 
       const walletsList = document.getElementById('walletsList');
       walletsList.innerHTML = (!window.appState.wallets || window.appState.wallets.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد حسابات مضافة.</div>` :
@@ -653,19 +651,6 @@
     window.toggle = (type, i) => { window.appState[type][i].done = !window.appState[type][i].done; renderLists(); autoSave(); };
     window.addHabit = () => { const i = document.getElementById('newHabitInput'); if(!i.value)return; window.appState.habits.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
     window.addTask = () => { const i = document.getElementById('newTaskInput'); if(!i.value)return; window.appState.tasks.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
-    
-    window.addTimelineEvent = () => {
-      const dateInput = document.getElementById('newEventDate');
-      const titleInput = document.getElementById('newEventTitle');
-      if(!titleInput.value.trim()) return showToast('أدخل عنوان الحدث أو المحطة');
-      const date = dateInput.value || new Date().toISOString().slice(0, 10);
-      if(!window.appState.timeline) window.appState.timeline = [];
-      window.appState.timeline.push({ date, title: titleInput.value.trim() });
-      titleInput.value = '';
-      renderLists();
-      autoSave();
-      showToast('تمت إضافة المحطة بنجاح 📖');
-    };
 
     window.addWallet = () => {
       const name = document.getElementById('newWalletName').value.trim();
@@ -761,7 +746,6 @@
       } catch(err) { console.error(err); }
     };
 
-    // 🎁 منح التجربة المجانية مرة واحدة فقط لكل حساب جديد
     window.handleRegister = async () => {
       const name = document.getElementById('regName').value;
       const email = document.getElementById('regEmail').value;
@@ -973,7 +957,6 @@
       document.getElementById('adminSpecificEmailBox').style.display = val === 'SPECIFIC' ? 'block' : 'none';
     };
 
-    // إرسال إشعار بابل (للجميع أو لشخص معين)
     window.adminSendBubbleNotification = async () => {
       const target = document.getElementById('adminNotifTarget').value;
       const specificEmail = document.getElementById('adminTargetUserEmail').value.trim();
@@ -981,44 +964,54 @@
       const imgUrl = document.getElementById('adminWidgetImgUrl').value.trim();
       const durationMin = parseInt(document.getElementById('adminWidgetDuration').value) || 0;
 
-      if(!msg) return showToast('أدخل نص الإشعار');
+      if(!msg) return showToast('أدخل نص الرسالة');
 
       const notifData = { message: msg, imageUrl: imgUrl, duration: durationMin, timestamp: Date.now() };
 
       if(target === 'ALL') {
         localStorage.setItem('wateerah_broadcast_notif', JSON.stringify(notifData));
-        showToast('تم إرسال الإشعار لجميع المشتركين بنجاح 🚀');
+        showToast('تم إرسال الرسالة الشفافة لجميع المشتركين 🚀');
       } else {
         if(!specificEmail) return showToast('أدخل إيميل المستخدم المستهدف');
         localStorage.setItem(`wateerah_notif_${specificEmail}`, JSON.stringify(notifData));
-        showToast(`تم إرسال الإشعار للمستخدم (${specificEmail}) بنجاح 🚀`);
+        showToast(`تم إرسال الرسالة للمستخدم (${specificEmail}) بنجاح 🚀`);
       }
       closeModal('adminModal');
+      checkGlassMessage();
     };
 
-    function checkBubbleNotification() {
+    // فحص وعرض الرسالة الزجاجية الشفافة
+    function checkGlassMessage() {
       const broadcast = localStorage.getItem('wateerah_broadcast_notif');
       const userEmail = auth.currentUser ? auth.currentUser.email : null;
       const personal = userEmail ? localStorage.getItem(`wateerah_notif_${userEmail}`) : null;
 
       let activeNotif = personal ? JSON.parse(personal) : (broadcast ? JSON.parse(broadcast) : null);
+      const card = document.getElementById('glassMessageContainer');
 
       if(activeNotif && activeNotif.message) {
         const elapsedMin = (Date.now() - activeNotif.timestamp) / (1000 * 60);
         if(activeNotif.duration === 0 || elapsedMin < activeNotif.duration) {
-          const widget = document.getElementById('notificationWidget');
-          document.getElementById('widgetTextContent').innerText = activeNotif.message;
-          const imgEl = document.getElementById('widgetImageContent');
+          document.getElementById('glassMessageText').innerText = activeNotif.message;
+          const imgEl = document.getElementById('glassMessageImg');
           if(activeNotif.imageUrl) {
             imgEl.src = activeNotif.imageUrl;
             imgEl.style.display = 'block';
           } else {
             imgEl.style.display = 'none';
           }
-          widget.style.display = 'block';
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
         }
+      } else {
+        card.style.display = 'none';
       }
     }
+
+    window.dismissGlassMessage = () => {
+      document.getElementById('glassMessageContainer').style.display = 'none';
+    };
 
     window.closeNotificationWidget = () => { document.getElementById('notificationWidget').style.display = 'none'; };
 
@@ -1055,7 +1048,7 @@
         document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
         document.getElementById('journalText').value = window.appState.journal || '';
         renderLists();
-        checkBubbleNotification();
+        checkGlassMessage();
       } else {
         updateSubscriptionUI();
         renderLists();
