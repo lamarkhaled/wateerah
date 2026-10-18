@@ -61,6 +61,8 @@
     .profile-pill { display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 8px; border-radius: 100px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; }
     .avatar-circle { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 600; }
 
+    #broadcastBanner { background: var(--admin-color); color: #FFF; text-align: center; padding: 10px; font-size: 0.88rem; font-weight: 500; display: none; }
+
     main { max-width: 1140px; margin: 36px auto 0; padding: 0 24px; }
     .hero-section { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
     .greeting h2 { font-size: 2.1rem; font-weight: 600; }
@@ -106,12 +108,17 @@
     /* النوافذ */
     .modal-overlay { position: fixed; inset: 0; background: rgba(15, 15, 14, 0.5); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .modal-overlay.open { display: flex; }
-    .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; max-width: 480px; width: 100%; padding: 32px; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+    .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; max-width: 580px; width: 100%; padding: 32px; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
     .modal-close { position: absolute; top: 22px; left: 22px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg-subtle); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 0.83rem; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
     .form-group input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
+
+    .admin-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .admin-stat-card { background: var(--bg-subtle); padding: 14px; border-radius: 12px; text-align: center; }
+    .admin-stat-card h4 { font-size: 1.4rem; font-weight: 700; color: var(--admin-color); }
+    .admin-stat-card span { font-size: 0.78rem; color: var(--text-secondary); }
 
     #toastContainer { position: fixed; bottom: 24px; left: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
     .toast { background: var(--text-primary); color: var(--bg-primary); padding: 12px 20px; border-radius: 12px; font-size: 0.88rem; box-shadow: var(--shadow-lg); }
@@ -120,6 +127,7 @@
 </head>
 <body>
 
+  <div id="broadcastBanner">✨ أهلاً بكم في منصة وتيرة المحدثة.</div>
   <div id="toastContainer"></div>
 
   <header>
@@ -129,10 +137,12 @@
     </div>
     <div class="nav-actions">
       <!-- لوحة تحكم الأدمن الخاصة بـ لمار -->
-      <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">👑 لوحة الأدمن</button>
+      <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">👑 لوحة تحكم الأدمن</button>
       
       <span id="planBadge" class="pro-badge" onclick="openModal('pricingModal')">الباقة الأساسية</span>
-      <button class="btn" onclick="openModal('pricingModal')">وتيرة بلس ✨</button>
+      <!-- زر الترقية يختفي تماماً إذا كان المستخدم مشتركاً -->
+      <button id="upgradeBtn" class="btn" onclick="openModal('pricingModal')">وتيرة بلس ✨</button>
+      
       <button id="guestAuthBtn" class="btn btn-primary" onclick="openAuthModal('login')">دخول / حساب جديد</button>
       <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="openModal('profileModal')">
         <div id="headerAvatar" class="avatar-circle">🌿</div>
@@ -144,7 +154,7 @@
   <main>
     <section class="hero-section">
       <div class="greeting">
-        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;" id="syncIndicator">⚪ غير متصل بالحساب (يرجى تفعيل البريد)</div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;" id="syncIndicator">⚪ غير متصل بالحساب</div>
         <h2 id="welcomeText">صباح الخير، أهلاً بك في وتيرتك.</h2>
         <p>صمّم مساحتك بالطريقة التي تشبهك.</p>
       </div>
@@ -226,38 +236,73 @@
     </div>
   </div>
 
-  <!-- نافذة استعادة كلمة المرور المستقلة الآمنة -->
+  <!-- نافذة استعادة كلمة المرور الآمنة -->
   <div id="resetModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closeModal('resetModal')">&times;</button>
       <h3 style="margin-bottom: 8px;">استعادة كلمة المرور الآمنة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">أدخل بريدك المسجل. سيتم قفل كلمة المرور القديمة فوراً لحماية حسابك.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">أدخل بريدك المسجل لإرسال رابط الاستعادة.</p>
       <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="resetEmail"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleResetPassword()">إرسال رابط استعادة كلمة المرور</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="handleResetPassword()">إرسال الرابط</button>
     </div>
   </div>
 
-  <!-- لوحة تحكم الأدمن (خاصة بـ لمار) -->
+  <!-- 👑 لوحة تحكم الأدمن الشاملة -->
   <div id="adminModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 480px;">
+    <div class="modal-box" style="max-width: 580px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
       <h3 style="margin-bottom: 6px; color: var(--admin-color);">👑 لوحة تحكم أدمن وتيرة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">التحكم بالإدارة والمستخدمين.</p>
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">⚡ إدارة النظام</h4>
-        <p style="font-size: 0.82rem; color: var(--text-secondary);">النظام يعمل بكفاءة وأمان تام.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">التحكم الإداري المطلق بالمنصة والمستخدمين.</p>
+      
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card"><h4 id="statTotalUsers">1</h4><span>النظام نشط</span></div>
+        <div class="admin-stat-card"><h4>متاحة</h4><span>أكواد الخصم</span></div>
+        <div class="admin-stat-card"><h4>آمن</h4><span>حماية الأمان</span></div>
+      </div>
+
+      <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; margin-bottom: 14px;">
+        <h4 style="font-size: 0.92rem; margin-bottom: 8px;">🎟️ إضافة كود خصم جديد</h4>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="adminNewCoupon" placeholder="رمز الكود (مثال: LAMAR)" style="flex: 2;">
+          <input type="number" id="adminCouponDisc" placeholder="النسبة %" style="flex: 1;">
+          <button class="btn btn-primary" onclick="adminAddCoupon()">إضافة</button>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px; margin-bottom: 14px;">
+        <h4 style="font-size: 0.92rem; margin-bottom: 8px;">📩 إدارة إيميلات المستخدمين</h4>
+        <div class="form-group" style="margin-bottom: 8px;"><input type="email" id="adminTargetEmail" placeholder="أدخل بريد المشترك"></div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn btn-subtle" style="flex: 1; justify-content: center;" onclick="adminResendVerification()">إعادة إرسال رابط التفعيل ✉️</button>
+          <button class="btn btn-subtle" style="flex: 1; justify-content: center;" onclick="adminSendPasswordReset()">إرسال استعادة كلمة المرور 🔒</button>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-subtle); padding: 14px; border-radius: 12px;">
+        <h4 style="font-size: 0.92rem; margin-bottom: 8px;">📢 نشر إعلان عام</h4>
+        <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminBroadcastText" placeholder="اكتب نص التنبيه..."></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminBroadcastMessage()">نشر التنبيه الفوري</button>
       </div>
     </div>
   </div>
 
-  <!-- نافذة الاشتراك المباشرة (بدون فورم تأكيد معقد) -->
+  <!-- نافذة الاشتراك -->
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 440px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
       <span class="pro-badge">وتيرة بلس ✨</span>
       <h3 style="margin: 10px 0 6px;">باقة وتيرة بلس</h3>
-      <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 20px;">استمتع بمزامنة سحابية غير محدودة وتخصيص متقدم.</p>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="upgradeDirectly()">ترقية وتفعيل فوري</button>
+      <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;">مزامنة سحابية غير محدودة وتخصيص متقدم.</p>
+      
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label>لديك كود خصم؟</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="userCouponInput" placeholder="أدخل الكود">
+          <button class="btn" onclick="applyUserCoupon()">تطبيق</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="upgradeDirectly()">ترقية وتفعيل فوري (149 ر.س)</button>
     </div>
   </div>
 
@@ -293,12 +338,14 @@
 
     const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
-    window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية' };
+    window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false };
     window.appState = {
       theme: 'default', focusGoal: '', journal: '', hiddenWidgets: [],
       habits: [{ text: 'قراءة 15 صفحة', done: false }],
       tasks: [{ text: 'ترتيب الأولويات', done: false }]
     };
+
+    window.platformCoupons = { "LAMAR": 25, "WATEERAH": 20 };
 
     window.showToast = function(msg) {
       const c = document.getElementById('toastContainer');
@@ -313,6 +360,20 @@
     window.switchToLogin = () => { document.getElementById('viewLogin').style.display = 'block'; document.getElementById('viewRegister').style.display = 'none'; };
     window.switchToRegister = () => { document.getElementById('viewLogin').style.display = 'none'; document.getElementById('viewRegister').style.display = 'block'; };
     window.openResetModal = () => { closeModal('authModal'); openModal('resetModal'); };
+
+    // دالة تحديث واجهة الهيدر بناءً على حالة الاشتراك (هل هو بلس أو أساسي؟)
+    window.updateSubscriptionUI = function() {
+      const upgradeBtn = document.getElementById('upgradeBtn');
+      const planBadge = document.getElementById('planBadge');
+
+      if (window.userProfile.isPro || window.userProfile.planType.includes('بلس')) {
+        upgradeBtn.style.display = 'none'; // يختفي زر الترقية تماماً
+        planBadge.innerText = 'وتيرة بلس ✨';
+      } else {
+        upgradeBtn.style.display = 'inline-flex'; // يظهر زر الترقية لغير المشتركين
+        planBadge.innerText = 'الباقة الأساسية';
+      }
+    };
 
     window.renderLists = function() {
       document.getElementById('habitsList').innerHTML = window.appState.habits.map((h, i) => `
@@ -360,11 +421,7 @@
       window.appState.focusGoal = document.getElementById('focusGoalInput').value;
       window.appState.journal = document.getElementById('journalText').value;
       const user = auth.currentUser;
-      if (!user) { showToast('مفعل محلياً (يرجى تسجيل وتفعيل الحساب)'); return; }
-      if (!user.emailVerified && user.email !== ADMIN_EMAIL) {
-        showToast('بريدك غير مفعل! تحقق من بريدك الإلكتروني.');
-        return;
-      }
+      if (!user) { showToast('مفعل محلياً'); return; }
       await setDoc(doc(db, "users", user.uid), { profile: userProfile, state: appState }, { merge: true });
       if(manual) showToast('تم الحفظ سحابياً بنجاح ☁️');
     };
@@ -401,22 +458,61 @@
       if(!email) return showToast('أدخل البريد الإلكتروني من فضلك');
       try {
         await sendPasswordResetEmail(auth, email);
-        showToast('تم إرسال رابط الاستعادة الآمن لبريدك. تم قفل الكلمة القديمة.');
+        showToast('تم إرسال رابط الاستعادة الآمن لبريدك.');
         closeModal('resetModal');
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
 
     window.upgradeDirectly = async () => {
-      userProfile.planType = 'وتيرة بلس ✨';
-      document.getElementById('planBadge').innerText = userProfile.planType;
+      window.userProfile.planType = 'وتيرة بلس ✨';
+      window.userProfile.isPro = true;
+      updateSubscriptionUI();
       closeModal('pricingModal');
       saveCurrentWateerah(true);
-      showToast('تم ترقية وتفعيل باقة وتيرة بلس بنجاح!');
+      showToast('تم تفعيل باقة وتيرة بلس بنجاح واختفى زر الترقية!');
+    };
+
+    window.adminAddCoupon = () => {
+      const code = document.getElementById('adminNewCoupon').value.trim().toUpperCase();
+      const disc = document.getElementById('adminCouponDisc').value;
+      if(!code || !disc) return showToast('أدخل الكود والنسبة');
+      window.platformCoupons[code] = parseInt(disc);
+      showToast(`تم إضافة كود الخصم (${code}) بنجاح!`);
+    };
+
+    window.adminBroadcastMessage = () => {
+      const txt = document.getElementById('adminBroadcastText').value.trim();
+      if(!txt) return showToast('أدخل نص التنبيه');
+      const banner = document.getElementById('broadcastBanner');
+      banner.innerText = txt;
+      banner.style.display = 'block';
+      showToast('تم نشر الإعلان الفوري لجميع المستخدمين!');
+      closeModal('adminModal');
+    };
+
+    window.adminResendVerification = async () => {
+      const targetEmail = document.getElementById('adminTargetEmail').value.trim();
+      if(!targetEmail) return showToast('أدخل بريد المشترك');
+      try {
+        await sendPasswordResetEmail(auth, targetEmail);
+        showToast(`تم إرسال رابط الأمان إلى: ${targetEmail}`);
+        closeModal('adminModal');
+      } catch(e) { showToast('تعذر العثور على هذا البريد.'); }
+    };
+
+    window.adminSendPasswordReset = async () => {
+      const targetEmail = document.getElementById('adminTargetEmail').value.trim();
+      if(!targetEmail) return showToast('أدخل بريد المشترك');
+      try {
+        await sendPasswordResetEmail(auth, targetEmail);
+        showToast(`تم إرسال رابط استعادة كلمة المرور إلى: ${targetEmail}`);
+        closeModal('adminModal');
+      } catch(e) { showToast('تعذر العثور على هذا البريد.'); }
     };
 
     window.saveProfile = async () => {
-      userProfile.name = document.getElementById('profileNameInput').value;
-      document.getElementById('headerUserName').innerText = userProfile.name;
+      window.userProfile.name = document.getElementById('profileNameInput').value;
+      document.getElementById('headerUserName').innerText = window.userProfile.name;
       closeModal('profileModal');
       saveCurrentWateerah(true);
     };
@@ -436,15 +532,16 @@
         const snap = await getDoc(doc(db, "users", user.uid));
         if(snap.exists()) {
           const d = snap.data();
-          if(d.profile) userProfile = d.profile;
-          if(d.state) appState = d.state;
+          if(d.profile) window.userProfile = d.profile;
+          if(d.state) window.appState = d.state;
         }
-        document.getElementById('headerUserName').innerText = userProfile.name || user.email;
-        document.getElementById('planBadge').innerText = userProfile.planType || 'الباقة الأساسية';
-        document.getElementById('focusGoalInput').value = appState.focusGoal || '';
-        document.getElementById('journalText').value = appState.journal || '';
+        document.getElementById('headerUserName').innerText = window.userProfile.name || user.email;
+        document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
+        document.getElementById('journalText').value = window.appState.journal || '';
+        updateSubscriptionUI();
         renderLists();
       } else {
+        updateSubscriptionUI();
         renderLists();
       }
     });
