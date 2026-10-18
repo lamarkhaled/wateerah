@@ -1,1 +1,25 @@
+/* assets/css/base.css */
 
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+  font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif; 
+  -webkit-tap-highlight-color: transparent; 
+}
+
+body {
+  background-color: var(--bg-primary);
+  background-image: var(--sky-glow);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color 0.4s ease;
+  min-height: 100vh;
+  padding-bottom: 90px;
+}
+
+/* إخفاء العناصر برمجياً */
+.hidden-el { 
+  display: none !important; 
+}
