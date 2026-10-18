@@ -15,7 +15,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- استدعاء ملفات الـ CSS الاحترافية -->
   <link rel="stylesheet" href="./assets/css/variables.css">
   <link rel="stylesheet" href="./assets/css/base.css">
   <link rel="stylesheet" href="./assets/css/layout.css">
@@ -109,7 +108,6 @@
       </div>
 
       <div id="bentoGrid" class="bento-grid">
-        <!-- الفجن بورد -->
         <div id="widget-vision" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-vision">
           <div class="card-header">
             <div class="card-title-wrap"><span class="drag-handle" title="سحب للترتيب">⋮⋮</span><span class="card-title">لوحة الأهداف (Vision Board)</span></div>
@@ -124,7 +122,6 @@
           </div>
         </div>
 
-        <!-- المهام الكانبان -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">لوحة العمل والمهام المتنقلة</span></div>
@@ -145,7 +142,6 @@
           </div>
         </div>
 
-        <!-- البوصلة -->
         <div id="widget-focus" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-focus">
           <div class="card-header">
             <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">بوصلة التركيز اليومي</span></div><button class="remove-widget-btn" onclick="window.removeWidget('widget-focus')">إخفاء</button>
@@ -153,7 +149,6 @@
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
 
-        <!-- العادات -->
         <div id="widget-habits" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-habits">
           <div class="card-header">
             <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">متتبع العادات اليومية</span></div><button class="remove-widget-btn" onclick="window.removeWidget('widget-habits')">إخفاء</button>
@@ -162,13 +157,16 @@
           <div class="add-row"><input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') window.addHabit()"><button class="btn btn-primary" onclick="window.addHabit()">إضافة</button></div>
         </div>
 
-        <!-- المالية -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-finance">
           <div class="card-header">
             <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">إدارة المالية الشاملة</span></div><button class="remove-widget-btn" onclick="window.removeWidget('widget-finance')">إخفاء</button>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-            <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">المحافظ البنكية</div><ul id="walletsList" class="item-list"></ul><div class="add-row"><input type="text" id="newWalletName" placeholder="الحساب..."><input type="number" id="newWalletBalance" placeholder="الرصيد"><button class="btn btn-primary" onclick="window.addWallet()">إضافة</button></div></div>
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">البنوك والحسابات المالية</div>
+              <div id="banksContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px;"></div>
+              <div class="add-row"><input type="text" id="newBankName" placeholder="اسم البنك الجديد (مثل: الراجحي)..."><button class="btn btn-primary" onclick="window.addBank()">إضافة بنك</button></div>
+            </div>
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">قائمة الأمنيات</div><ul id="wishlistList" class="item-list"></ul><div class="add-row"><input type="text" id="newWishTitle" placeholder="الأمنية..."><input type="number" id="newWishCost" placeholder="التكلفة"><button class="btn btn-primary" onclick="window.addWishlistItem()">إضافة</button></div></div>
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الاشتراكات الشهرية</div><ul id="subscriptionsList" class="item-list"></ul><div class="add-row"><input type="text" id="newSubName" placeholder="الاشتراك..."><input type="number" id="newSubCost" placeholder="المبلغ"><button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button></div></div>
           </div>
@@ -178,7 +176,6 @@
           </div>
         </div>
 
-        <!-- التدوين -->
         <div id="widget-journal" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-journal">
           <div class="card-header"><div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">التدوين الحر</span></div><button class="remove-widget-btn" onclick="window.removeWidget('widget-journal')">إخفاء</button></div>
           <textarea id="journalText" class="journal-area" placeholder="اكتب أفكارك بحرية..." oninput="window.autoSave()"></textarea>
@@ -215,7 +212,7 @@
         <div style="display: flex; justify-content: space-between; font-size: 0.82rem;"><span style="color: var(--accent-color); cursor: pointer;" onclick="window.openResetModal()">نسيت كلمة المرور؟</span><span style="color: var(--text-secondary); cursor: pointer;" onclick="window.switchToRegister()">إنشاء حساب جديد</span></div>
       </div>
       <div id="viewRegister" style="display: none;">
-        <h3 style="margin-bottom: 14px;">إنشاء حساب جديد</h3>
+        <h3 style="margin-bottom: 14px;">إنشاء حساب جديد (تجربة مجانية يومين)</h3>
         <div class="form-group"><label>الاسم</label><input type="text" id="regName"></div><div class="form-group"><label>البريد</label><input type="email" id="regEmail"></div><div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div>
         <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="window.handleRegister()">إنشاء الحساب</button>
         <div style="text-align:center;"><span style="color: var(--text-secondary); cursor: pointer; font-size: 0.82rem;" onclick="window.switchToLogin()">لديك حساب بالفعل؟ سجل دخول</span></div>
@@ -224,7 +221,7 @@
   </div>
 
   <div id="verificationNoticeModal" class="modal-overlay"><div class="modal-box" style="text-align: center; max-width: 420px;"><button class="modal-close" onclick="window.closeModal('verificationNoticeModal')">&times;</button><h3 style="margin-bottom: 10px; color: var(--danger-color);">تحقق من بريدك الإلكتروني</h3><p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">يرجى النقر على الرابط المرسل لبريدك لتفعيل الحساب.</p><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button></div></div>
-  <div id="resetModal" class="modal-overlay"><div class="modal-box" style="max-width: 420px;"><button class="modal-close" onclick="window.closeModal('resetModal')">&times;</button><h3 style="margin-bottom: 10px;">استعادة كلمة المرور</h3><div class="form-group"><label>البريد</label><input type="email" id="resetEmail"></div><button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.handleResetPassword()">إرسال رابط الاستعادة</button></div></div>
+  <div id="resetModal" class="modal-overlay"><div class="modal-box" style="max-width: 420px;"><button class="modal-close" onclick="window.closeModal('resetModal')">&times;</button><h3 style="margin-bottom: 10px;">استعادة كلمة المرور</h3><div class="form-group"><label>البريد</label><input type="email" id="resetEmail"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="window.handleResetPassword()">إرسال رابط الاستعادة</button></div></div>
 
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
@@ -237,10 +234,10 @@
         <div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الرسالة أو المسابقة..."></textarea></div>
         <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط الصورة (اختياري)"></div>
         <div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="المدة بالدقائق (0 يعني دائم)"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.adminSendCloudMessage()">نشر الرسالة</button>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="window.adminSendCloudMessage()">نشر الرسالة</button>
       </div>
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">المستخدمين المسجلين</h4><div id="adminUsersList" style="font-size: 0.82rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 12px;">جاري التحميل...</div></div>
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">توليد أكواد التفعيل</h4><div style="display: flex; gap: 8px; margin-bottom: 8px;"><input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;"><input type="number" id="adminCodeCustomDays" value="365" placeholder="الأيام" style="flex:1;"></div><button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.adminGenerateActivationCode()">توليد الكود</button><div id="adminCodesList" style="font-size: 0.82rem; max-height: 90px; overflow-y: auto; margin-top: 10px;"></div></div>
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">توليد أكواد التفعيل</h4><div style="display: flex; gap: 8px; margin-bottom: 8px;"><input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;"><input type="number" id="adminCodeCustomDays" value="365" placeholder="الأيام" style="flex:1;"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="window.adminGenerateActivationCode()">توليد الكود</button><div id="adminCodesList" style="font-size: 0.82rem; max-height: 90px; overflow-y: auto; margin-top: 10px;"></div></div>
     </div>
   </div>
 
@@ -256,7 +253,7 @@
       </div>
       <div id="pricingViewSubscribed" style="display: none; padding: 8px;">
         <div style="text-align: center; margin-bottom: 24px;"><span class="pro-badge">عضوية نشطة</span><h3 style="margin: 12px 0 6px;">إدارة الاشتراك</h3><p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;" id="subActiveDetails"></p><div><div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;"><span>المدة المتبقية:</span><strong id="daysRemainingText">0 يوم</strong></div><div class="progress-bar-bg"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div></div></div>
-        <div style="background: var(--bg-subtle); padding: 18px; border-radius: 14px; margin-bottom: 20px;"><h4 style="font-size: 0.9rem; margin-bottom: 8px;">تجديد الاشتراك</h4><div style="display: flex; gap: 8px; margin-bottom: 10px;"><input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); outline: none;"><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button></div></div>
+        <div style="background: var(--bg-subtle); padding: 18px; border-radius: 14px; margin-bottom: 20px;"><h4 style="font-size: 0.9rem; margin-bottom: 8px;">تجديد وتمديد الاشتراك</h4><div style="display: flex; gap: 8px; margin-bottom: 10px;"><input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); outline: none;"><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button></div></div>
       </div>
     </div>
   </div>
@@ -272,8 +269,97 @@
     </div>
   </div>
 
-  <!-- الاستدعاء البرمجي للوحدات -->
-  <script type="module" src="./assets/js/main.js"></script>
+  <!-- سكربت جافا سكريبت المباشر ليعمل بدون مشاكل Vercel -->
+  <script type="module">
+    import { initializeApp } from "./assets/js/firebase-config.js";
+    import { auth, db, ADMIN_EMAIL } from "./assets/js/firebase-config.js";
+    import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+    import { doc, setDoc, getDoc, collection, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
 
+    import "./assets/js/ui.js";
+    import "./assets/js/widgets.js";
+    import "./assets/js/auth.js";
+    import "./assets/js/admin.js";
+
+    window.unverifiedUserObject = null;
+    window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 30, trialUsed: false };
+    window.appState = {
+      hasStarted: false, theme: 'default', activeWidgets: [], widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
+      focusGoal: '', journal: '', habits: [], visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
+    };
+
+    let saveTimer; window.autoSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => window.saveCurrentWateerah(false), 700); };
+
+    window.saveCurrentWateerah = async (manual) => {
+      window.appState.focusGoal = document.getElementById('focusGoalInput')?.value || ''; window.appState.journal = document.getElementById('journalText')?.value || '';
+      localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
+      const user = auth.currentUser;
+      if (!user) { if(manual && window.showToast) window.showToast('تم الحفظ محلياً'); return; }
+      try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); if(manual && window.showToast) window.showToast('تم الحفظ والمزامنة سحابياً'); } catch(e) {}
+    };
+
+    window.saveProfile = async () => {
+      window.userProfile.name = document.getElementById('profileNameInput')?.value.trim() || 'صديقنا';
+      document.getElementById('headerUserName').innerText = window.userProfile.name; document.getElementById('headerAvatar').innerText = window.userProfile.name[0];
+      if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
+      if(window.closeModal) window.closeModal('profileModal'); 
+      window.saveCurrentWateerah(true);
+    };
+
+    function listenToCloudMessages() {
+      onSnapshot(doc(db, "notifications", "activeMessage"), (snap) => {
+        if (!snap.exists()) return;
+        const data = snap.data(); const user = auth.currentUser; const myEmail = user ? user.email : ''; const myUid = user ? user.uid : '';
+        if (!(data.target === 'ALL' || data.target === myEmail || data.target === myUid)) return;
+        const elapsedMin = (Date.now() - data.timestamp) / (1000 * 60);
+        if (data.duration > 0 && elapsedMin >= data.duration) { const a = document.getElementById('activeGlassMessage'); const e = document.getElementById('emptyGlassMessage'); if(a) a.style.display = 'none'; if(e) e.style.display = 'flex'; return; }
+        const a = document.getElementById('activeGlassMessage'); const e = document.getElementById('emptyGlassMessage'); if(a) a.style.display = 'block'; if(e) e.style.display = 'none';
+        const txt = document.getElementById('glassMessageText'); if(txt) txt.innerText = data.message;
+        const imgEl = document.getElementById('glassMessageImg'); if (data.imageUrl && imgEl) { imgEl.src = data.imageUrl; imgEl.style.display = 'block'; } else if(imgEl) { imgEl.style.display = 'none'; }
+        const timerEl = document.getElementById('msgRemainingTime'); if (data.duration > 0 && timerEl) timerEl.innerText = `تختفي بعد ${Math.max(1, Math.ceil(data.duration - elapsedMin))} د`; else if(timerEl) timerEl.innerText = '';
+      });
+    }
+
+    const savedLocal = localStorage.getItem('wateerah_local_state');
+    if (savedLocal) { try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {} }
+
+    setTimeout(() => { 
+      if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
+      if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
+      if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
+      if(window.initWidgetsDragAndDrop) window.initWidgetsDragAndDrop(); 
+      listenToCloudMessages(); 
+    }, 200);
+
+    onAuthStateChanged(auth, async (user) => {
+      setTimeout(async () => {
+          if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
+            const guestBtn = document.getElementById('guestAuthBtn'); if(guestBtn) guestBtn.style.display = 'none';
+            const pill = document.getElementById('userProfilePill'); if(pill) pill.style.display = 'flex';
+            const syncInd = document.getElementById('syncIndicator'); if(syncInd) syncInd.innerText = 'متصل ومتزامن سحابياً';
+            const uidDisp = document.getElementById('profileUidDisplay'); if(uidDisp) uidDisp.value = user.uid;
+
+            if (user.email === ADMIN_EMAIL) { const adminBtn = document.getElementById('adminPanelBtn'); if(adminBtn) adminBtn.style.display = 'inline-flex'; }
+
+            try { const snap = await getDoc(doc(db, "users", user.uid)); if(snap.exists()) { const d = snap.data(); if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; if(d.state) window.appState = { ...window.appState, ...d.state }; } } catch(e) {}
+            if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
+            if(window.updateSubscriptionUI) window.updateSubscriptionUI();
+            
+            const hdrName = document.getElementById('headerUserName'); if(hdrName) hdrName.innerText = window.userProfile.name || user.email;
+            const hdrAv = document.getElementById('headerAvatar'); if(hdrAv) hdrAv.innerText = (window.userProfile.name || 'ل')[0];
+            const prfInp = document.getElementById('profileNameInput'); if(prfInp) prfInp.value = window.userProfile.name || '';
+            const fGoal = document.getElementById('focusGoalInput'); if(fGoal) fGoal.value = window.appState.focusGoal || '';
+            const jTxt = document.getElementById('journalText'); if(jTxt) jTxt.value = window.appState.journal || '';
+            
+            if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
+            if(window.renderLists) window.renderLists();
+          } else { 
+            if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
+            if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
+            if(window.renderLists) window.renderLists(); 
+          }
+      }, 200);
+    });
+  </script>
 </body>
 </html>
