@@ -2,11 +2,6 @@ import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
 import { doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
 
-import './ui.js';
-import './widgets.js';
-import './auth.js';
-import './admin.js';
-
 window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
 window.draggedKanbanIndex = null;
@@ -14,7 +9,7 @@ window.draggedKanbanIndex = null;
 window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 30, trialUsed: false };
 window.appState = {
   hasStarted: false, theme: 'default', activeWidgets: [], widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
-  focusGoal: '', journal: '', habits: [], visionBoard: [], kanbanTasks: [], wallets: [], wishlist: [], subscriptions: []
+  focusGoal: '', journal: '', habits: [], visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
 };
 
 let saveTimer; window.autoSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => window.saveCurrentWateerah(false), 700); };
