@@ -2,435 +2,915 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>وتيرة — صمّم إيقاع يومك</title>
+  
+  <!-- إعدادات تطبيق أجهزة أبل (iOS Web App / PWA) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="وتيرة">
+  <meta name="theme-color" content="#F9F8F6">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231F4E3D'/><circle cx='50' cy='50' r='18' fill='%23F9F8F6'/></svg>">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
+      /* الألوان الأصلية مع شفافية نظام iOS */
+      --bg-primary: #F9F8F6;
+      --bg-glass: rgba(255, 255, 255, 0.72);
+      --bg-glass-strong: rgba(255, 255, 255, 0.88);
+      --bg-subtle: rgba(242, 240, 236, 0.75);
+      --text-primary: #141413;
+      --text-secondary: #6E6D6A;
+      --border-color: rgba(20, 20, 19, 0.08);
+      --border-glass: rgba(255, 255, 255, 0.6);
+      --accent-color: #1F4E3D;
+      --accent-light: rgba(31, 78, 61, 0.1);
+      --danger-color: #C93B2B;
+      --danger-light: rgba(201, 59, 43, 0.1);
+      --warning-color: #D97706;
+      --warning-light: rgba(217, 119, 6, 0.12);
+      --admin-color: #5B21B6;
+      --admin-light: rgba(91, 33, 182, 0.1);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --shadow-ios: 0 8px 30px rgba(20, 20, 19, 0.04), 0 1px 3px rgba(20, 20, 19, 0.02);
+      --shadow-float: 0 20px 50px rgba(20, 20, 19, 0.1);
+      --blur-ios: blur(24px) saturate(180%);
+      --transition: all 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+      --sky-glow: radial-gradient(circle at 50% -10%, rgba(253, 230, 138, 0.25), transparent 60%);
+    }
+
+    [data-theme="minimal"] {
       --bg-primary: #F5F5F7;
-      --bg-card: #FFFFFF;
-      --bg-subtle: #E8E8ED;
+      --bg-glass: rgba(255, 255, 255, 0.78);
+      --bg-glass-strong: rgba(255, 255, 255, 0.92);
+      --bg-subtle: rgba(232, 232, 237, 0.7);
       --text-primary: #1D1D1F;
       --text-secondary: #86868B;
-      --border-color: #D2D2D7;
-      --accent-color: #0066CC;
-      --accent-light: #F0F4F8;
-      --danger-color: #FF3B30;
-      --danger-light: #FFEFEE;
-      --admin-color: #AF52DE;
-      --admin-light: #F8F0FC;
-      --radius: 20px;
-      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.04);
-      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
-      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --border-color: rgba(0, 0, 0, 0.07);
+      --accent-color: #1D1D1F;
+      --accent-light: rgba(29, 29, 31, 0.08);
     }
 
     [data-theme="dark"] {
-      --bg-primary: #000000; --bg-card: #1C1C1E; --bg-subtle: #2C2C2E;
-      --text-primary: #F5F5F7; --text-secondary: #8E8E93; --border-color: #38383A;
-      --accent-color: #0A84FF; --accent-light: #16222B;
+      --bg-primary: #111110;
+      --bg-glass: rgba(28, 28, 26, 0.72);
+      --bg-glass-strong: rgba(36, 36, 33, 0.9);
+      --bg-subtle: rgba(44, 44, 41, 0.65);
+      --text-primary: #F3F2EE;
+      --text-secondary: #9A9893;
+      --border-color: rgba(255, 255, 255, 0.09);
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --accent-color: #D4A373;
+      --accent-light: rgba(212, 163, 115, 0.15);
+      --sky-glow: radial-gradient(circle at 50% -10%, rgba(56, 189, 248, 0.08), transparent 60%);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'SF Pro Display', 'IBM Plex Sans Arabic', -apple-system, sans-serif; }
-    body { background-color: var(--bg-primary); color: var(--text-primary); line-height: 1.6; transition: background-color 0.4s ease; min-height: 100vh; padding-bottom: 80px; }
+    body.night-mode-glow {
+      --sky-glow: radial-gradient(circle at 80% -10%, rgba(99, 102, 241, 0.12), transparent 60%);
+    }
 
-    header { max-width: 1100px; margin: 0 auto; padding: 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 16px; backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; background: rgba(245, 245, 247, 0.8); }
-    [data-theme="dark"] header { background: rgba(0, 0, 0, 0.8); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background-color: var(--bg-primary);
+      background-image: var(--sky-glow);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background-color 0.4s ease;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
 
+    /* شريط التنقل الزجاجي بنمط iOS */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      background: var(--bg-glass);
+      backdrop-filter: var(--blur-ios);
+      -webkit-backdrop-filter: var(--blur-ios);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 24px;
+    }
+    .header-inner {
+      max-width: 1240px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
     .brand { display: flex; align-items: baseline; gap: 8px; }
-    .brand h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.5px; }
+    .brand h1 { font-size: 1.55rem; font-weight: 700; letter-spacing: -0.5px; }
     .brand span.dot { color: var(--accent-color); font-size: 2rem; line-height: 0; }
-    .brand p { font-size: 0.82rem; color: var(--text-secondary); margin-right: 6px; padding-right: 10px; border-right: 1px solid var(--border-color); }
+    .brand p { font-size: 0.8rem; color: var(--text-secondary); margin-right: 6px; padding-right: 10px; border-right: 1px solid var(--border-color); }
 
     .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .btn { padding: 8px 16px; border-radius: 980px; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: var(--transition); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-    .btn:hover { background: var(--bg-subtle); transform: scale(1.02); }
-    .btn-primary { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
-    .btn-primary:hover { opacity: 0.9; }
+    
+    .btn {
+      padding: 7px 15px; border-radius: 999px; font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; transition: var(--transition);
+      border: 1px solid var(--border-color);
+      background: var(--bg-glass-strong); color: var(--text-primary);
+      display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+      backdrop-filter: blur(10px);
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-ios); }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--accent-color); color: #FFFFFF; border-color: var(--accent-color); }
+    [data-theme="dark"] .btn-primary { color: #111110; }
     .btn-subtle { background: var(--bg-subtle); border-color: transparent; }
     .btn-danger { background: var(--danger-light); color: var(--danger-color); border-color: transparent; }
-    .btn-admin { background: var(--admin-light); color: var(--admin-color); border-color: #E8D4F8; font-weight: 600; }
-    .pro-badge { background: var(--accent-light); color: var(--accent-color); padding: 5px 12px; border-radius: 980px; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
-
-    .profile-pill { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 6px; border-radius: 980px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; }
-    .avatar-circle { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem; }
-
-    /* فقاعة الإشعارات (ألوبابل) */
-    #notificationWidget {
-      position: fixed; bottom: 24px; right: 24px; max-width: 320px; width: 90%;
-      background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px);
-      border: 1px solid var(--border-color); border-radius: 22px; padding: 16px; box-shadow: var(--shadow-lg);
-      z-index: 2500; display: none; animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes slideInRight { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .widget-close { position: absolute; top: 8px; left: 8px; background: none; border: none; font-size: 1rem; cursor: pointer; color: var(--text-secondary); }
-    .widget-img { width: 100%; border-radius: 12px; margin-top: 8px; max-height: 140px; object-fit: cover; display: none; }
-
-    main { max-width: 1100px; margin: 32px auto 0; padding: 0 20px; }
-    .hero-section { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
-    .greeting h2 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.5px; }
-    .greeting p { color: var(--text-secondary); font-size: 0.95rem; margin-top: 4px; }
-
-    .hero-stats { display: flex; align-items: center; gap: 14px; background: var(--bg-card); border: 1px solid var(--border-color); padding: 14px 20px; border-radius: var(--radius); box-shadow: var(--shadow-sm); width: 100%; max-width: 400px; }
+    .btn-admin { background: var(--admin-light); color: var(--admin-color); border-color: transparent; font-weight: 600; }
     
-    .customizer-bar { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: var(--shadow-sm); }
-    .customizer-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .customizer-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-left: 4px; }
-    .chip { padding: 5px 14px; border-radius: 980px; font-size: 0.78rem; font-weight: 500; border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); cursor: pointer; transition: var(--transition); }
-    .chip.active { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
+    .pro-badge {
+      background: var(--accent-light); color: var(--accent-color);
+      padding: 5px 12px; border-radius: 999px; font-size: 0.76rem; font-weight: 600; cursor: pointer;
+    }
 
+    .profile-pill {
+      display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 6px;
+      border-radius: 999px; border: 1px solid var(--border-color);
+      background: var(--bg-glass-strong); cursor: pointer; font-size: 0.82rem; font-weight: 500;
+    }
+    .avatar-circle {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--accent-color); color: #FFF;
+      display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.72rem;
+    }
+
+    main { max-width: 1240px; margin: 28px auto 0; padding: 0 20px; }
+
+    /* شاشة البدء لأول مرة (Onboarding) */
+    #onboardingScreen {
+      max-width: 560px; margin: 60px auto; text-align: center;
+      background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios);
+      border: 1px solid var(--border-glass); border-radius: 28px;
+      padding: 48px 32px; box-shadow: var(--shadow-float);
+    }
+    .time-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 600;
+      background: var(--bg-subtle); color: var(--text-secondary); margin-bottom: 16px;
+    }
+    #onboardingScreen h2 { font-size: 2rem; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; }
+    #onboardingScreen p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 28px; }
+    .theme-selector-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+    .theme-card {
+      padding: 16px 12px; border-radius: var(--radius-md); border: 2px solid var(--border-color);
+      cursor: pointer; transition: var(--transition); background: var(--bg-glass-strong);
+      font-size: 0.85rem; font-weight: 600;
+    }
+    .theme-card.active { border-color: var(--accent-color); background: var(--accent-light); color: var(--accent-color); }
+
+    /* قسم الهيرو والرسائل الشفافة */
+    .hero-section {
+      margin-bottom: 22px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: stretch;
+    }
+    @media (max-width: 850px) { .hero-section { grid-template-columns: 1fr; } }
+
+    .greeting-box {
+      background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios);
+      border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 24px 28px; display: flex; flex-direction: column; justify-content: center;
+      box-shadow: var(--shadow-ios); position: relative; overflow: hidden;
+    }
+    .greeting-meta { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 6px; }
+    .greeting-box h2 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.4px; }
+    .greeting-box p { color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px; }
+
+    /* خانة الرسائل الزجاجية في الهيرو */
+    .hero-glass-messages {
+      background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios);
+      border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 20px 24px; box-shadow: var(--shadow-ios);
+      display: flex; flex-direction: column; justify-content: center; position: relative;
+    }
+    .msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .msg-tag { font-size: 0.72rem; font-weight: 700; color: var(--accent-color); background: var(--accent-light); padding: 3px 10px; border-radius: 999px; }
+    .msg-timer { font-size: 0.72rem; color: var(--text-secondary); }
+
+    /* شريط التحكم بالأدوات والمظهر */
+    .toolbar-ios {
+      background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios);
+      border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 12px 18px; margin-bottom: 24px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+      box-shadow: var(--shadow-ios);
+    }
+    .toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .toolbar-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-left: 6px; }
+    
+    .chip {
+      padding: 6px 13px; border-radius: 999px; font-size: 0.78rem; font-weight: 500;
+      border: 1px solid var(--border-color); background: transparent; color: var(--text-primary);
+      cursor: pointer; transition: var(--transition);
+    }
+    .chip.active { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
+    
+    .add-widget-plus {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent-color); color: #FFF; border: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: 400; cursor: pointer; transition: var(--transition);
+    }
+    .add-widget-plus:hover { transform: scale(1.08); }
+
+    /* المساحة الفارغة الابتدائية */
+    #emptyWorkspaceState {
+      text-align: center; padding: 64px 24px;
+      background: var(--bg-glass); backdrop-filter: var(--blur-ios);
+      border: 1px dashed var(--border-color); border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+    }
+    #emptyWorkspaceState h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 6px; }
+    #emptyWorkspaceState p { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 18px; }
+
+    /* شبكة الأدوات ودعم السحب والإفلات */
     .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
-    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); transition: var(--transition); }
-    .card:hover { box-shadow: var(--shadow-lg); }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .card-title { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .card-subtitle { font-size: 0.78rem; color: var(--text-secondary); }
+    .widget-card {
+      background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios);
+      border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 22px; box-shadow: var(--shadow-ios); transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .widget-card.dragging { opacity: 0.45; transform: scale(0.98); border: 1px dashed var(--accent-color); }
     .col-6 { grid-column: span 6; }
     .col-12 { grid-column: span 12; }
     @media (max-width: 900px) { .col-6 { grid-column: span 12; } }
 
-    .focus-input { width: 100%; border: 1px solid var(--border-color); background: var(--bg-primary); padding: 14px 18px; border-radius: 14px; font-size: 1rem; color: var(--text-primary); outline: none; transition: var(--transition); }
-    .focus-input:focus { border-color: var(--accent-color); background: var(--bg-card); box-shadow: 0 0 0 4px var(--accent-light); }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);
+    }
+    .card-title-wrap { display: flex; align-items: center; gap: 10px; }
+    .drag-handle {
+      cursor: grab; color: var(--text-secondary); opacity: 0.5; font-size: 1.1rem;
+      padding: 2px 6px; user-select: none;
+    }
+    .drag-handle:active { cursor: grabbing; }
+    .card-title { font-size: 1.02rem; font-weight: 600; }
+    .remove-widget-btn {
+      background: none; border: none; color: var(--text-secondary);
+      font-size: 0.78rem; cursor: pointer; padding: 4px 8px; border-radius: 6px;
+    }
+    .remove-widget-btn:hover { background: var(--danger-light); color: var(--danger-color); }
 
+    /* ===================================================== */
+    /* 1. الفجن بورد الفعلي البني (Realistic Corkboard)     */
+    /* ===================================================== */
+    .corkboard-surface {
+      background-color: #8C6239;
+      background-image: 
+        radial-gradient(rgba(66, 40, 14, 0.18) 1px, transparent 0),
+        radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 0);
+      background-size: 16px 16px;
+      background-position: 0 0, 8px 8px;
+      border: 10px solid #5C3A21;
+      border-radius: 18px;
+      box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.35), 0 6px 20px rgba(0,0,0,0.06);
+      padding: 28px 22px;
+      min-height: 340px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+    .polaroid-item {
+      background: #FFFDF9;
+      color: #141413;
+      padding: 10px 10px 14px 10px;
+      border-radius: 6px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.28);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .polaroid-item:nth-child(even) { transform: rotate(1.2deg); }
+    .polaroid-item:nth-child(odd) { transform: rotate(-1.2deg); }
+    .polaroid-item:hover { transform: scale(1.03) rotate(0deg); z-index: 5; box-shadow: 0 16px 35px rgba(0,0,0,0.35); }
+    
+    /* دبوس التثبيت */
+    .board-pin {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #E63946, #9B1B26);
+      position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+      z-index: 2;
+    }
+    .polaroid-img {
+      width: 100%; height: 145px; object-fit: cover; border-radius: 3px; background: #EAE6DF; display: block;
+    }
+    .polaroid-caption {
+      margin-top: 10px; font-weight: 600; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;
+    }
+    .polaroid-meta {
+      font-size: 0.72rem; color: #6E6D6A; margin-top: 4px; display: flex; justify-content: space-between;
+    }
+    .polaroid-progress-bg {
+      width: 100%; height: 5px; background: #E6E4E0; border-radius: 99px; overflow: hidden; margin-top: 8px;
+    }
+    .polaroid-progress-fill {
+      height: 100%; background: #1F4E3D; transition: width 0.3s ease;
+    }
+
+    /* ===================================================== */
+    /* 2. لوحة العمل المتنقلة (Kanban Board)                */
+    /* ===================================================== */
+    .kanban-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: start;
+    }
+    @media (max-width: 960px) { .kanban-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .kanban-grid { grid-template-columns: 1fr; } }
+
+    .kanban-col {
+      background: var(--bg-subtle); border: 1px solid var(--border-color);
+      border-radius: var(--radius-md); padding: 14px; min-height: 260px;
+    }
+    .kanban-col-header {
+      font-size: 0.85rem; font-weight: 700; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--text-primary);
+    }
+    .kanban-count {
+      font-size: 0.72rem; background: var(--bg-glass-strong); padding: 2px 8px; border-radius: 99px; color: var(--text-secondary);
+    }
+    .kanban-cards-wrap { display: flex; flex-direction: column; gap: 10px; min-height: 180px; }
+    .kanban-card {
+      background: var(--bg-glass-strong); border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm); padding: 12px; box-shadow: var(--shadow-ios);
+      cursor: grab; transition: var(--transition);
+    }
+    .kanban-card:active { cursor: grabbing; }
+    .kanban-card-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 8px; }
+    .kanban-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+    
+    .priority-badge { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+    .p-urgent { background: var(--danger-light); color: var(--danger-color); }
+    .p-normal { background: var(--warning-light); color: var(--warning-color); }
+    .p-low { background: var(--bg-subtle); color: var(--text-secondary); }
+    
+    .date-badge { font-size: 0.68rem; color: var(--text-secondary); background: var(--bg-primary); padding: 2px 7px; border-radius: 6px; }
+    .kanban-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; margin-top: 4px; }
+    .kanban-card-footer select { font-size: 0.72rem; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); }
+
+    /* القوائم والحقول العامة */
+    .focus-input {
+      width: 100%; border: 1px solid var(--border-color); background: var(--bg-glass-strong);
+      padding: 14px 18px; border-radius: var(--radius-md); font-size: 0.98rem; color: var(--text-primary); outline: none;
+    }
     .item-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-primary); border: 1px solid transparent; border-radius: 12px; gap: 10px; }
+    .list-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: var(--bg-glass-strong); border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm); gap: 10px;
+    }
     .item-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-    .checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; flex-shrink: 0; transition: var(--transition); }
+    .checkbox {
+      width: 19px; height: 19px; border-radius: 6px; border: 1.8px solid var(--text-secondary);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; flex-shrink: 0;
+    }
     .list-item.completed .checkbox { background: var(--accent-color); border-color: var(--accent-color); color: #FFF; }
-    .item-text-input { border: none; background: transparent; color: var(--text-primary); font-size: 0.92rem; width: 100%; outline: none; padding: 2px 4px; border-radius: 6px; }
-    .delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem; opacity: 0.4; transition: var(--transition); }
+    .list-item.completed .item-text-input { text-decoration: line-through; opacity: 0.6; }
+    .item-text-input { border: none; background: transparent; color: var(--text-primary); font-size: 0.88rem; width: 100%; outline: none; }
+    .delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem; opacity: 0.5; }
     .delete-btn:hover { opacity: 1; color: var(--danger-color); }
 
     .add-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-    .add-row input { flex: 1; min-width: 130px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
-    .journal-area { width: 100%; min-height: 120px; border: 1px solid var(--border-color); background: var(--bg-primary); border-radius: 14px; padding: 14px; color: var(--text-primary); outline: none; resize: vertical; }
-
-    /* تصميم رسائل أبل الزجاجية (Glassmorphism) */
-    .glass-message-card {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 14px;
-      padding: 14px 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-      width: 100%;
-      position: relative;
+    .add-row input, .add-row select {
+      flex: 1; min-width: 120px; padding: 10px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color); background: var(--bg-glass-strong); color: var(--text-primary); outline: none; font-size: 0.85rem;
     }
-    [data-theme="dark"] .glass-message-card {
-      background: rgba(28, 28, 30, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    .journal-area {
+      width: 100%; min-height: 120px; border: 1px solid var(--border-color);
+      background: var(--bg-glass-strong); border-radius: var(--radius-md); padding: 14px; color: var(--text-primary); outline: none; resize: vertical;
     }
 
-    .finance-section-title { font-size: 1.15rem; font-weight: 600; color: var(--text-primary); margin: 24px 0 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-    .sub-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
-    
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    /* النوافذ المنبثقة الزجاجية (iOS Modals) */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 15, 14, 0.45);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
+    }
     .modal-overlay.open { display: flex; }
-    .modal-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; max-width: 540px; width: 100%; padding: 32px; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
-    .modal-close { position: absolute; top: 20px; left: 20px; width: 30px; height: 30px; border-radius: 50%; background: var(--bg-subtle); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-box {
+      background: var(--bg-glass-strong); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios);
+      border: 1px solid var(--border-glass); border-radius: 24px;
+      max-width: 580px; width: 100%; padding: 28px; position: relative;
+      box-shadow: var(--shadow-float); max-height: 90vh; overflow-y: auto;
+    }
+    .modal-close {
+      position: absolute; top: 20px; left: 20px; width: 30px; height: 30px; border-radius: 50%;
+      background: var(--bg-subtle); border: none; cursor: pointer; color: var(--text-primary);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
 
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-color); box-shadow: 0 0 0 4px var(--accent-light); }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 11px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.88rem;
+    }
 
-    #toastContainer { position: fixed; bottom: 24px; left: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
-    .toast { background: var(--text-primary); color: var(--bg-primary); padding: 12px 20px; border-radius: 14px; font-size: 0.85rem; font-weight: 500; box-shadow: var(--shadow-lg); animation: slideUp 0.3s ease; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .hidden-widget { display: none !important; }
+    .progress-bar-bg { width: 100%; height: 8px; background: var(--bg-subtle); border-radius: 99px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--accent-color); width: 0%; transition: width 0.3s ease; }
+
+    #toastContainer { position: fixed; bottom: 24px; left: 24px; z-index: 3000; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      background: var(--text-primary); color: var(--bg-primary); padding: 11px 18px;
+      border-radius: 12px; font-size: 0.84rem; font-weight: 500; box-shadow: var(--shadow-float);
+    }
+    .hidden-el { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- فقاعة الإشعارات العائمة (بابل أبل) -->
-  <div id="notificationWidget">
-    <button class="widget-close" onclick="closeNotificationWidget()">&times;</button>
-    <div style="font-size: 0.75rem; font-weight: 600; color: var(--accent-color); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">إشعار نظام</div>
-    <p id="widgetTextContent" style="font-size: 0.88rem; color: var(--text-primary); line-height: 1.5;"></p>
-    <img id="widgetImageContent" class="widget-img" src="" alt="صورة الإشعار">
-  </div>
-
   <div id="toastContainer"></div>
 
   <header>
-    <div class="brand">
-      <h1>وتيرة<span class="dot">.</span></h1>
-      <p>تصميم متجرد وانسيابي</p>
-    </div>
-    <div class="nav-actions">
-      <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">👑 لوحة التحكم</button>
-      <span id="planBadge" class="pro-badge" onclick="openModal('pricingModal')">الباقة الأساسية</span>
-      <button id="upgradeBtn" class="btn" onclick="openModal('pricingModal')">تفعيل الاشتراك ✨</button>
-      <button id="guestAuthBtn" class="btn btn-primary" onclick="openAuthModal('login')">تسجيل الدخول</button>
-      <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="openModal('profileModal')">
-        <div id="headerAvatar" class="avatar-circle">🌿</div>
-        <span id="headerUserName">لمار</span>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>وتيرة<span class="dot">.</span></h1>
+        <p>نظام إدارة الحياة الشخصي</p>
+      </div>
+      <div class="nav-actions">
+        <button id="iosInstallBtn" class="btn btn-subtle" onclick="openModal('iosGuideModal')">تثبيت كتطبيق iOS</button>
+        <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="openModal('adminModal')">لوحة الإدارة</button>
+        <span id="planBadge" class="pro-badge" onclick="openModal('pricingModal')">الباقة الأساسية</span>
+        <button id="upgradeBtn" class="btn" onclick="openModal('pricingModal')">تفعيل الاشتراك</button>
+        <button id="guestAuthBtn" class="btn btn-primary" onclick="openAuthModal('login')">دخول / حساب جديد</button>
+        <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="openModal('profileModal')">
+          <div id="headerAvatar" class="avatar-circle">ل</div>
+          <span id="headerUserName">لمار</span>
+        </div>
       </div>
     </div>
   </header>
 
   <main>
-    <section class="hero-section">
-      <div class="greeting">
-        <div style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 500;" id="syncIndicator">● غير متصل بالسحابة</div>
-        <h2 id="welcomeText">صباح الخير، أهلاً بك يا لمار.</h2>
-        <p>مصممة بعناية فائقة لتشبه تجربة أبل.</p>
+    <!-- 1. شاشة البدء لأول مرة (Onboarding) -->
+    <section id="onboardingScreen" class="hidden-el">
+      <div class="time-pill" id="onboardingTimePill">الفترة الصباحية</div>
+      <h2 id="onboardingGreeting">صباح الخير، أهلاً بك في وتيرة</h2>
+      <p>مساحتك الخاصة بنظام iOS الشفاف والنقي. اختر المظهر المفضل لديك للبدء في تشكيل أدواتك الخاصة من الصفر.</p>
+      
+      <div class="theme-selector-grid">
+        <div class="theme-card active" onclick="selectOnboardingTheme('default', this)">ورق دافئ</div>
+        <div class="theme-card" onclick="selectOnboardingTheme('minimal', this)">صباح نقي</div>
+        <div class="theme-card" onclick="selectOnboardingTheme('dark', this)">سكون ليلي</div>
       </div>
 
-      <!-- خانة الرسائل الزجاجية الشفافة في الهيرو -->
-      <div class="hero-stats">
-        <div id="glassMessageContainer" class="glass-message-card" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-size: 0.7rem; font-weight: 600; color: var(--accent-color); text-transform: uppercase;">إعلان مسابقة</span>
-            <button onclick="dismissGlassMessage()" style="background: none; border: none; cursor: pointer; font-size: 0.9rem; color: var(--text-secondary);">&times;</button>
-          </div>
-          <p id="glassMessageText" style="font-size: 0.88rem; line-height: 1.5; color: var(--text-primary);"></p>
-          <img id="glassMessageImg" src="" alt="صورة الرسالة" style="width: 100%; border-radius: 10px; margin-top: 6px; max-height: 120px; object-fit: cover; display: none;">
-        </div>
-        <div id="defaultHeroPlaceholder" style="font-size: 0.82rem; color: var(--text-secondary); text-align: center; width: 100%; font-weight: 400;">
-          لا توجد إشعارات نشطة
-        </div>
-      </div>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <section class="customizer-bar">
-      <div class="customizer-group">
-        <span class="customizer-label">المظهر:</span>
-        <button class="chip active" data-theme-val="default" onclick="setTheme('default', this)">فاتح</button>
-        <button class="chip" data-theme-val="minimal" onclick="setTheme('minimal', this)">نقي</button>
-        <button class="chip" data-theme-val="dark" onclick="setTheme('dark', this)">داكن</button>
-      </div>
-      <div class="customizer-group">
-        <span class="customizer-label">الأدوات:</span>
-        <button class="chip active" id="btn-widget-focus" onclick="toggleWidget('widget-focus', this)">التركيز</button>
-        <button class="chip active" id="btn-widget-habits" onclick="toggleWidget('widget-habits', this)">العادات</button>
-        <button class="chip active" id="btn-widget-tasks" onclick="toggleWidget('widget-tasks', this)">المهام</button>
-        <button class="chip active" id="btn-widget-finance" onclick="toggleWidget('widget-finance', this)">المالية</button>
-        <button class="chip active" id="btn-widget-journal" onclick="toggleWidget('widget-journal', this)">التدوين</button>
-      </div>
-    </section>
-
-    <div class="bento-grid">
-      <!-- 1. التركيز اليومي -->
-      <div id="widget-focus" class="card col-12">
-        <div class="card-header"><span class="card-title">🎯 تركيزك الأساسي</span></div>
-        <input type="text" id="focusGoalInput" class="focus-input" placeholder="ما هو هدفك الأهم اليوم؟" oninput="autoSave()">
-      </div>
-
-      <!-- 2. العادات اليومية -->
-      <div id="widget-habits" class="card col-6">
-        <div class="card-header"><span class="card-title">🔄 العادات اليومية</span></div>
-        <ul id="habitsList" class="item-list"></ul>
-        <div class="add-row">
-          <input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') addHabit()">
-          <button class="btn btn-primary" onclick="addHabit()">إضافة</button>
-        </div>
-      </div>
-
-      <!-- 3. المهام -->
-      <div id="widget-tasks" class="card col-6">
-        <div class="card-header"><span class="card-title">📋 قائمة المهام</span></div>
-        <ul id="tasksList" class="item-list"></ul>
-        <div class="add-row">
-          <input type="text" id="newTaskInput" placeholder="مهمة جديدة..." onkeypress="if(event.key==='Enter') addTask()">
-          <button class="btn btn-primary" onclick="إضافة">إضافة</button>
-        </div>
-      </div>
-
-      <!-- 4. المالية -->
-      <div id="widget-finance" class="card col-12">
-        <div class="card-header">
-          <span class="card-title">💳 إدارة الأرصدة والمحافظ</span>
-          <span class="card-subtitle">تتبع الأموال والأهداف بوضوح</span>
+    <!-- 2. واجهة العمل الرئيسية -->
+    <div id="mainWorkspace" class="hidden-el">
+      
+      <!-- قسم الهيرو + الرسائل الزجاجية الشفافة -->
+      <section class="hero-section">
+        <div class="greeting-box">
+          <div class="greeting-meta">
+            <span id="syncIndicator">غير متصل بالسحابة</span>
+            <span>•</span>
+            <span id="liveDateText"></span>
+          </div>
+          <h2 id="welcomeText">صباح الخير، أهلاً بك يا لمار.</h2>
+          <p id="dayNightSubtext">رتّب أولوياتك بهدوء وتركيز.</p>
         </div>
 
-        <div class="finance-section-title">الحسابات والمحافظ البنكية</div>
-        <ul id="walletsList" class="item-list"></ul>
-        <div class="add-row" style="margin-bottom: 20px;">
-          <input type="text" id="newWalletName" placeholder="اسم الحساب (مثال: الراجحي)" style="flex: 2;">
-          <input type="number" id="newWalletBalance" placeholder="الرصيد" style="flex: 1;">
-          <button class="btn btn-primary" onclick="addWallet()">إضافة حساب</button>
+        <div class="hero-glass-messages">
+          <div id="activeGlassMessage" style="display: none;">
+            <div class="msg-header">
+              <span class="msg-tag">رسالة المنصة</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="msg-timer" id="msgRemainingTime"></span>
+                <button onclick="dismissGlassMessage()" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1rem;">&times;</button>
+              </div>
+            </div>
+            <p id="glassMessageText" style="font-size: 0.9rem; color: var(--text-primary); line-height: 1.5;"></p>
+            <img id="glassMessageImg" src="" alt="" style="width:100%; max-height:110px; object-fit:cover; border-radius:8px; margin-top:8px; display:none;">
+          </div>
+          <div id="emptyGlassMessage" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 0.85rem; font-weight: 600;">صندوق الرسائل والتنبيهات</div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);">تظهر هنا الرسائل الإدارية والمسابقات المؤقتة بشفافية.</div>
+            </div>
+            <button class="btn btn-subtle" onclick="saveCurrentWateerah(true)">حفظ فوري</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- شريط المظهر والأدوات مع زر (+) -->
+      <section class="toolbar-ios">
+        <div class="toolbar-group">
+          <span class="toolbar-label">المظهر:</span>
+          <button class="chip active" data-theme-btn="default" onclick="setTheme('default', this)">ورق دافئ</button>
+          <button class="chip" data-theme-btn="minimal" onclick="setTheme('minimal', this)">صباح نقي</button>
+          <button class="chip" data-theme-btn="dark" onclick="setTheme('dark', this)">سكون ليلي</button>
+        </div>
+        <div class="toolbar-group">
+          <span class="toolbar-label">أدواتي المفعلة (اسحب البطاقات لترتيبها):</span>
+          <div id="activeWidgetsChips" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
+          <button class="add-widget-plus" title="إضافة أداة جديدة" onclick="openModal('addWidgetModal')">+</button>
+        </div>
+      </section>
+
+      <!-- حالة المساحة الفارغة تماماً -->
+      <div id="emptyWorkspaceState" class="hidden-el">
+        <h3>مساحتك فارغة وجاهزة للتشكيل</h3>
+        <p>اضغط على زر (+) لإضافة الأدوات التي تحتاجها وترتيبها بالسحب والإفلات.</p>
+        <button class="btn btn-primary" onclick="openModal('addWidgetModal')">+ إضافة أول أداة</button>
+      </div>
+
+      <!-- شبكة الأدوات القابلة للسحب والإفلات -->
+      <div id="bentoGrid" class="bento-grid">
+
+        <!-- أداة 1: الفجن بورد الفعلي البني -->
+        <div id="widget-vision" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-vision">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="drag-handle" title="اسحب لترتيب الأداة">⋮⋮</span>
+              <span class="card-title">لوح الرؤية والأهداف (Vision Board)</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span style="font-size: 0.76rem; color: var(--text-secondary);">اضغط على أي بطاقة لفتح خطتها ومهامها وتقويمها</span>
+              <button class="remove-widget-btn" onclick="removeWidget('widget-vision')">إخفاء</button>
+            </div>
+          </div>
+
+          <div id="corkboardContainer" class="corkboard-surface"></div>
+
+          <div class="add-row" style="margin-top: 16px;">
+            <input type="text" id="newVisionTitle" placeholder="عنوان الهدف أو الحلم..." style="flex: 1.5;">
+            <input type="text" id="newVisionImg" placeholder="رابط الصورة (https://...)" style="flex: 2;">
+            <input type="date" id="newVisionDate" style="flex: 1;">
+            <button class="btn btn-primary" onclick="addVisionItem()">تثبيت على البورد</button>
+          </div>
         </div>
 
-        <div class="finance-section-title">لوحة الأهداف المرئية (Vision Board)</div>
-        <div class="sub-card">
-          <ul id="visionBoardList" class="item-list" style="margin-bottom: 12px;"></ul>
+        <!-- أداة 2: لوحة العمل والمهام المتنقلة (Kanban) -->
+        <div id="widget-kanban" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-kanban">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="drag-handle">⋮⋮</span>
+              <span class="card-title">لوحة العمل والمهام المتنقلة</span>
+            </div>
+            <button class="remove-widget-btn" onclick="removeWidget('widget-kanban')">إخفاء</button>
+          </div>
+
+          <div class="add-row" style="margin-top: 0; margin-bottom: 18px;">
+            <input type="text" id="newKanbanTitle" placeholder="عنوان المهمة أو الفكرة..." style="flex: 2;">
+            <select id="newKanbanStatus" style="flex: 1;">
+              <option value="idea">فكرة</option>
+              <option value="scheduled">مجدول بتقويم</option>
+              <option value="progress">قيد التنفيذ</option>
+              <option value="done">مكتمل</option>
+            </select>
+            <select id="newKanbanPriority" style="flex: 1;">
+              <option value="urgent">عاجل</option>
+              <option value="normal" selected>غير عاجل</option>
+              <option value="low">غير مهم</option>
+            </select>
+            <input type="date" id="newKanbanDate" style="flex: 1;">
+            <button class="btn btn-primary" onclick="addKanbanTask()">+ إدراج</button>
+          </div>
+
+          <div class="kanban-grid">
+            <div class="kanban-col" ondragover="allowKanbanDrop(event)" ondrop="dropKanbanCard(event, 'idea')">
+              <div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div>
+              <div class="kanban-cards-wrap" id="col-idea"></div>
+            </div>
+            <div class="kanban-col" ondragover="allowKanbanDrop(event)" ondrop="dropKanbanCard(event, 'scheduled')">
+              <div class="kanban-col-header"><span>مجدول بتقويم</span><span class="kanban-count" id="count-scheduled">0</span></div>
+              <div class="kanban-cards-wrap" id="col-scheduled"></div>
+            </div>
+            <div class="kanban-col" ondragover="allowKanbanDrop(event)" ondrop="dropKanbanCard(event, 'progress')">
+              <div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div>
+              <div class="kanban-cards-wrap" id="col-progress"></div>
+            </div>
+            <div class="kanban-col" ondragover="allowKanbanDrop(event)" ondrop="dropKanbanCard(event, 'done')">
+              <div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div>
+              <div class="kanban-cards-wrap" id="col-done"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- أداة 3: البوصلة اليومية -->
+        <div id="widget-focus" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-focus">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="drag-handle">⋮⋮</span>
+              <span class="card-title">بوصلة التركيز اليومي</span>
+            </div>
+            <button class="remove-widget-btn" onclick="removeWidget('widget-focus')">إخفاء</button>
+          </div>
+          <input type="text" id="focusGoalInput" class="focus-input" placeholder="ما هي النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="autoSave()">
+        </div>
+
+        <!-- أداة 4: العادات اليومية -->
+        <div id="widget-habits" class="widget-card col-6 hidden-el" draggable="true" data-widget-id="widget-habits">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="drag-handle">⋮⋮</span>
+              <span class="card-title">متتبع العادات اليومية</span>
+            </div>
+            <button class="remove-widget-btn" onclick="removeWidget('widget-habits')">إخفاء</button>
+          </div>
+          <ul id="habitsList" class="item-list"></ul>
           <div class="add-row">
-            <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex: 1.5;">
-            <input type="text" id="newVisionImg" placeholder="رابط الصورة..." style="flex: 2;">
-            <button class="btn btn-primary" onclick="addVisionGoal()">إضافة هدف</button>
+            <input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') addHabit()">
+            <button class="btn btn-primary" onclick="addHabit()">إضافة</button>
           </div>
         </div>
 
-        <div class="finance-section-title">قائمة الأمنيات (Wishlist)</div>
-        <div class="sub-card">
-          <ul id="wishlistList" class="item-list" style="margin-bottom: 12px;"></ul>
-          <div class="add-row">
-            <input type="text" id="newWishTitle" placeholder="اسم الغرض..." style="flex: 2;">
-            <input type="number" id="newWishCost" placeholder="التكلفة" style="flex: 1;">
-            <button class="btn btn-primary" onclick="addWishlistItem()">إضافة للأمنيات</button>
+        <!-- أداة 5: حصين المالية -->
+        <div id="widget-finance" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-finance">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="drag-handle">⋮⋮</span>
+              <span class="card-title">حصين المالية (المحافظ، الالتزامات، التوزيع، والأمنيات)</span>
+            </div>
+            <button class="remove-widget-btn" onclick="removeWidget('widget-finance')">إخفاء</button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الحسابات والمحافظ البنكية</div>
+              <ul id="walletsList" class="item-list"></ul>
+              <div class="add-row">
+                <input type="text" id="newWalletName" placeholder="اسم الحساب...">
+                <input type="number" id="newWalletBalance" placeholder="الرصيد (ر.س)">
+                <button class="btn btn-primary" onclick="addWallet()">إضافة</button>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">قائمة الأمنيات (Wishlist)</div>
+              <ul id="wishlistList" class="item-list"></ul>
+              <div class="add-row">
+                <input type="text" id="newWishTitle" placeholder="الأمنية...">
+                <input type="number" id="newWishCost" placeholder="التكلفة (ر.س)">
+                <button class="btn btn-primary" onclick="addWishlistItem()">إضافة</button>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الالتزامات والاشتراكات الشهرية</div>
+              <ul id="subscriptionsList" class="item-list"></ul>
+              <div class="add-row">
+                <input type="text" id="newSubName" placeholder="الالتزام...">
+                <input type="number" id="newSubCost" placeholder="المبلغ">
+                <button class="btn btn-primary" onclick="addSubscription()">إضافة</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+              <span style="font-size: 0.88rem; font-weight: 700;">حاسبة توزيع الدخل الشهري</span>
+              <input type="number" id="totalIncomeInput" value="5000" oninput="calculateDistribution()" style="width: 160px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);">
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:10px;" id="distributionResults"></div>
           </div>
         </div>
 
-        <div class="finance-section-title">حاسبة التوزيع المالي</div>
-        <div class="sub-card">
-          <div class="form-group" style="margin-bottom: 10px;">
-            <label>إجمالي الدخل الشهري:</label>
-            <input type="number" id="totalIncomeInput" value="5000" oninput="calculateDistribution()">
+        <!-- أداة 6: مساحة الصفاء والتدوين -->
+        <div id="widget-journal" class="widget-card col-12 hidden-el" draggable="true" data-widget-id="widget-journal">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="drag-handle">⋮⋮</span>
+              <span class="card-title">مساحة الصفاء والتدوين الحر</span>
+            </div>
+            <button class="remove-widget-btn" onclick="removeWidget('widget-journal')">إخفاء</button>
           </div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px;" id="distributionResults"></div>
+          <textarea id="journalText" class="journal-area" placeholder="فرّغ أفكارك وخواطرك اليومية هنا..." oninput="autoSave()"></textarea>
         </div>
-      </div>
 
-      <!-- 5. التدوين -->
-      <div id="widget-journal" class="card col-12">
-        <div class="card-header"><span class="card-title">📝 مساحة الأفكار والتأمل</span></div>
-        <textarea id="journalText" class="journal-area" placeholder="اكتب أفكارك بحرية..." oninput="autoSave()"></textarea>
       </div>
     </div>
   </main>
 
-  <!-- نافذة الدخول -->
-  <div id="authModal" class="modal-overlay">
+  <!-- نافذة إضافة الأدوات (+) -->
+  <div id="addWidgetModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px;">
+      <button class="modal-close" onclick="closeModal('addWidgetModal')">&times;</button>
+      <h3 style="margin-bottom: 6px;">مكتبة أدوات وتيرة</h3>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف الأدوات التي تحتاجها لمساحتك، ويمكنك سحبها وإفلاتها لتغيير ترتيبها.</p>
+      <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+  </div>
+
+  <!-- نافذة تفاصيل بطاقة الفجن بورد (خطة + تقويم + مهام + نسبة مئوية) -->
+  <div id="visionDetailModal" class="modal-overlay">
     <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('visionDetailModal')">&times;</button>
+      <img id="vModalImg" src="" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 14px; margin-bottom: 14px;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 id="vModalTitle" style="font-size: 1.25rem;"></h3>
+        <span id="vModalPercentBadge" class="pro-badge">0% مكتمل</span>
+      </div>
+
+      <div class="progress-bar-bg" style="margin-bottom: 18px;">
+        <div id="vModalProgressBar" class="progress-bar-fill"></div>
+      </div>
+
+      <div class="form-group">
+        <label>التاريخ المستهدف لتحقيق الهدف (التقويم):</label>
+        <input type="date" id="vModalDate" onchange="saveVisionModalChanges()">
+      </div>
+
+      <div class="form-group">
+        <label>الخطة الاستراتيجية والخطوات:</label>
+        <textarea id="vModalPlan" rows="3" placeholder="اكتب خطتك التفصيلية لتحقيق هذه الرؤية..." oninput="saveVisionModalChanges()"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>مهام تحقيق الهدف (تُحتسب منها نسبة الاكتمال تلقائياً):</label>
+        <ul id="vModalTasksList" class="item-list" style="margin-bottom: 10px;"></ul>
+        <div class="add-row" style="margin-top: 6px;">
+          <input type="text" id="vModalNewTaskInput" placeholder="أضف مهمة فرعية لهذه الرؤية..." onkeypress="if(event.key==='Enter') addVisionSubTask()">
+          <button class="btn btn-primary" onclick="addVisionSubTask()">+ إضافة</button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+        <button class="btn btn-danger" onclick="deleteCurrentVisionItem()">حذف البطاقة من البورد</button>
+        <button class="btn btn-primary" onclick="closeModal('visionDetailModal')">تم وحفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة شرح التثبيت كتطبيق على أجهزة أبل (iOS PWA) -->
+  <div id="iosGuideModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 440px; text-align: center;">
+      <button class="modal-close" onclick="closeModal('iosGuideModal')">&times;</button>
+      <h3 style="margin-bottom: 10px;">إضافة "وتيرة" كتطبيق على أجهزة أبل</h3>
+      <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 18px;">
+        تم تهيئة المنصة لتعمل كتطبيق أصيل (Web App) بشاشة كاملة على iPhone و iPad:
+      </p>
+      <div style="text-align: right; background: var(--bg-subtle); padding: 16px; border-radius: 14px; font-size: 0.85rem; line-height: 1.9; margin-bottom: 18px;">
+        1. افتح الموقع من متصفح <strong>Safari</strong>.<br>
+        2. اضغط على زر <strong>المشاركة (Share)</strong> في الشريط السفلي.<br>
+        3. اختر <strong>"إضافة إلى الشاشة الرئيسية" (Add to Home Screen)</strong>.<br>
+        4. اضغط <strong>إضافة (Add)</strong> لتظهر أيقونة وتيرة بين تطبيقاتك.
+      </div>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="closeModal('iosGuideModal')">حسناً، فهمت</button>
+    </div>
+  </div>
+
+  <!-- نافذة الدخول والتسجيل -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 440px;">
       <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
       <div id="viewLogin">
-        <h3 style="margin-bottom: 16px; font-weight: 600;">تسجيل الدخول</h3>
+        <h3 style="margin-bottom: 14px;">تسجيل الدخول</h3>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="loginEmail"></div>
         <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="handleLogin()">متابعة</button>
-        <div style="display: flex; justify-content: space-between; font-size: 0.82rem;">
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 11px;" onclick="handleLogin()">دخول</button>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
           <span style="color: var(--accent-color); cursor: pointer;" onclick="openResetModal()">نسيت كلمة المرور؟</span>
           <span style="color: var(--text-secondary); cursor: pointer;" onclick="switchToRegister()">إنشاء حساب جديد</span>
         </div>
       </div>
       <div id="viewRegister" style="display: none;">
-        <h3 style="margin-bottom: 16px; font-weight: 600;">إنشاء حساب جديد (تجربة مجانية يومين ✨)</h3>
+        <h3 style="margin-bottom: 14px;">إنشاء حساب جديد</h3>
         <div class="form-group"><label>الاسم</label><input type="text" id="regName"></div>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="regEmail"></div>
         <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="handleRegister()">إنشاء الحساب</button>
-        <span style="color: var(--text-secondary); cursor: pointer; font-size: 0.82rem;" onclick="switchToLogin()">لديك حساب بالفعل؟ سجل دخول</span>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 11px;" onclick="handleRegister()">تسجيل الحساب</button>
+        <span style="color: var(--text-secondary); cursor: pointer; font-size: 0.8rem;" onclick="switchToLogin()">لديك حساب؟ سجل دخول</span>
       </div>
     </div>
   </div>
 
-  <!-- نافذة تفعيل البريد -->
+  <!-- نافذة البريد غير المفعل -->
   <div id="verificationNoticeModal" class="modal-overlay">
     <div class="modal-box" style="text-align: center; max-width: 420px;">
-      <h3 style="margin-bottom: 10px; font-weight: 600; color: var(--danger-color);">تحقق من بريدك الإلكتروني</h3>
-      <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px;">
-        يرجى النقر على رابط التفعيل المرسل إلى بريدك لتفعيل حسابك بالكامل.
+      <h3 style="margin-bottom: 10px; color: var(--danger-color);">بريدك الإلكتروني غير مفعل</h3>
+      <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; margin-bottom: 18px;">
+        يرجى تفعيل بريدك الإلكتروني من الرابط المرسل إليك، أو طلب إعادة الإرسال الآن.
       </p>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px; padding: 12px;" onclick="resendVerificationEmailDirectly()">إعادة إرسال الرابط</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 8px; padding: 11px;" onclick="resendVerificationEmailDirectly()">إعادة إرسال رابط التفعيل</button>
       <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('verificationNoticeModal')">إغلاق</button>
     </div>
   </div>
 
-  <!-- نافذة الاستعادة -->
+  <!-- نافذة استعادة كلمة المرور -->
   <div id="resetModal" class="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 420px;">
       <button class="modal-close" onclick="closeModal('resetModal')">&times;</button>
-      <h3 style="margin-bottom: 10px; font-weight: 600;">استعادة كلمة المرور</h3>
+      <h3 style="margin-bottom: 10px;">استعادة كلمة المرور</h3>
       <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="resetEmail"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleResetPassword()">إرسال رابط الاستعادة</button>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 11px;" onclick="handleResetPassword()">إرسال رابط الاستعادة</button>
     </div>
   </div>
 
-  <!-- 👑 لوحة التحكم -->
+  <!-- لوحة تحكم الأدمن -->
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
-      <h3 style="margin-bottom: 6px; font-weight: 600; color: var(--admin-color);">لوحة التحكم الإدارية</h3>
-      <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 20px;">إدارة المسابقات، المشتركين، وأكواد التفعيل.</p>
+      <h3 style="margin-bottom: 6px; color: var(--admin-color);">لوحة التحكم الإدارية</h3>
+      <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 16px;">إرسال الرسائل الشفافة الفورية عبر السحابة، إدارة المشتركين، وتوليد الأكواد.</p>
       
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">إرسال رسالة / مسابقة في الهيرو</h4>
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 14px; margin-bottom: 14px;">
+        <h4 style="font-size: 0.88rem; margin-bottom: 10px;">إرسال رسالة شفافة في أعلى المنصة (الهيرو)</h4>
         <div class="form-group" style="margin-bottom: 8px;">
-          <label>إرسال إلى:</label>
+          <label>توجيه الرسالة إلى:</label>
           <select id="adminNotifTarget" onchange="toggleTargetEmailBox(this.value)">
-            <option value="ALL">جميع المشتركين</option>
-            <option value="SPECIFIC">مستخدم معين (بالإيميل / المعرف)</option>
+            <option value="ALL">جميع المشتركين في المنصة (بما فيهم حسابك)</option>
+            <option value="SPECIFIC">مشترك محدد (بالإيميل أو رقم المعرف UID)</option>
           </select>
         </div>
         <div class="form-group" id="adminSpecificEmailBox" style="display:none; margin-bottom: 8px;">
-          <input type="text" id="adminTargetUserEmail" placeholder="إيميل أو معرف المستخدم...">
+          <input type="text" id="adminTargetUserEmail" placeholder="أدخل البريد الإلكتروني أو رقم المشترك...">
         </div>
-        <div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الرسالة أو المسابقة..."></textarea></div>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط الصورة (اختياري)"></div>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="المدة بالدقائق (0 يعني دائم)"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="adminSendBubbleNotification()">إرسال الرسالة</button>
+        <div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="اكتب نص الرسالة أو إعلان المسابقة..."></textarea></div>
+        <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط صورة مرفقة (اختياري)"></div>
+        <div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="مدة الظهور بالدقائق قبل الاختفاء التلقائي (مثال: 30)"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminSendCloudMessage()">نشر الرسالة فوراً</button>
       </div>
 
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">المستخدمين المسجلين</h4>
-        <div id="adminUsersList" style="font-size: 0.82rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color);">جاري التحميل...</div>
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 14px; margin-bottom: 14px;">
+        <h4 style="font-size: 0.88rem; margin-bottom: 10px;">المشتركين المسجلين (مع أرقامهم وإيميلاتهم)</h4>
+        <div id="adminUsersList" style="font-size: 0.8rem; max-height: 140px; overflow-y: auto; background: var(--bg-primary); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color);">جاري التحميل...</div>
       </div>
 
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;">توليد أكواد التفعيل</h4>
+      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 14px;">
+        <h4 style="font-size: 0.88rem; margin-bottom: 10px;">توليد أكواد تفعيل الاشتراكات (تُستخدم لمرة واحدة)</h4>
         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
           <input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;">
-          <input type="number" id="adminCodeCustomDays" value="365" placeholder="الأيام" style="flex:1;">
+          <input type="number" id="adminCodeCustomDays" value="30" placeholder="الأيام" style="flex:1;">
         </div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="adminGenerateActivationCode()">توليد الكود</button>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="adminGenerateActivationCode()">حفظ وتوليد الكود</button>
+        <div id="adminCodesList" style="font-size: 0.78rem; max-height: 90px; overflow-y: auto;"></div>
       </div>
     </div>
   </div>
 
-  <!-- نافذة الاشتراك -->
+  <!-- نافذة الاشتراكات والتجربة المجانية (مرة واحدة لكل حساب) -->
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 440px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
       
       <div id="pricingViewUnsubscribed">
         <span class="pro-badge">وتيرة بلس</span>
-        <h3 style="margin: 10px 0 6px; font-weight: 600;">تفعيل الاشتراك</h3>
-        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">أدخل كود التفعيل الخاص بك أدناه:</p>
-        <div class="form-group" style="margin-bottom: 12px;">
+        <h3 style="margin: 10px 0 6px;">تفعيل عضوية وتيرة بلس</h3>
+        <p style="color: var(--text-secondary); font-size: 0.84rem; margin-bottom: 16px;">
+          للحصول على كود التفعيل، يمكنك إتمام الطلب عبر متجرنا في سلة ثم إدخال الكود أدناه:
+        </p>
+
+        <!-- قسم التجربة المجانية ليومين (يظهر مرة واحدة فقط إذا لم يُستخدم من قبل) -->
+        <div id="oneTimeTrialBox" style="background: var(--accent-light); border: 1px solid var(--accent-color); padding: 14px; border-radius: 12px; margin-bottom: 16px; display: none;">
+          <div style="font-size: 0.86rem; font-weight: 700; color: var(--accent-color); margin-bottom: 4px;">متاح لحسابك: تجربة مجانية لمدة يومين</div>
+          <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 10px;">تُمنح لمرة واحدة فقط لكل حساب لتجربة كافة المزايا.</p>
+          <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="activateOneTimeFreeTrial()">تفعيل التجربة المجانية (يومين)</button>
+        </div>
+
+        <a href="https://salla.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 14px;">الانتقال لمتجر سلة للشراء</a>
+        
+        <div class="form-group">
+          <label>أدخل كود التفعيل (يُستخدم لمرة واحدة):</label>
           <div style="display: flex; gap: 8px;">
-            <input type="text" id="userActivationCodeInput" placeholder="أدخل الكود هنا...">
+            <input type="text" id="userActivationCodeInput" placeholder="WATEERAH-...">
             <button class="btn btn-primary" onclick="activateUserSubscriptionWithCode()">تفعيل</button>
           </div>
         </div>
       </div>
 
-      <div id="pricingViewSubscribed" style="display: none; text-align: center; padding: 10px;">
-        <span class="pro-badge" style="font-size: 0.9rem; padding: 6px 16px;">مشترك في وتيرة بلس</span>
-        <h3 style="margin: 12px 0 6px; font-weight: 600;">حالة الاشتراك نشطة</h3>
-        <p style="color: var(--text-secondary); font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px;" id="subActiveDetails"></p>
-        <div style="margin-bottom: 20px;">
+      <div id="pricingViewSubscribed" style="display: none; text-align: center; padding: 8px;">
+        <span class="pro-badge">العضوية نشطة</span>
+        <h3 style="margin: 12px 0 6px;">اشتراك وتيرة بلس</h3>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; margin-bottom: 16px;" id="subActiveDetails"></p>
+        
+        <div style="margin-bottom: 18px;">
           <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;">
-            <span>الأيام المتبقية:</span>
+            <span>المدة المتبقية على انتهاء الاشتراك:</span>
             <strong id="daysRemainingText">0 يوم</strong>
           </div>
-          <div class="progress-bar-bg" style="height: 6px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div>
+          <div class="progress-bar-bg"><div id="subProgressBarFill" class="progress-bar-fill"></div></div>
         </div>
         <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('pricingModal')">إغلاق</button>
       </div>
     </div>
   </div>
 
-  <!-- نافذة الملف الشخصي -->
+  <!-- نافذة إعدادات الحساب -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 400px;">
       <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
-      <h3 style="margin-bottom: 16px; font-weight: 600;">إعدادات الحساب</h3>
-      <div class="form-group"><label>الاسم</label><input type="text" id="profileNameInput"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px; padding: 12px;" onclick="saveProfile()">حفظ التغييرات</button>
-      <button class="btn btn-danger" style="width: 100%; justify-content: center; padding: 12px;" onclick="handleLogout()">تسجيل الخروج</button>
+      <h3 style="margin-bottom: 14px;">إعدادات الحساب</h3>
+      <div class="form-group"><label>الاسم المعروض</label><input type="text" id="profileNameInput"></div>
+      <div class="form-group"><label>معرف الحساب (UID للمسابقات)</label><input type="text" id="profileUidDisplay" readonly style="opacity: 0.7;"></div>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 8px;" onclick="saveProfile()">حفظ الاسم</button>
+      <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="handleLogout()">تسجيل الخروج</button>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB00VedBbLRBhjkMTSxkbXFY16gMJS_I6E",
@@ -448,49 +928,537 @@
 
     const ADMIN_EMAIL = "wateerahapp@gmail.com";
     let unverifiedUserObject = null;
+    let activeVisionIndex = null;
+    let draggedKanbanIndex = null;
 
-    window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', trialUsed: false };
+    // قائمة الأدوات المتاحة للإضافة
+    const AVAILABLE_WIDGETS = [
+      { id: 'widget-vision', name: 'لوح الرؤية البني (Vision Board)', desc: 'بورد واقعي مع صور، خطط، تقويم، ونسبة إنجاز' },
+      { id: 'widget-kanban', name: 'لوحة العمل والمهام المتنقلة', desc: 'أعمدة (فكرة، مجدول، قيد التنفيذ، مكتمل) مع الأولوية' },
+      { id: 'widget-focus', name: 'بوصلة التركيز اليومي', desc: 'تحديد الهدف الأهم لليوم' },
+      { id: 'widget-habits', name: 'متتبع العادات اليومية', desc: 'قائمة العادات اليومية' },
+      { id: 'widget-finance', name: 'حصين المالية الشامل', desc: 'المحافظ، الأمنيات، الاشتراكات، وحاسبة التوزيع' },
+      { id: 'widget-journal', name: 'مساحة الصفاء والتدوين', desc: 'تدوين حر للأفكار والخواطر' }
+    ];
+
+    window.userProfile = {
+      name: 'لمار',
+      planType: 'الباقة الأساسية',
+      isPro: false,
+      expiryDate: '',
+      totalSubDays: 30,
+      trialUsed: false
+    };
+
+    // يبدأ النظام فارغاً من الأدوات في أول مرة
     window.appState = {
-      theme: 'default', focusGoal: '', journal: '', hiddenWidgets: [],
-      habits: [{ text: 'قراءة 15 صفحة', done: false }],
-      tasks: [{ text: 'ترتيب الأولويات', done: false }],
-      wallets: [{ name: 'مصرف الراجحي', balance: 4500 }],
-      visionBoard: [{ title: 'السفر والاسترخاء', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500' }],
-      wishlist: [{ title: 'شاشة ديل احترافية', cost: 1800 }],
-      subscriptions: [{ name: 'منصة سلة', cost: 99 }],
-      ideasVault: [{ text: 'خدمة تصميم قوالب سلة' }]
+      hasStarted: false,
+      theme: 'default',
+      activeWidgets: [], // فارغ في البداية ليضيف العميل ما يشاء
+      widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
+      focusGoal: '',
+      journal: '',
+      habits: [],
+      visionBoard: [],
+      kanbanTasks: [],
+      wallets: [],
+      wishlist: [],
+      subscriptions: []
     };
 
     window.showToast = function(msg) {
       const c = document.getElementById('toastContainer');
       const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
-      c.appendChild(t); setTimeout(() => t.remove(), 3000);
+      c.appendChild(t); setTimeout(() => t.remove(), 3200);
     };
 
+    // ضبط التوقيت الصباحي والمسائي تلقائياً
+    function updateDayNightGreeting() {
+      const hour = new Date().getHours();
+      const isMorning = hour >= 4 && hour < 17;
+      const greetingWord = isMorning ? 'صباح الخير' : 'مساء الخير';
+      const periodLabel = isMorning ? 'الفترة الصباحية' : 'الفترة المسائية';
+      
+      if (!isMorning) {
+        document.body.classList.add('night-mode-glow');
+      } else {
+        document.body.classList.remove('night-mode-glow');
+      }
+
+      const userName = window.userProfile.name || 'صديقنا';
+      document.getElementById('welcomeText').innerText = `${greetingWord}، أهلاً بك يا ${userName}.`;
+      document.getElementById('onboardingGreeting').innerText = `${greetingWord}، أهلاً بك في وتيرة`;
+      document.getElementById('onboardingTimePill').innerText = periodLabel;
+      document.getElementById('dayNightSubtext').innerText = isMorning ? 'بداية يوم مشرقة، رتّب أولوياتك بهدوء.' : 'أمسية هادئة، راجع إنجازاتك وخطط للغد.';
+      
+      const todayStr = new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+      document.getElementById('liveDateText').innerText = todayStr;
+    }
+
+    // شاشة البدء لأول مرة
+    window.selectOnboardingTheme = (themeName, el) => {
+      document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      applyTheme(themeName);
+    };
+
+    window.startWorkspaceFirstTime = () => {
+      window.appState.hasStarted = true;
+      localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
+      renderWorkspaceVisibility();
+      autoSave();
+    };
+
+    function renderWorkspaceVisibility() {
+      const onb = document.getElementById('onboardingScreen');
+      const mainW = document.getElementById('mainWorkspace');
+      if (!window.appState.hasStarted) {
+        onb.classList.remove('hidden-el');
+        mainW.classList.add('hidden-el');
+      } else {
+        onb.classList.add('hidden-el');
+        mainW.classList.remove('hidden-el');
+        renderActiveWidgets();
+      }
+    }
+
+    // إدارة إظهار وإخفاء وترتيب الأدوات
+    function renderActiveWidgets() {
+      const active = window.appState.activeWidgets || [];
+      const order = window.appState.widgetOrder || AVAILABLE_WIDGETS.map(w => w.id);
+      const grid = document.getElementById('bentoGrid');
+      const emptyState = document.getElementById('emptyWorkspaceState');
+
+      if (active.length === 0) {
+        emptyState.classList.remove('hidden-el');
+      } else {
+        emptyState.classList.add('hidden-el');
+      }
+
+      // ترتيب عناصر الـ DOM حسب widgetOrder
+      order.forEach(wId => {
+        const el = document.getElementById(wId);
+        if (el) {
+          grid.appendChild(el);
+          if (active.includes(wId)) {
+            el.classList.remove('hidden-el');
+          } else {
+            el.classList.add('hidden-el');
+          }
+        }
+      });
+
+      // تحديث الشرائح في الشريط العلوي
+      const chipsWrap = document.getElementById('activeWidgetsChips');
+      chipsWrap.innerHTML = active.map(wId => {
+        const info = AVAILABLE_WIDGETS.find(w => w.id === wId);
+        return info ? `<span class="chip active" style="font-size:0.72rem; padding:4px 10px;">${info.name}</span>` : '';
+      }).join('');
+    }
+
+    function renderWidgetLibraryModal() {
+      const container = document.getElementById('widgetLibraryList');
+      const active = window.appState.activeWidgets || [];
+      container.innerHTML = AVAILABLE_WIDGETS.map(w => {
+        const isAdded = active.includes(w.id);
+        return `
+          <div class="list-item" style="padding: 12px 16px;">
+            <div>
+              <div style="font-weight: 600; font-size: 0.9rem;">${w.name}</div>
+              <div style="font-size: 0.76rem; color: var(--text-secondary);">${w.desc}</div>
+            </div>
+            ${isAdded 
+              ? `<button class="btn btn-danger" onclick="removeWidget('${w.id}')">إزالة</button>`
+              : `<button class="btn btn-primary" onclick="addWidgetToWorkspace('${w.id}')">+ إضافة</button>`
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.addWidgetToWorkspace = (wId) => {
+      if (!window.appState.activeWidgets) window.appState.activeWidgets = [];
+      if (!window.appState.activeWidgets.includes(wId)) {
+        window.appState.activeWidgets.push(wId);
+      }
+      renderActiveWidgets();
+      renderWidgetLibraryModal();
+      autoSave();
+    };
+
+    window.removeWidget = (wId) => {
+      window.appState.activeWidgets = (window.appState.activeWidgets || []).filter(id => id !== wId);
+      renderActiveWidgets();
+      renderWidgetLibraryModal();
+      autoSave();
+    };
+
+    // تفعيل السحب والإفلات بين الأدوات (Drag & Drop Widgets)
+    function initWidgetsDragAndDrop() {
+      const grid = document.getElementById('bentoGrid');
+      let draggedCard = null;
+
+      grid.querySelectorAll('.widget-card').forEach(card => {
+        card.addEventListener('dragstart', (e) => {
+          if (e.target.classList.contains('kanban-card')) return;
+          draggedCard = card;
+          setTimeout(() => card.classList.add('dragging'), 0);
+        });
+
+        card.addEventListener('dragend', () => {
+          if (!draggedCard) return;
+          draggedCard.classList.remove('dragging');
+          draggedCard = null;
+          // حفظ الترتيب الجديد
+          const newOrder = Array.from(grid.querySelectorAll('.widget-card')).map(c => c.getAttribute('data-widget-id'));
+          window.appState.widgetOrder = newOrder;
+          autoSave();
+        });
+
+        card.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (!draggedCard || draggedCard === card) return;
+          const bounding = card.getBoundingClientRect();
+          const offset = e.clientY - bounding.top;
+          if (offset > bounding.height / 2) {
+            card.after(draggedCard);
+          } else {
+            card.before(draggedCard);
+          }
+        });
+      });
+    }
+
+    // =====================================================
+    // إدارة الفجن بورد الفعلي البني (Vision Board + Tasks)
+    // =====================================================
+    function renderVisionBoard() {
+      const board = document.getElementById('corkboardContainer');
+      if (!window.appState.visionBoard) window.appState.visionBoard = [];
+      
+      if (window.appState.visionBoard.length === 0) {
+        board.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.85); padding: 60px 20px; font-size: 0.92rem;">اللوح الخشبي فارغ حالياً. أضف أول صورة لهدفك من الحقول بالأسفل لتثبيتها هنا.</div>`;
+        return;
+      }
+
+      board.innerHTML = window.appState.visionBoard.map((item, idx) => {
+        const tasks = item.tasks || [];
+        const doneCount = tasks.filter(t => t.done).length;
+        const pct = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : (item.manualPct || 0);
+        return `
+          <div class="polaroid-item" onclick="openVisionDetail(${idx})">
+            <div class="board-pin"></div>
+            <img class="polaroid-img" src="${item.img}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500'">
+            <div class="polaroid-caption">
+              <span>${item.title}</span>
+              <span style="font-size: 0.78rem; font-weight: 700; color: #1F4E3D;">${pct}%</span>
+            </div>
+            <div class="polaroid-meta">
+              <span>${item.targetDate || 'بدون تاريخ'}</span>
+              <span>${tasks.length} مهام</span>
+            </div>
+            <div class="polaroid-progress-bg">
+              <div class="polaroid-progress-fill" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.addVisionItem = () => {
+      const title = document.getElementById('newVisionTitle').value.trim();
+      const img = document.getElementById('newVisionImg').value.trim();
+      const targetDate = document.getElementById('newVisionDate').value;
+      if (!title) return showToast('أدخل عنوان الهدف أولاً');
+
+      if (!window.appState.visionBoard) window.appState.visionBoard = [];
+      window.appState.visionBoard.push({
+        title,
+        img: img || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
+        targetDate: targetDate || '',
+        plan: '',
+        tasks: []
+      });
+
+      document.getElementById('newVisionTitle').value = '';
+      document.getElementById('newVisionImg').value = '';
+      document.getElementById('newVisionDate').value = '';
+      renderVisionBoard();
+      autoSave();
+      showToast('تم تثبيت الهدف على البورد');
+    };
+
+    window.openVisionDetail = (idx) => {
+      activeVisionIndex = idx;
+      const item = window.appState.visionBoard[idx];
+      if (!item) return;
+
+      document.getElementById('vModalImg').src = item.img;
+      document.getElementById('vModalTitle').innerText = item.title;
+      document.getElementById('vModalDate').value = item.targetDate || '';
+      document.getElementById('vModalPlan').value = item.plan || '';
+      renderVisionModalTasks();
+      openModal('visionDetailModal');
+    };
+
+    function renderVisionModalTasks() {
+      if (activeVisionIndex === null) return;
+      const item = window.appState.visionBoard[activeVisionIndex];
+      if (!item.tasks) item.tasks = [];
+
+      const doneCount = item.tasks.filter(t => t.done).length;
+      const pct = item.tasks.length > 0 ? Math.round((doneCount / item.tasks.length) * 100) : 0;
+
+      document.getElementById('vModalPercentBadge').innerText = `${pct}% مكتمل`;
+      document.getElementById('vModalProgressBar').style.width = `${pct}%`;
+
+      const listEl = document.getElementById('vModalTasksList');
+      listEl.innerHTML = item.tasks.map((t, tIdx) => `
+        <li class="list-item ${t.done ? 'completed' : ''}">
+          <div class="item-left">
+            <div class="checkbox" onclick="toggleVisionSubTask(${tIdx})">${t.done ? '✓' : ''}</div>
+            <span style="font-size: 0.86rem;">${t.text}</span>
+          </div>
+          <button class="delete-btn" onclick="deleteVisionSubTask(${tIdx})">&times;</button>
+        </li>
+      `).join('');
+    }
+
+    window.addVisionSubTask = () => {
+      if (activeVisionIndex === null) return;
+      const input = document.getElementById('vModalNewTaskInput');
+      if (!input.value.trim()) return;
+      window.appState.visionBoard[activeVisionIndex].tasks.push({ text: input.value.trim(), done: false });
+      input.value = '';
+      renderVisionModalTasks();
+      renderVisionBoard();
+      autoSave();
+    };
+
+    window.toggleVisionSubTask = (tIdx) => {
+      const item = window.appState.visionBoard[activeVisionIndex];
+      item.tasks[tIdx].done = !item.tasks[tIdx].done;
+      renderVisionModalTasks();
+      renderVisionBoard();
+      autoSave();
+    };
+
+    window.deleteVisionSubTask = (tIdx) => {
+      window.appState.visionBoard[activeVisionIndex].tasks.splice(tIdx, 1);
+      renderVisionModalTasks();
+      renderVisionBoard();
+      autoSave();
+    };
+
+    window.saveVisionModalChanges = () => {
+      if (activeVisionIndex === null) return;
+      const item = window.appState.visionBoard[activeVisionIndex];
+      item.targetDate = document.getElementById('vModalDate').value;
+      item.plan = document.getElementById('vModalPlan').value;
+      renderVisionBoard();
+      autoSave();
+    };
+
+    window.deleteCurrentVisionItem = () => {
+      if (activeVisionIndex === null) return;
+      window.appState.visionBoard.splice(activeVisionIndex, 1);
+      activeVisionIndex = null;
+      closeModal('visionDetailModal');
+      renderVisionBoard();
+      autoSave();
+    };
+
+    // =====================================================
+    // إدارة لوحة العمل المتنقلة (Kanban Board)
+    // =====================================================
+    function renderKanbanBoard() {
+      if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
+      const cols = { idea: [], scheduled: [], progress: [], done: [] };
+
+      window.appState.kanbanTasks.forEach((task, idx) => {
+        const st = cols[task.status] ? task.status : 'idea';
+        cols[st].push({ ...task, idx });
+      });
+
+      const priorityLabel = { urgent: 'عاجل', normal: 'غير عاجل', low: 'غير مهم' };
+      const priorityClass = { urgent: 'p-urgent', normal: 'p-normal', low: 'p-low' };
+
+      ['idea', 'scheduled', 'progress', 'done'].forEach(colKey => {
+        document.getElementById(`count-${colKey}`).innerText = cols[colKey].length;
+        const wrap = document.getElementById(`col-${colKey}`);
+        wrap.innerHTML = cols[colKey].map(item => `
+          <div class="kanban-card" draggable="true" ondragstart="dragKanbanCard(event, ${item.idx})">
+            <div class="kanban-card-title">${item.title}</div>
+            <div class="kanban-badges">
+              <span class="priority-badge ${priorityClass[item.priority] || 'p-normal'}">${priorityLabel[item.priority] || 'غير عاجل'}</span>
+              ${item.date ? `<span class="date-badge">${item.date}</span>` : ''}
+            </div>
+            <div class="kanban-card-footer">
+              <select onchange="changeKanbanStatus(${item.idx}, this.value)">
+                <option value="idea" ${item.status==='idea'?'selected':''}>فكرة</option>
+                <option value="scheduled" ${item.status==='scheduled'?'selected':''}>مجدول</option>
+                <option value="progress" ${item.status==='progress'?'selected':''}>قيد التنفيذ</option>
+                <option value="done" ${item.status==='done'?'selected':''}>مكتمل</option>
+              </select>
+              <button class="delete-btn" onclick="deleteKanbanTask(${item.idx})">&times;</button>
+            </div>
+          </div>
+        `).join('');
+      });
+    }
+
+    window.addKanbanTask = () => {
+      const title = document.getElementById('newKanbanTitle').value.trim();
+      const status = document.getElementById('newKanbanStatus').value;
+      const priority = document.getElementById('newKanbanPriority').value;
+      const date = document.getElementById('newKanbanDate').value;
+      if (!title) return showToast('أدخل عنوان المهمة');
+
+      if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
+      window.appState.kanbanTasks.push({ title, status, priority, date });
+      document.getElementById('newKanbanTitle').value = '';
+      renderKanbanBoard();
+      autoSave();
+    };
+
+    window.changeKanbanStatus = (idx, newStatus) => {
+      window.appState.kanbanTasks[idx].status = newStatus;
+      renderKanbanBoard();
+      autoSave();
+    };
+
+    window.deleteKanbanTask = (idx) => {
+      window.appState.kanbanTasks.splice(idx, 1);
+      renderKanbanBoard();
+      autoSave();
+    };
+
+    window.dragKanbanCard = (e, idx) => {
+      e.stopPropagation();
+      draggedKanbanIndex = idx;
+    };
+
+    window.allowKanbanDrop = (e) => { e.preventDefault(); };
+
+    window.dropKanbanCard = (e, targetStatus) => {
+      e.preventDefault();
+      if (draggedKanbanIndex === null) return;
+      window.appState.kanbanTasks[draggedKanbanIndex].status = targetStatus;
+      draggedKanbanIndex = null;
+      renderKanbanBoard();
+      autoSave();
+    };
+
+    // =====================================================
+    // القوائم الأخرى (العادات، والمالية)
+    // =====================================================
+    window.renderLists = function() {
+      renderVisionBoard();
+      renderKanbanBoard();
+
+      document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `
+        <li class="list-item ${h.done ? 'completed' : ''}">
+          <div class="item-left">
+            <div class="checkbox" onclick="toggleHabit(${i})">${h.done ? '✓' : ''}</div>
+            <input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; autoSave()">
+          </div>
+          <button class="delete-btn" onclick="window.appState.habits.splice(${i},1); renderLists(); autoSave()">&times;</button>
+        </li>`).join('');
+
+      document.getElementById('walletsList').innerHTML = (window.appState.wallets || []).map((w, i) => `
+        <li class="list-item">
+          <div class="item-left">
+            <input type="text" class="item-text-input" value="${w.name}" onchange="window.appState.wallets[${i}].name=this.value; autoSave()" style="font-weight:600;">
+            <input type="number" class="item-text-input" value="${w.balance}" onchange="window.appState.wallets[${i}].balance=parseFloat(this.value)||0; autoSave();" style="color:var(--accent-color); font-weight:700; max-width:90px;">
+            <span style="font-size:0.75rem; color:var(--text-secondary);">ر.س</span>
+          </div>
+          <button class="delete-btn" onclick="window.appState.wallets.splice(${i},1); renderLists(); autoSave()">&times;</button>
+        </li>`).join('');
+
+      document.getElementById('wishlistList').innerHTML = (window.appState.wishlist || []).map((w, i) => `
+        <li class="list-item">
+          <div class="item-left">
+            <input type="text" class="item-text-input" value="${w.title}" onchange="window.appState.wishlist[${i}].title=this.value; autoSave()">
+            <span style="font-size:0.8rem; font-weight:600; color:var(--danger-color);">${w.cost} ر.س</span>
+          </div>
+          <button class="delete-btn" onclick="window.appState.wishlist.splice(${i},1); renderLists(); autoSave()">&times;</button>
+        </li>`).join('');
+
+      document.getElementById('subscriptionsList').innerHTML = (window.appState.subscriptions || []).map((s, i) => `
+        <li class="list-item">
+          <div class="item-left">
+            <input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; autoSave()">
+            <span style="font-size:0.8rem; font-weight:600;">${s.cost} ر.س</span>
+          </div>
+          <button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); renderLists(); autoSave()">&times;</button>
+        </li>`).join('');
+
+      calculateDistribution();
+    };
+
+    window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; renderLists(); autoSave(); };
+    window.addHabit = () => { const el = document.getElementById('newHabitInput'); if(!el.value.trim())return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; renderLists(); autoSave(); };
+    window.addWallet = () => { const n = document.getElementById('newWalletName'); const b = document.getElementById('newWalletBalance'); if(!n.value.trim())return; window.appState.wallets.push({name:n.value.trim(), balance:parseFloat(b.value)||0}); n.value=''; b.value=''; renderLists(); autoSave(); };
+    window.addWishlistItem = () => { const t = document.getElementById('newWishTitle'); const c = document.getElementById('newWishCost'); if(!t.value.trim())return; window.appState.wishlist.push({title:t.value.trim(), cost:parseFloat(c.value)||0}); t.value=''; c.value=''; renderLists(); autoSave(); };
+    window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; renderLists(); autoSave(); };
+
+    window.calculateDistribution = () => {
+      const income = parseFloat(document.getElementById('totalIncomeInput')?.value) || 5000;
+      const container = document.getElementById('distributionResults');
+      if(container) {
+        container.innerHTML = `
+          <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>
+          <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div>
+          <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div>
+          <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div>
+          <div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>
+        `;
+      }
+    };
+
+    function applyTheme(name) {
+      if(name === 'default') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', name);
+      window.appState.theme = name;
+      document.querySelectorAll('[data-theme-btn]').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-theme-btn') === name);
+      });
+    }
+
+    window.setTheme = (name, btn) => { applyTheme(name); autoSave(); };
+
+    // =====================================================
+    // النوافذ والاشتراكات والتجربة المجانية لمرة واحدة
+    // =====================================================
     window.openModal = async id => {
+      if (id === 'addWidgetModal') renderWidgetLibraryModal();
       if (id === 'pricingModal') {
         const isSubscribed = window.userProfile.isPro;
         document.getElementById('pricingViewUnsubscribed').style.display = isSubscribed ? 'none' : 'block';
         document.getElementById('pricingViewSubscribed').style.display = isSubscribed ? 'block' : 'none';
         
+        // إظهار صندوق التجربة المجانية فقط إذا لم يستخدمها الحساب من قبل
+        const trialBox = document.getElementById('oneTimeTrialBox');
+        trialBox.style.display = (!isSubscribed && !window.userProfile.trialUsed) ? 'block' : 'none';
+
         if (isSubscribed && window.userProfile.expiryDate) {
           const now = new Date();
           const expiry = new Date(window.userProfile.expiryDate);
-          const diffTime = expiry - now;
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          const remainingDays = diffDays > 0 ? diffDays : 0;
+          const diffDays = Math.max(0, Math.ceil((expiry - now) / (1000 * 60 * 60 * 24)));
+          const totalDays = window.userProfile.totalSubDays || 30;
           
-          document.getElementById('daysRemainingText').innerText = remainingDays + ' يوم متبقي';
-          document.getElementById('subProgressBarFill').style.width = Math.min(100, Math.max(0, (remainingDays / 365) * 100)) + '%';
-          
+          document.getElementById('daysRemainingText').innerText = `${diffDays} يوم متبقي`;
+          document.getElementById('subProgressBarFill').style.width = `${Math.min(100, Math.round((diffDays / totalDays) * 100))}%`;
           document.getElementById('subActiveDetails').innerHTML = `
-            نوع الباقة: <strong>${window.userProfile.planType}</strong><br>
-            تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong><br>
-            الحالة: <strong>نشط ✨</strong>
+            الباقة: <strong>${window.userProfile.planType}</strong><br>
+            تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong>
           `;
         }
       }
-      if (id === 'adminModal') { await loadAdminUsers(); }
+      if (id === 'adminModal') {
+        await loadAdminUsers();
+        await loadAdminCodes();
+      }
       document.getElementById(id).classList.add('open');
     };
     window.closeModal = id => document.getElementById(id).classList.remove('open');
@@ -500,395 +1468,296 @@
     window.switchToRegister = () => { document.getElementById('viewLogin').style.display = 'none'; document.getElementById('viewRegister').style.display = 'block'; };
     window.openResetModal = () => { closeModal('authModal'); openModal('resetModal'); };
 
+    // تفعيل التجربة المجانية ليومين (تُستخدم مرة واحدة فقط لكل حساب)
+    window.activateOneTimeFreeTrial = async () => {
+      if (!auth.currentUser) return showToast('يرجى تسجيل الدخول أولاً لتفعيل التجربة');
+      if (window.userProfile.trialUsed) return showToast('لقد استخدمت التجربة المجانية مسبقاً');
+
+      const expiry = new Date();
+      expiry.setDate(expiry.getDate() + 2);
+
+      window.userProfile.isPro = true;
+      window.userProfile.trialUsed = true;
+      window.userProfile.totalSubDays = 2;
+      window.userProfile.planType = 'تجربة مجانية (يومين)';
+      window.userProfile.expiryDate = expiry.toISOString().slice(0, 10);
+
+      updateSubscriptionUI();
+      await saveCurrentWateerah(true);
+      closeModal('pricingModal');
+      showToast('تم تفعيل التجربة المجانية لمدة يومين');
+    };
+
     window.updateSubscriptionUI = function() {
-      const planBadge = document.getElementById('planBadge');
-      const upgradeBtn = document.getElementById('upgradeBtn');
-      
       if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-        const now = new Date();
-        const expiry = new Date(window.userProfile.expiryDate);
-        if (now > expiry) {
+        if (new Date() > new Date(window.userProfile.expiryDate)) {
           window.userProfile.isPro = false;
           window.userProfile.planType = 'الباقة الأساسية';
         }
       }
-
-      if (window.userProfile.isPro) {
-        planBadge.innerText = window.userProfile.planType || 'وتيرة بلس ✨';
-        if(upgradeBtn) upgradeBtn.innerText = 'إدارة الاشتراك';
-      } else {
-        planBadge.innerText = 'الباقة الأساسية';
-        if(upgradeBtn) upgradeBtn.innerText = 'تفعيل الاشتراك ✨';
-      }
-      
-      const userName = window.userProfile.name || 'صديقنا';
-      document.getElementById('welcomeText').innerText = `صباح الخير، أهلاً بك يا ${userName}.`;
+      document.getElementById('planBadge').innerText = window.userProfile.isPro ? window.userProfile.planType : 'الباقة الأساسية';
+      document.getElementById('upgradeBtn').innerText = window.userProfile.isPro ? 'تفاصيل الاشتراك' : 'تفعيل الاشتراك';
+      updateDayNightGreeting();
     };
 
-    window.renderLists = function() {
-      document.getElementById('habitsList').innerHTML = window.appState.habits.map((h, i) => `
-        <li class="list-item ${h.done ? 'completed' : ''}">
-          <div class="item-left"><div class="checkbox" onclick="toggle('habits', ${i})">${h.done ? '✓' : ''}</div>
-          <input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; autoSave()"></div>
-          <button class="delete-btn" onclick="window.appState.habits.splice(${i},1); renderLists(); autoSave()">&times;</button>
-        </li>`).join('');
-
-      document.getElementById('tasksList').innerHTML = window.appState.tasks.map((t, i) => `
-        <li class="list-item ${t.done ? 'completed' : ''}">
-          <div class="item-left"><div class="checkbox" onclick="toggle('tasks', ${i})">${t.done ? '✓' : ''}</div>
-          <input type="text" class="item-text-input" value="${t.text}" onchange="window.appState.tasks[${i}].text=this.value; autoSave()"></div>
-          <button class="delete-btn" onclick="window.appState.tasks.splice(${i},1); renderLists(); autoSave()">&times;</button>
-        </li>`).join('');
-
-      const walletsList = document.getElementById('walletsList');
-      walletsList.innerHTML = (!window.appState.wallets || window.appState.wallets.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد حسابات مضافة.</div>` :
-        window.appState.wallets.map((w, i) => `
-          <li class="list-item">
-            <div class="item-left" style="gap: 8px;">
-              <span>💳</span>
-              <input type="text" class="item-text-input" value="${w.name}" onchange="window.appState.wallets[${i}].name=this.value; autoSave()" style="font-weight:600; max-width: 150px;">
-              <input type="number" class="item-text-input" value="${w.balance}" onchange="window.appState.wallets[${i}].balance=parseFloat(this.value)||0; autoSave(); calculateDistribution();" style="color:var(--accent-color); font-weight:700;">
-              <span style="font-size: 0.82rem; color:var(--text-secondary);">ر.س</span>
-            </div>
-            <button class="delete-btn" onclick="window.appState.wallets.splice(${i},1); renderLists(); autoSave();">&times;</button>
-          </li>`).join('');
-
-      const visionList = document.getElementById('visionBoardList');
-      visionList.innerHTML = (!window.appState.visionBoard || window.appState.visionBoard.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">لا توجد أهداف بصرية.</div>` :
-        window.appState.visionBoard.map((v, i) => `
-          <li class="list-item" style="display:flex; align-items:center; gap:12px;">
-            <img src="${v.img}" alt="goal" style="width:40px; height:40px; border-radius:8px; object-fit:cover;">
-            <input type="text" class="item-text-input" value="${v.title}" onchange="window.appState.visionBoard[${i}].title=this.value; autoSave()" style="font-weight:600;">
-            <button class="delete-btn" onclick="window.appState.visionBoard.splice(${i},1); renderLists(); autoSave();">&times;</button>
-          </li>`).join('');
-
-      const wishList = document.getElementById('wishlistList');
-      wishList.innerHTML = (!window.appState.wishlist || window.appState.wishlist.length === 0) ? `<div style="text-align:center; color:var(--text-secondary); padding:10px;">قائمة الأمنيات فارغة.</div>` :
-        window.appState.wishlist.map((w, i) => `
-          <li class="list-item">
-            <div class="item-left" style="gap: 8px;">
-              <span>🛍️</span>
-              <input type="text" class="item-text-input" value="${w.title}" onchange="window.appState.wishlist[${i}].title=this.value; autoSave()" style="font-weight:600;">
-              <input type="number" class="item-text-input" value="${w.cost}" onchange="window.appState.wishlist[${i}].cost=parseFloat(this.value)||0; autoSave()" style="color:var(--danger-color); font-weight:700;">
-              <span style="font-size: 0.82rem; color:var(--text-secondary);">ر.س</span>
-            </div>
-            <button class="delete-btn" onclick="window.appState.wishlist.splice(${i},1); renderLists(); autoSave();">&times;</button>
-          </li>`).join('');
-
-      calculateDistribution();
-    };
-
-    window.toggle = (type, i) => { window.appState[type][i].done = !window.appState[type][i].done; renderLists(); autoSave(); };
-    window.addHabit = () => { const i = document.getElementById('newHabitInput'); if(!i.value)return; window.appState.habits.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
-    window.addTask = () => { const i = document.getElementById('newTaskInput'); if(!i.value)return; window.appState.tasks.push({text:i.value, done:false}); i.value=''; renderLists(); autoSave(); };
-
-    window.addWallet = () => {
-      const name = document.getElementById('newWalletName').value.trim();
-      const balance = parseFloat(document.getElementById('newWalletBalance').value) || 0;
-      if(!name) return showToast('أدخل اسم المحفظة');
-      if(!window.appState.wallets) window.appState.wallets = [];
-      window.appState.wallets.push({ name, balance });
-      document.getElementById('newWalletName').value = '';
-      document.getElementById('newWalletBalance').value = '';
-      renderLists(); autoSave(); showToast('تمت إضافة الحساب بنجاح');
-    };
-
-    window.addVisionGoal = () => {
-      const title = document.getElementById('newVisionTitle').value.trim();
-      const img = document.getElementById('newVisionImg').value.trim();
-      if(!title) return showToast('أدخل اسم الهدف');
-      if(!window.appState.visionBoard) window.appState.visionBoard = [];
-      window.appState.visionBoard.push({ title, img: img || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500' });
-      document.getElementById('newVisionTitle').value = '';
-      document.getElementById('newVisionImg').value = '';
-      renderLists(); autoSave(); showToast('تمت إضافة الهدف');
-    };
-
-    window.addWishlistItem = () => {
-      const title = document.getElementById('newWishTitle').value.trim();
-      const cost = parseFloat(document.getElementById('newWishCost').value) || 0;
-      if(!title) return showToast('أدخل اسم الأمنية');
-      if(!window.appState.wishlist) window.appState.wishlist = [];
-      window.appState.wishlist.push({ title, cost });
-      document.getElementById('newWishTitle').value = '';
-      document.getElementById('newWishCost').value = '';
-      renderLists(); autoSave(); showToast('تمت إضافة الأمنية');
-    };
-
-    window.calculateDistribution = () => {
-      const income = parseFloat(document.getElementById('totalIncomeInput')?.value) || 5000;
-      const container = document.getElementById('distributionResults');
-      if(container) {
-        container.innerHTML = `
-          <div style="background:var(--bg-card); padding:8px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:600; color:var(--accent-color);">${income*0.1} ر.س</div></div>
-          <div style="background:var(--bg-card); padding:8px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:600; color:var(--accent-color);">${income*0.25} ر.س</div></div>
-          <div style="background:var(--bg-card); padding:8px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:600; color:var(--accent-color);">${income*0.25} ر.س</div></div>
-          <div style="background:var(--bg-card); padding:8px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:600; color:var(--accent-color);">${income*0.3} ر.س</div></div>
-          <div style="background:var(--bg-card); padding:8px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.7rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:600; color:var(--accent-color);">${income*0.1} ر.س</div></div>
-        `;
-      }
-    };
-
-    window.setTheme = (name, btn) => {
-      if(name==='default') document.documentElement.removeAttribute('data-theme');
-      else document.documentElement.setAttribute('data-theme', name);
-      window.appState.theme = name;
-      btn.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active'); autoSave();
-    };
-
-    window.toggleWidget = (id, btn) => {
-      document.getElementById(id).classList.toggle('hidden-widget');
-      btn.classList.toggle('active');
-    };
-
-    let timeout;
-    window.autoSave = () => { clearTimeout(timeout); timeout = setTimeout(() => saveCurrentWateerah(false), 800); };
+    // =====================================================
+    // الحفظ السحابي والمصادقة
+    // =====================================================
+    let saveTimer;
+    window.autoSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => saveCurrentWateerah(false), 700); };
 
     window.saveCurrentWateerah = async (manual) => {
-      window.appState.focusGoal = document.getElementById('focusGoalInput').value;
-      window.appState.journal = document.getElementById('journalText').value;
+      window.appState.focusGoal = document.getElementById('focusGoalInput')?.value || '';
+      window.appState.journal = document.getElementById('journalText')?.value || '';
+      localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
+
       const user = auth.currentUser;
-      if (!user) { showToast('مفعل محلياً'); return; }
+      if (!user) { if(manual) showToast('تم الحفظ محلياً على جهازك'); return; }
       try {
-        await setDoc(doc(db, "users", user.uid), { profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true });
-        if(manual) showToast('تم الحفظ سحابياً');
-      } catch(err) { console.error(err); }
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          profile: window.userProfile,
+          state: window.appState,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        if(manual) showToast('تم الحفظ والمزامنة سحابياً');
+      } catch(e) { console.error(e); }
     };
 
     window.handleRegister = async () => {
-      const name = document.getElementById('regName').value;
-      const email = document.getElementById('regEmail').value;
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
       const pass = document.getElementById('regPassword').value;
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
         await sendEmailVerification(cred.user);
-        
-        window.userProfile.name = name;
-        window.userProfile.isPro = true;
-        window.userProfile.planType = 'تجربة مجانية ✨';
-        window.userProfile.trialUsed = true;
-        
-        const trialExpiry = new Date();
-        trialExpiry.setDate(trialExpiry.getDate() + 2);
-        window.userProfile.expiryDate = trialExpiry.toISOString().slice(0, 10).replace(/-/g, '/');
-
-        await setDoc(doc(db, "users", cred.user.uid), { 
-          email, 
-          profile: window.userProfile, 
-          state: window.appState, 
-          status: 'نشط', 
-          createdAt: new Date().toISOString() 
+        window.userProfile.name = name || 'مشترك';
+        window.userProfile.trialUsed = false;
+        await setDoc(doc(db, "users", cred.user.uid), {
+          email,
+          profile: window.userProfile,
+          state: window.appState,
+          createdAt: new Date().toISOString()
         });
-
-        showToast('تم إنشاء الحساب ومنحك يومين تجربة مجانية');
+        showToast('تم إنشاء الحساب وإرسال رابط التفعيل لبريدك');
         closeModal('authModal');
-      } catch(e) { showToast('خطأ في التسجيل: ' + e.message); }
+      } catch(e) { showToast('خطأ: ' + e.message); }
     };
 
     window.handleLogin = async () => {
-      const email = document.getElementById('loginEmail').value;
+      const email = document.getElementById('loginEmail').value.trim();
       const pass = document.getElementById('loginPassword').value;
       try {
         const cred = await signInWithEmailAndPassword(auth, email, pass);
         if (!cred.user.emailVerified && cred.user.email !== ADMIN_EMAIL) {
           unverifiedUserObject = cred.user;
           closeModal('authModal');
-          document.getElementById('verificationNoticeModal').classList.add('open');
+          openModal('verificationNoticeModal');
           await signOut(auth);
           return;
         }
         closeModal('authModal');
-        showToast('أهلاً بك بعودتك');
+        showToast('مرحباً بعودتك');
       } catch(e) { showToast('بيانات الدخول غير صحيحة'); }
     };
 
     window.resendVerificationEmailDirectly = async () => {
-      if(!unverifiedUserObject) { return showToast('يرجى تسجيل الدخول أولاً'); }
+      if(!unverifiedUserObject) return showToast('سجل دخولك أولاً لإعادة الإرسال');
       try {
         await sendEmailVerification(unverifiedUserObject);
-        showToast('تم إرسال رابط التفعيل');
+        showToast('تم إرسال رابط التفعيل إلى بريدك');
         closeModal('verificationNoticeModal');
-      } catch(e) { showToast('يرجى الانتظار قليلاً'); }
+      } catch(e) { showToast('انتظر قليلاً قبل المحاولة مجدداً'); }
     };
 
     window.handleResetPassword = async () => {
-      const email = document.getElementById('resetEmail').value;
+      const email = document.getElementById('resetEmail').value.trim();
       if(!email) return showToast('أدخل البريد الإلكتروني');
       try {
         await sendPasswordResetEmail(auth, email);
-        showToast('تم إرسال رابط الاستعادة');
+        showToast('تم إرسال رابط الاستعادة لبريدك');
         closeModal('resetModal');
       } catch(e) { showToast('البريد غير مسجل'); }
     };
 
+    // تفعيل الكود لمرة واحدة
     window.activateUserSubscriptionWithCode = async () => {
-      const codeInput = document.getElementById('userActivationCodeInput');
-      const code = codeInput ? codeInput.value.trim() : '';
-      if(!code) return showToast('أدخل كود التفعيل');
-
-      const user = auth.currentUser;
-      if(!user) return showToast('يرجى تسجيل الدخول أولاً');
+      const code = document.getElementById('userActivationCodeInput').value.trim();
+      if(!code) return showToast('أدخل الكود أولاً');
+      if(!auth.currentUser) return showToast('سجل دخولك أولاً');
 
       try {
         const codeRef = doc(db, "activationCodes", code);
-        const codeSnap = await getDoc(codeRef);
+        const snap = await getDoc(codeRef);
+        if(!snap.exists()) return showToast('الكود غير صحيح أو تم استخدامه مسبقاً');
 
-        if(!codeSnap.exists()) {
-          return showToast('كود التفعيل غير صحيح أو مستخدم');
-        }
-
-        const codeData = codeSnap.data();
-        const days = parseInt(codeData.days) || 365;
-
-        const startDate = new Date();
-        const expiryDate = new Date();
-        expiryDate.setDate(startDate.getDate() + days);
+        const days = parseInt(snap.data().days) || 30;
+        const expiry = new Date();
+        expiry.setDate(expiry.getDate() + days);
 
         window.userProfile.isPro = true;
-        window.userProfile.planType = 'وتيرة بلس ✨';
-        window.userProfile.subStartDate = startDate.toISOString().slice(0, 10).replace(/-/g, '/');
-        window.userProfile.expiryDate = expiryDate.toISOString().slice(0, 10).replace(/-/g, '/');
+        window.userProfile.totalSubDays = days;
+        window.userProfile.planType = `وتيرة بلس (${days} يوم)`;
+        window.userProfile.expiryDate = expiry.toISOString().slice(0, 10);
 
         await deleteDoc(codeRef);
         await saveCurrentWateerah(true);
         updateSubscriptionUI();
         closeModal('pricingModal');
-        showToast('تم تفعيل الاشتراك بنجاح');
+        showToast(`تم تفعيل اشتراكك لمدة ${days} يوم`);
       } catch(e) { showToast('حدث خطأ أثناء التفعيل'); }
     };
 
-    window.adminGenerateActivationCode = async () => {
-      const code = document.getElementById('adminNewActivationCode').value.trim();
-      const days = parseInt(document.getElementById('adminCodeCustomDays').value) || 365;
-      if(!code) return showToast('أدخل رمز الكود');
+    // =====================================================
+    // إدارة الأدمن والرسائل الفورية عبر Firestore
+    // =====================================================
+    window.toggleTargetEmailBox = val => {
+      document.getElementById('adminSpecificEmailBox').style.display = val === 'SPECIFIC' ? 'block' : 'none';
+    };
+
+    window.adminSendCloudMessage = async () => {
+      const target = document.getElementById('adminNotifTarget').value;
+      const specificTarget = document.getElementById('adminTargetUserEmail').value.trim();
+      const message = document.getElementById('adminWidgetMsg').value.trim();
+      const imageUrl = document.getElementById('adminWidgetImgUrl').value.trim();
+      const duration = parseInt(document.getElementById('adminWidgetDuration').value) || 0;
+
+      if(!message) return showToast('اكتب نص الرسالة أولاً');
+
+      const payload = {
+        message,
+        imageUrl,
+        duration,
+        target: target === 'ALL' ? 'ALL' : specificTarget,
+        timestamp: Date.now()
+      };
 
       try {
-        await setDoc(doc(db, "activationCodes", code), {
-          code: code,
-          days: days,
-          createdAt: new Date().toISOString()
-        });
+        await setDoc(doc(db, "notifications", "activeMessage"), payload);
+        showToast('تم إرسال الرسالة فوراً عبر السحابة');
+        closeModal('adminModal');
+      } catch(e) {
+        showToast('حدث خطأ في إرسال الرسالة');
+      }
+    };
+
+    // الاستماع الفوري للرسائل من Firestore لتصل للجميع بما فيهم الأدمن
+    function listenToCloudMessages() {
+      onSnapshot(doc(db, "notifications", "activeMessage"), (snap) => {
+        if (!snap.exists()) return;
+        const data = snap.data();
+        const user = auth.currentUser;
+        const myEmail = user ? user.email : '';
+        const myUid = user ? user.uid : '';
+
+        // التحقق مما إذا كانت الرسالة موجهة للكل أو لهذا المستخدم تحديداً (بالإيميل أو UID)
+        const isForMe = data.target === 'ALL' || (myEmail && data.target === myEmail) || (myUid && data.target === myUid);
+        if (!isForMe) return;
+
+        const elapsedMin = (Date.now() - data.timestamp) / (1000 * 60);
+        if (data.duration > 0 && elapsedMin >= data.duration) {
+          hideGlassMessageUI();
+          return;
+        }
+
+        document.getElementById('activeGlassMessage').style.display = 'block';
+        document.getElementById('emptyGlassMessage').style.display = 'none';
+        document.getElementById('glassMessageText').innerText = data.message;
+        
+        const imgEl = document.getElementById('glassMessageImg');
+        if (data.imageUrl) { imgEl.src = data.imageUrl; imgEl.style.display = 'block'; }
+        else { imgEl.style.display = 'none'; }
+
+        if (data.duration > 0) {
+          const left = Math.max(1, Math.ceil(data.duration - elapsedMin));
+          document.getElementById('msgRemainingTime').innerText = `تختفي بعد ${left} د`;
+        } else {
+          document.getElementById('msgRemainingTime').innerText = '';
+        }
+      });
+    }
+
+    function hideGlassMessageUI() {
+      document.getElementById('activeGlassMessage').style.display = 'none';
+      document.getElementById('emptyGlassMessage').style.display = 'flex';
+    }
+
+    window.dismissGlassMessage = () => { hideGlassMessageUI(); };
+
+    window.adminGenerateActivationCode = async () => {
+      const code = document.getElementById('adminNewActivationCode').value.trim();
+      const days = parseInt(document.getElementById('adminCodeCustomDays').value) || 30;
+      if(!code) return showToast('أدخل رمز الكود');
+      try {
+        await setDoc(doc(db, "activationCodes", code), { code, days, createdAt: new Date().toISOString() });
         document.getElementById('adminNewActivationCode').value = '';
-        showToast('تم توليد الكود بنجاح');
-      } catch(e) { showToast('خطأ في توليد الكود'); }
+        showToast('تم حفظ الكود بنجاح');
+        loadAdminCodes();
+      } catch(e) { showToast('خطأ في حفظ الكود'); }
+    };
+
+    async function loadAdminCodes() {
+      const el = document.getElementById('adminCodesList');
+      try {
+        const snap = await getDocs(collection(db, "activationCodes"));
+        let html = '';
+        snap.forEach(d => {
+          const c = d.data();
+          html += `<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border-color);">
+            <span><strong>${c.code}</strong> (${c.days} يوم)</span>
+            <button class="btn btn-danger" style="padding:2px 8px; font-size:0.7rem;" onclick="adminDeleteCode('${c.code}')">حذف</button>
+          </div>`;
+        });
+        el.innerHTML = html || 'لا توجد أكواد نشطة.';
+      } catch(e) {}
+    }
+
+    window.adminDeleteCode = async code => {
+      await deleteDoc(doc(db, "activationCodes", code));
+      loadAdminCodes();
     };
 
     async function loadAdminUsers() {
       const listEl = document.getElementById('adminUsersList');
-      if(!listEl) return;
-      listEl.innerHTML = 'جاري التحميل...';
       try {
-        const querySnapshot = await getDocs(collection(db, "users"));
-        if(querySnapshot.empty) {
-          listEl.innerHTML = 'لا توجد حسابات مسجلة.';
-          return;
-        }
+        const snap = await getDocs(collection(db, "users"));
         let html = '';
-        querySnapshot.forEach((d) => {
-          const data = d.data();
-          const email = data.email || d.id;
-          html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border-color); gap:8px;">
-            <div style="font-size:0.78rem; overflow:hidden; text-overflow:ellipsis;">👤 <strong>${email}</strong></div>
-            <button class="btn btn-primary" style="padding:4px 8px; font-size:0.7rem;" onclick="adminEditUserSubscription('${d.id}')">تعديل</button>
+        snap.forEach(d => {
+          const u = d.data();
+          html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border-color);">
+            <div>
+              <strong>${u.email || 'بدون إيميل'}</strong><br>
+              <span style="font-size:0.72rem; color:var(--text-secondary);">UID: ${d.id} | ${u.profile?.planType || 'أساسي'} (${u.profile?.expiryDate || '-'})</span>
+            </div>
+            <button class="btn btn-subtle" style="padding:4px 10px; font-size:0.72rem;" onclick="adminEditUserSubscription('${d.id}')">تعديل</button>
           </div>`;
         });
-        listEl.innerHTML = html;
-      } catch(e) { listEl.innerHTML = 'تعذر تحميل المستخدمين.'; }
+        listEl.innerHTML = html || 'لا يوجد مشتركين.';
+      } catch(e) { listEl.innerHTML = 'تعذر التحميل.'; }
     }
 
-    window.adminEditUserSubscription = async (uid) => {
-      const newExpiry = prompt("أدخل تاريخ الانتهاء الجديد (YYYY/MM/DD) أو اكتب 'دائم':");
-      if(!newExpiry) return;
-      try {
-        const userRef = doc(db, "users", uid);
-        const userSnap = await getDoc(userRef);
-        if(userSnap.exists()) {
-          let p = userSnap.data().profile || {};
-          p.isPro = true;
-          p.expiryDate = newExpiry;
-          p.planType = 'وتيرة بلس ✨';
-          await setDoc(userRef, { profile: p }, { merge: true });
-          showToast('تم التعديل بنجاح');
-          loadAdminUsers();
-        }
-      } catch(e) { showToast('خطأ في التعديل'); }
-    };
-
-    window.toggleTargetEmailBox = (val) => {
-      document.getElementById('adminSpecificEmailBox').style.display = val === 'SPECIFIC' ? 'block' : 'none';
-    };
-
-    // إرسال الرسائل الشفافة الزجاجية (تصل للجميع بما فيهم الأدمن، وتدعم البريد أو رقم المشترك/المعرف)
-    window.adminSendBubbleNotification = async () => {
-      const target = document.getElementById('adminNotifTarget').value;
-      const targetUser = document.getElementById('adminTargetUserEmail').value.trim();
-      const msg = document.getElementById('adminWidgetMsg').value.trim();
-      const imgUrl = document.getElementById('adminWidgetImgUrl').value.trim();
-      const durationMin = parseInt(document.getElementById('adminWidgetDuration').value) || 0;
-
-      if(!msg) return showToast('أدخل نص الرسالة');
-
-      const notifData = { message: msg, imageUrl: imgUrl, duration: durationMin, timestamp: Date.now() };
-
-      if(target === 'ALL') {
-        localStorage.setItem('wateerah_global_glass_msg', JSON.stringify(notifData));
-        showToast('تم إرسال الرسالة لجميع المشتركين في المنصة (بما فيهم حسابك)');
-      } else {
-        if(!targetUser) return showToast('أدخل بريد أو رقم/معرف المشترك');
-        localStorage.setItem(`wateerah_user_glass_msg_${targetUser}`, JSON.stringify(notifData));
-        showToast(`تم إرسال الرسالة للمشترك (${targetUser}) بنجاح`);
+    window.adminEditUserSubscription = async uid => {
+      const days = prompt("أدخل عدد أيام الاشتراك الجديدة لهذا المشترك:");
+      if(!days) return;
+      const expiry = new Date();
+      expiry.setDate(expiry.getDate() + (parseInt(days) || 30));
+      const userRef = doc(db, "users", uid);
+      const snap = await getDoc(userRef);
+      if(snap.exists()) {
+        let p = snap.data().profile || {};
+        p.isPro = true;
+        p.totalSubDays = parseInt(days) || 30;
+        p.planType = `وتيرة بلس (${days} يوم)`;
+        p.expiryDate = expiry.toISOString().slice(0, 10);
+        await setDoc(userRef, { profile: p }, { merge: true });
+        showToast('تم تحديث اشتراك العميل');
+        loadAdminUsers();
       }
-      closeModal('adminModal');
-      checkGlassMessage();
     };
-
-    // فحص وعرض الرسالة الزجاجية في الهيرو
-    function checkGlassMessage() {
-      const globalMsg = localStorage.getItem('wateerah_global_glass_msg');
-      const userEmail = auth.currentUser ? auth.currentUser.email : null;
-      const userUid = auth.currentUser ? auth.currentUser.uid : null;
-      
-      const personalEmailMsg = userEmail ? localStorage.getItem(`wateerah_user_glass_msg_${userEmail}`) : null;
-      const personalUidMsg = userUid ? localStorage.getItem(`wateerah_user_glass_msg_${userUid}`) : null;
-
-      let activeMsg = personalUidMsg ? JSON.parse(personalUidMsg) : (personalEmailMsg ? JSON.parse(personalEmailMsg) : (globalMsg ? JSON.parse(globalMsg) : null));
-      
-      const card = document.getElementById('glassMessageContainer');
-      const placeholder = document.getElementById('defaultHeroPlaceholder');
-
-      if(activeMsg && activeMsg.message) {
-        const elapsedMin = (Date.now() - activeMsg.timestamp) / (1000 * 60);
-        if(activeMsg.duration === 0 || elapsedMin < activeMsg.duration) {
-          document.getElementById('glassMessageText').innerText = activeMsg.message;
-          const imgEl = document.getElementById('glassMessageImg');
-          if(activeMsg.imageUrl) {
-            imgEl.src = activeMsg.imageUrl;
-            imgEl.style.display = 'block';
-          } else {
-            imgEl.style.display = 'none';
-          }
-          if(card) card.style.display = 'block';
-          if(placeholder) placeholder.style.display = 'none';
-        } else {
-          if(card) card.style.display = 'none';
-          if(placeholder) placeholder.style.display = 'block';
-        }
-      } else {
-        if(card) card.style.display = 'none';
-        if(placeholder) placeholder.style.display = 'block';
-      }
-    }
-
-    window.dismissGlassMessage = () => {
-      document.getElementById('glassMessageContainer').style.display = 'none';
-      document.getElementById('defaultHeroPlaceholder').style.display = 'block';
-    };
-
-    window.closeNotificationWidget = () => { document.getElementById('notificationWidget').style.display = 'none'; };
 
     window.saveProfile = async () => {
-      window.userProfile.name = document.getElementById('profileNameInput').value;
+      window.userProfile.name = document.getElementById('profileNameInput').value.trim() || 'لمار';
+      document.getElementById('headerUserName').innerText = window.userProfile.name;
       updateSubscriptionUI();
       closeModal('profileModal');
       saveCurrentWateerah(true);
@@ -896,11 +1765,24 @@
 
     window.handleLogout = async () => { await signOut(auth); location.reload(); };
 
+    // التهيئة الأولية
+    const savedLocal = localStorage.getItem('wateerah_local_state');
+    if (savedLocal) {
+      try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {}
+    }
+
+    updateDayNightGreeting();
+    applyTheme(window.appState.theme || 'default');
+    renderWorkspaceVisibility();
+    initWidgetsDragAndDrop();
+    listenToCloudMessages();
+
     onAuthStateChanged(auth, async (user) => {
       if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
         document.getElementById('guestAuthBtn').style.display = 'none';
         document.getElementById('userProfilePill').style.display = 'flex';
-        document.getElementById('syncIndicator').innerText = '● متزامن سحابياً';
+        document.getElementById('syncIndicator').innerText = 'متصل ومتزامن سحابياً';
+        document.getElementById('profileUidDisplay').value = user.uid;
 
         if (user.email === ADMIN_EMAIL) {
           document.getElementById('adminPanelBtn').style.display = 'inline-flex';
@@ -910,19 +1792,23 @@
           const snap = await getDoc(doc(db, "users", user.uid));
           if(snap.exists()) {
             const d = snap.data();
-            if(d.profile) window.userProfile = d.profile;
-            if(d.state) window.appState = d.state;
+            if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile };
+            if(d.state) window.appState = { ...window.appState, ...d.state };
           }
         } catch(e) { console.error(e); }
 
+        applyTheme(window.appState.theme || 'default');
         updateSubscriptionUI();
         document.getElementById('headerUserName').innerText = window.userProfile.name || user.email;
+        document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0];
+        document.getElementById('profileNameInput').value = window.userProfile.name || '';
         document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
         document.getElementById('journalText').value = window.appState.journal || '';
+        renderWorkspaceVisibility();
         renderLists();
-        checkGlassMessage();
       } else {
         updateSubscriptionUI();
+        renderWorkspaceVisibility();
         renderLists();
       }
     });
