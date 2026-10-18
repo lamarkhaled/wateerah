@@ -305,7 +305,7 @@
         </div>
       </div>
       <div id="viewRegister" style="display: none;">
-        <h3 style="margin-bottom: 16px;">انضم إلى منصة وتيرة</h3>
+        <h3 style="margin-bottom: 16px;">انضم إلى منصة وتيرة (تحصل على يومين تجربة مجانية ✨)</h3>
         <div class="form-group"><label>الاسم المعروض</label><input type="text" id="regName"></div>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="regEmail"></div>
         <div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div>
@@ -315,12 +315,12 @@
     </div>
   </div>
 
-  <!-- نافذة التنبيه بحالة البريد غير المفعل (تظهر للعميل فوراً عند محاولة الدخول بإيميل غير مفعل) -->
+  <!-- نافذة التنبيه بحالة البريد غير المفعل -->
   <div id="verificationNoticeModal" class="modal-overlay">
     <div class="modal-box" style="text-align: center; max-width: 440px;">
       <h3 style="margin-bottom: 12px; color: var(--danger-color);">⚠️ بريدك الإلكتروني غير مفعل</h3>
       <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
-        عذراً، لا يمكنك الدخول حتى تقوم بتفعيل بريدك الإلكتروني. يرجى التحقق من صندوق الوارد (أو الـ Spam)، وإذا لم تستلم الرابط اضغط على الزر أدناه لإعادة إرساله فوراً.
+        عذراً، يرجى تفعيل بريدك الإلكتروني أولاً لتتمكن من الدخول. شيك على صندوق الوارد أو الـ Spam، أو اضغط أدناه لإعادة إرسال الرابط.
       </p>
       <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px; padding: 12px;" onclick="resendVerificationEmailDirectly()">إعادة إرسال رابط التفعيل الآن ✉️</button>
       <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="closeModal('verificationNoticeModal')">إغلاق</button>
@@ -338,31 +338,26 @@
     </div>
   </div>
 
-  <!-- 👑 لوحة تحكم الأدمن -->
+  <!-- 👑 لوحة تحكم الأدمن (مع تحديد الأيام بحرية للأكواد) -->
   <div id="adminModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 620px;">
       <button class="modal-close" onclick="closeModal('adminModal')">&times;</button>
       <h3 style="margin-bottom: 6px; color: var(--admin-color);">👑 لوحة تحكم أدمن وتيرة</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">توليد أكواد التفعيل الفردية وإدارة اشتراكات العملاء.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">توليد أكواد التفعيل وتحديد مدتها بالريال أو الأيام.</p>
       
-      <!-- قسم توليد كود تفعيل -->
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">🎟️ توليد كود تفعيل اشتراك (يُستخدم مرة واحدة)</h4>
+        <h4 style="font-size: 0.95rem; margin-bottom: 10px;">🎟️ توليد كود تفعيل وتحديد عدد الأيام بحرية</h4>
         <div class="form-group" style="margin-bottom: 8px;">
-          <label>رمز الكود (مثال: WATEERAH-VIP-789):</label>
-          <input type="text" id="adminNewActivationCode" placeholder="أدخل كود فريد...">
+          <label>رمز الكود (مثال: LAMAR-PRO-90):</label>
+          <input type="text" id="adminNewActivationCode" placeholder="أدخل الكود...">
         </div>
         <div class="form-group" style="margin-bottom: 8px;">
-          <label>مدة صلاحية الكود:</label>
-          <select id="adminCodeDays">
-            <option value="30">شهر (30 يوم)</option>
-            <option value="365" selected>سنة كاملة (365 يوم)</option>
-          </select>
+          <label>حدد مدة الأيام لهذا الكود:</label>
+          <input type="number" id="adminCodeCustomDays" value="365" placeholder="عدد الأيام (مثال: 30، 90، 365)">
         </div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminGenerateActivationCode()">إضافة وحفظ كود التفعيل 🚀</button>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="adminGenerateActivationCode()">إضافة وحفظ الكود 🚀</button>
       </div>
 
-      <!-- قائمة الأكواد النشطة -->
       <div style="background: var(--bg-subtle); padding: 16px; border-radius: 12px; margin-bottom: 14px;">
         <h4 style="font-size: 0.95rem; margin-bottom: 10px;">📋 الأكواد المتاحة في النظام:</h4>
         <div id="adminCodesList" style="font-size: 0.85rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);">
@@ -372,7 +367,7 @@
     </div>
   </div>
 
-  <!-- نافذة تفعيل الاشتراك (عبر الأكواد الفريدة) -->
+  <!-- نافذة تفعيل الاشتراك -->
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 480px;">
       <button class="modal-close" onclick="closeModal('pricingModal')">&times;</button>
@@ -381,15 +376,15 @@
         <span class="pro-badge">وتيرة بلس ✨</span>
         <h3 style="margin: 10px 0 6px;">تفعيل اشتراك وتيرة بلس</h3>
         <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;">
-          اشترك أولاً عبر متجرنا في سلة، وسصلك كود التفعيل الخاص بك على بريدك أو واتساب لإدخاله هنا فوراً:
+          اشترك عبر متجرنا في سلة، وسصلك كود التفعيل الخاص بك لإدخاله هنا فوراً:
         </p>
 
         <a href="https://sella.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 16px; font-weight: 600;">🛒 شراء اشتراك من متجر سلة</a>
         
         <div class="form-group" style="margin-bottom: 14px;">
-          <label>أدخل كود التفعيل الخاص بك:</label>
+          <label>أدخل كود التفعيل:</label>
           <div style="display: flex; gap: 8px;">
-            <input type="text" id="userActivationCodeInput" placeholder="مثال: WATEERAH-VIP-..." style="font-weight: 600;">
+            <input type="text" id="userActivationCodeInput" placeholder="أدخل الكود هنا..." style="font-weight: 600;">
             <button class="btn btn-primary" onclick="activateUserSubscriptionWithCode()">تفعيل</button>
           </div>
         </div>
@@ -444,7 +439,7 @@
     const db = getFirestore(app);
 
     const ADMIN_EMAIL = "wateerahapp@gmail.com";
-    let unverifiedUserObject = null; // الاحتفاظ بالمستخدم غير المفعل لإعادة إرسال التفعيل له
+    let unverifiedUserObject = null;
 
     window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '' };
     window.appState = {
@@ -481,9 +476,8 @@
           document.getElementById('subProgressBarFill').style.width = Math.min(100, Math.max(0, (remainingDays / 365) * 100)) + '%';
           
           document.getElementById('subActiveDetails').innerHTML = `
-            تاريخ البداية: <strong>${window.userProfile.subStartDate || 'اليوم'}</strong><br>
             تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong><br>
-            الحالة: <strong>نشط عبر كود تفعيل رسمي ✅</strong>
+            الحالة: <strong>نشط ✨</strong>
           `;
         }
       }
@@ -500,6 +494,17 @@
     window.updateSubscriptionUI = function() {
       const planBadge = document.getElementById('planBadge');
       const upgradeBtn = document.getElementById('upgradeBtn');
+      
+      // التحقق من انتهاء صلاحية الاشتراك أو التجربة المجانية تلقائياً
+      if (window.userProfile.isPro && window.userProfile.expiryDate) {
+        const now = new Date();
+        const expiry = new Date(window.userProfile.expiryDate);
+        if (now > expiry && window.userProfile.expiryDate !== 'دائم') {
+          window.userProfile.isPro = false;
+          window.userProfile.planType = 'الباقة الأساسية';
+        }
+      }
+
       if (window.userProfile.isPro) {
         planBadge.innerText = 'وتيرة بلس ✨';
         upgradeBtn.innerText = 'إدارة الاشتراك';
@@ -690,33 +695,47 @@
       } catch(err) { console.error(err); }
     };
 
+    // 🎁 منح يومين تجربة مجانية تلقائياً عند التسجيل الجديد
     window.handleRegister = async () => {
       const name = document.getElementById('regName').value;
       const email = document.getElementById('regEmail').value;
       const pass = document.getElementById('regPassword').value;
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        await sendEmailVerification(cred.user); // إرسال إيميل التفعيل الحقيقي
+        await sendEmailVerification(cred.user);
+        
         window.userProfile.name = name;
-        await setDoc(doc(db, "users", cred.user.uid), { email, profile: window.userProfile, state: window.appState, status: 'نشط', createdAt: new Date().toISOString() });
-        showToast('تم إنشاء الحساب وإرسال رابط تفعيل البريد الحقيقي!');
+        window.userProfile.isPro = true; // تفعيل بلس تلقائياً للتجربة
+        window.userProfile.planType = 'تجربة مجانية ✨';
+        
+        const trialExpiry = new Date();
+        trialExpiry.setDate(trialExpiry.getDate() + 2); // إضافة يومين بالضبط
+        window.userProfile.expiryDate = trialExpiry.toISOString().slice(0, 10).replace(/-/g, '/');
+
+        await setDoc(doc(db, "users", cred.user.uid), { 
+          email, 
+          profile: window.userProfile, 
+          state: window.appState, 
+          status: 'نشط', 
+          createdAt: new Date().toISOString() 
+        });
+
+        showToast('🎉 أهلاً بك! تم منحك يومين تجربة مجانية وإرسال رابط تفعيل البريد.');
         closeModal('authModal');
       } catch(e) { showToast('خطأ في التسجيل: ' + e.message); }
     };
 
-    // فحص تفعيل الإيميل لحظة دخول العميل وإظهار نافذة إعادة الترسيل إن لم يكن مفعلاً
     window.handleLogin = async () => {
       const email = document.getElementById('loginEmail').value;
       const pass = document.getElementById('loginPassword').value;
       try {
         const cred = await signInWithEmailAndPassword(auth, email, pass);
         
-        // التحقق مما إذا كان البريد غير مفعل ولم يكن هو حساب الأدمن
         if (!cred.user.emailVerified && cred.user.email !== ADMIN_EMAIL) {
-          unverifiedUserObject = cred.user; // حفظ الكائن لإعادة الإرسال
+          unverifiedUserObject = cred.user;
           closeModal('authModal');
-          document.getElementById('verificationNoticeModal').classList.add('open'); // إظهار نافذة التنبيه للعميل
-          await signOut(auth); // إبقاء الحساب مقفلاً لحين التفعيل
+          document.getElementById('verificationNoticeModal').classList.add('open');
+          await signOut(auth);
           return;
         }
 
@@ -725,17 +744,14 @@
       } catch(e) { showToast('بيانات الدخول غير صحيحة.'); }
     };
 
-    // زر إعادة إرسال رابط التفعيل المباشر للعميل من النافذة المنبثقة
     window.resendVerificationEmailDirectly = async () => {
-      if(!unverifiedUserObject) {
-        return showToast('يرجى محاولة تسجيل الدخول مرة أخرى أولاً.');
-      }
+      if(!unverifiedUserObject) { return showToast('يرجى محاولة تسجيل الدخول مرة أخرى أولاً.'); }
       try {
         await sendEmailVerification(unverifiedUserObject);
-        showToast('✉️ تم إرسال رابط تفعيل البريد الإلكتروني الجديد بنجاح! تحقق من بريدك.');
+        showToast('✉️ تم إرسال رابط تفعيل البريد الإلكتروني بنجاح!');
         closeModal('verificationNoticeModal');
       } catch(e) {
-        showToast('يرجى الانتظار قليلاً قبل إعادة محاولة الإرسال.');
+        showToast('يرجى الانتظار قليلأً قبل إعادة المحاولة.');
       }
     };
 
@@ -749,6 +765,7 @@
       } catch(e) { showToast('البريد غير مسجل.'); }
     };
 
+    // 🎟️ تفعيل كود الاشتراك وتحديد مدته بالأيام التي حددها الأدمن
     window.activateUserSubscriptionWithCode = async () => {
       const codeInput = document.getElementById('userActivationCodeInput');
       const code = codeInput ? codeInput.value.trim() : '';
@@ -766,7 +783,7 @@
         }
 
         const codeData = codeSnap.data();
-        const days = codeData.days || 365;
+        const days = parseInt(codeData.days) || 365;
 
         const startDate = new Date();
         const expiryDate = new Date();
@@ -777,20 +794,21 @@
         window.userProfile.subStartDate = startDate.toISOString().slice(0, 10).replace(/-/g, '/');
         window.userProfile.expiryDate = expiryDate.toISOString().slice(0, 10).replace(/-/g, '/');
 
-        await deleteDoc(codeRef);
+        await deleteDoc(codeRef); // حذف الكود لكي يُستخدم لمرة واحدة فقط
         await saveCurrentWateerah(true);
         updateSubscriptionUI();
         closeModal('pricingModal');
-        showToast('🎉 تم تفعيل اشتراك وتيرة بلس بنجاح تام!');
+        showToast(`🎉 تم تفعيل اشتراك وتيرة بلس بنجاح لمدة ${days} يوم!`);
       } catch(e) {
         console.error(e);
         showToast('حدث خطأ أثناء تفعيل الكود.');
       }
     };
 
+    // 👑 توليد الكود من الأدمن وتحديد عدد الأيام بحرية
     window.adminGenerateActivationCode = async () => {
       const code = document.getElementById('adminNewActivationCode').value.trim();
-      const days = parseInt(document.getElementById('adminCodeDays').value) || 365;
+      const days = parseInt(document.getElementById('adminCodeCustomDays').value) || 365;
       if(!code) return showToast('أدخل رمز الكود');
 
       try {
@@ -800,9 +818,11 @@
           createdAt: new Date().toISOString()
         });
         document.getElementById('adminNewActivationCode').value = '';
-        showToast(`تم إنشاء وتوليد الكود (${code}) بنجاح!`);
+        showToast(`تم إنشاء الكود (${code}) بمدة ${days} يوم بنجاح!`);
         loadAdminCodes();
-      } catch(e) { showToast('خطأ في إنشاء الكود.'); }
+      } catch(e) {
+        showToast('خطأ في إنشاء الكود.');
+      }
     };
 
     async function loadAdminCodes() {
@@ -824,7 +844,9 @@
           </div>`;
         });
         listEl.innerHTML = html;
-      } catch(e) { listEl.innerHTML = 'تعذر تحميل الأكواد.'; }
+      } catch(e) {
+        listEl.innerHTML = 'تعذر تحميل الأكواد.';
+      }
     }
 
     window.adminDeleteCode = async (code) => {
@@ -832,7 +854,9 @@
         await deleteDoc(doc(db, "activationCodes", code));
         showToast('تم حذف الكود.');
         loadAdminCodes();
-      } catch(e) { showToast('خطأ في الحذف.'); }
+      } catch(e) {
+        showToast('خطأ في الحذف.');
+      }
     };
 
     window.saveProfile = async () => {
@@ -863,10 +887,10 @@
           }
         } catch(e) { console.error(e); }
 
+        updateSubscriptionUI();
         document.getElementById('headerUserName').innerText = window.userProfile.name || user.email;
         document.getElementById('focusGoalInput').value = window.appState.focusGoal || '';
         document.getElementById('journalText').value = window.appState.journal || '';
-        updateSubscriptionUI();
         renderLists();
       } else {
         updateSubscriptionUI();
