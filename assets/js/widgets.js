@@ -158,7 +158,7 @@ window.calculateDistribution = () => {
   if(container) container.innerHTML = `<div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>`;
 };
 
-// ================= دوال ملاحظات أبل =================
+// ================= دوال التدوين (هوية وتيرة) =================
 window.currentActiveNoteId = null;
 
 window.renderNotesList = function() {
@@ -167,7 +167,7 @@ window.renderNotesList = function() {
   if (!listContainer) return;
   
   if (window.appState.notes.length === 0) {
-    listContainer.innerHTML = '<div style="text-align:center; color:var(--text-secondary); padding:60px 20px; font-size:0.95rem;">لا توجد ملاحظات.<br>اضغط على 📝 لإنشاء ملاحظة جديدة.</div>';
+    listContainer.innerHTML = '<div style="text-align:center; color:var(--text-secondary); padding:60px 20px; font-size:0.95rem;">لا توجد تدوينات.<br>اضغط على 📝 لإنشاء تدوينة جديدة.</div>';
     return;
   }
   
@@ -178,7 +178,7 @@ window.renderNotesList = function() {
     const dateStr = dateObj.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' });
     
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = note.content || 'ملاحظة جديدة';
+    tempDiv.innerHTML = note.content || 'تدوينة جديدة';
     let rawText = tempDiv.textContent || tempDiv.innerText || '';
     const title = rawText.split('\n')[0].substring(0, 30) || 'بدون عنوان';
     let snippet = rawText.replace(title, '').trim().substring(0, 40);
@@ -254,7 +254,7 @@ window.autoSaveNote = function() {
 
 window.deleteCurrentNote = function() {
   if (!window.currentActiveNoteId) return;
-  if (confirm('هل أنت متأكد من حذف هذه الملاحظة نهائياً؟')) {
+  if (confirm('هل أنت متأكد من حذف هذه التدوينة نهائياً؟')) {
     window.appState.notes = window.appState.notes.filter(n => n.id !== window.currentActiveNoteId);
     window.autoSave();
     window.showNotesList();
