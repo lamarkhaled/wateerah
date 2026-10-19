@@ -6,7 +6,7 @@ window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
 window.draggedKanbanIndex = null;
 
-// المتغيرات الجديدة للتحكم بالتاريخ
+// المتغيرات للتحكم بالتاريخ
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
@@ -20,7 +20,7 @@ window.appState = {
 let saveTimer; window.autoSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => window.saveCurrentWateerah(false), 700); };
 
 window.saveCurrentWateerah = async (manual) => {
-  // حفظ بيانات اليوم الحالي في السجل
+  // حفظ بيانات اليوم الحالي في السجل اليومي قبل المزامنة
   if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
   window.appState.dailyRecords[window.currentDateStr] = {
     focusGoal: document.getElementById('focusGoalInput')?.value || '',
@@ -36,24 +36,39 @@ window.saveCurrentWateerah = async (manual) => {
 
 // الدالة السحرية لتغيير التاريخ وفتح صفحة جديدة
 window.changeDate = function(offset) {
+  // 1. احفظ اليوم الحالي قبل ما ننتقل
+  if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
+  window.appState.dailyRecords[window.currentDateStr] = {
+    focusGoal: document.getElementById('focusGoalInput')?.value || '',
+    journal: document.getElementById('journalText')?.value || '',
+    habits: window.appState.habits || []
+  };
+
+  // 2. غير التاريخ
   if (offset === 0) { window.currentDateObj = new Date(); } 
   else { window.currentDateObj.setDate(window.currentDateObj.getDate() + offset); }
-  
-  window.saveCurrentWateerah(false); // حفظ اليوم الحالي قبل الانتقال
   
   window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
   const todayStr = new Date().toISOString().slice(0, 10);
   
-  document.getElementById('dateLabel').innerText = (window.currentDateStr === todayStr) ? 'اليوم' : 'يوم آخر';
-  document.getElementById('liveDateText').innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', month: 'short', day: 'numeric' });
-
-  // تحميل بيانات اليوم المحدد (أو صفحة فارغة إذا كان يوم جديد)
-  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', journal: '', habits: [] };
-  window.appState.habits = daily.habits;
-  document.getElementById('focusGoalInput').value = daily.focusGoal;
-  document.getElementById('journalText').value = daily.journal;
+  const dateLabel = document.getElementById('dateLabel');
+  if (dateLabel) dateLabel.innerText = (window.currentDateStr === todayStr) ? 'اليوم' : 'يوم آخر';
   
-  window.renderLists();
+  const liveDate = document.getElementById('liveDateText');
+  if (liveDate) liveDate.innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', month: 'short', day: 'numeric' });
+
+  // 3. اسحب بيانات اليوم الجديد
+  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', journal: '', habits: [] };
+  window.appState.habits = daily.habits || [];
+  
+  const focusInput = document.getElementById('focusGoalInput');
+  if(focusInput) focusInput.value = daily.focusGoal || '';
+  
+  const journalInput = document.getElementById('journalText');
+  if(journalInput) journalInput.value = daily.journal || '';
+  
+  if(window.renderLists) window.renderLists();
+  window.saveCurrentWateerah(false);
 };
 
 window.saveProfile = async () => {
@@ -85,9 +100,14 @@ setTimeout(() => {
   if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
   if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
   if(window.initWidgetsDragAndDrop) window.initWidgetsDragAndDrop(); 
-  listenToCloudMessages();
-  window.changeDate(0); // تفعيل اليوم الحالي فوراً
-  if(window.innerWidth <= 768) window.switchTab('home'); // تفعيل التاب الأول للموبايل
+  listenToCloudMessages(); 
+  
+  // تشغيل التاريخ والصفحة الأولى
+  window.changeDate(0);
+  if (window.innerWidth <= 768) {
+    document.querySelectorAll('.widget-card').forEach(card => card.classList.remove('active-tab-item'));
+    document.querySelectorAll('.tab-home').forEach(el => el.classList.add('active-tab-item'));
+  }
 }, 200);
 
 onAuthStateChanged(auth, async (user) => {
@@ -106,12 +126,12 @@ onAuthStateChanged(auth, async (user) => {
         
         document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; document.getElementById('profileNameInput').value = window.userProfile.name || '';
         
-        window.changeDate(0); // سحب بيانات اليوم الحالي من السحاب
+        window.changeDate(0);
         if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
       } else { 
         if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
         if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-        window.changeDate(0); 
+        window.changeDate(0);
       }
   }, 200);
 });
