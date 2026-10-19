@@ -156,28 +156,28 @@
           <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
             <div class="card-title-wrap">
               <span class="drag-handle">⋮⋮</span>
-              <span class="card-title" style="color: #eab308; font-weight: 600;">الملاحظات</span>
+              <span class="card-title" style="color: var(--accent-color); font-weight: 700;">التدوين</span>
             </div>
             <div style="display: flex; gap: 12px; align-items: center;">
-              <button style="background:none; border:none; color:#eab308; font-size:1.3rem; cursor:pointer; transition: transform 0.2s;" onclick="window.createNewNote()" title="ملاحظة جديدة" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📝</button>
+              <button style="background:none; border:none; color:var(--accent-color); font-size:1.3rem; cursor:pointer; transition: transform 0.2s;" onclick="window.createNewNote()" title="تدوينة جديدة" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📝</button>
               <button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-journal')">إخفاء</button>
             </div>
           </div>
           <div id="notesListView" style="flex: 1; overflow-y: auto; background: var(--bg-glass-strong); display: block;"></div>
           <div id="noteEditorView" style="display: none; flex: 1; flex-direction: column; background: var(--bg-glass-strong); padding: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <button style="background:none; border:none; color:#eab308; font-weight:600; cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:4px;" onclick="window.showNotesList()">
-                <span style="font-size:1.2rem;">❮</span> الملاحظات
+              <button style="background:none; border:none; color:var(--accent-color); font-weight:700; cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:4px;" onclick="window.showNotesList()">
+                <span style="font-size:1.2rem;">❮</span> التدوين
               </button>
               <div style="display:flex; gap:16px; align-items: center;">
-                <label style="cursor:pointer; color:#eab308; font-size:1.3rem;" title="إدراج صورة">
+                <label style="cursor:pointer; color:var(--accent-color); font-size:1.3rem;" title="إدراج صورة">
                   📷 <input type="file" accept="image/*" style="display:none;" onchange="window.addNoteImage(event)">
                 </label>
-                <button style="background:none; border:none; color:var(--danger-color); font-size:1.1rem; cursor:pointer;" onclick="window.deleteCurrentNote()" title="حذف الملاحظة">🗑️</button>
+                <button style="background:none; border:none; color:var(--danger-color); font-size:1.1rem; cursor:pointer;" onclick="window.deleteCurrentNote()" title="حذف التدوينة">🗑️</button>
               </div>
             </div>
             <div id="currentNoteDate" style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 16px;"></div>
-            <div id="noteContentEditable" class="apple-notes-editor" contenteditable="true" placeholder="ملاحظة جديدة..." oninput="window.autoSaveNote()"></div>
+            <div id="noteContentEditable" class="apple-notes-editor" contenteditable="true" placeholder="تدوينة جديدة..." oninput="window.autoSaveNote()"></div>
           </div>
         </div>
       </div>
@@ -275,14 +275,11 @@
     </div>
   </div>
 
-  <!-- نافذة السجل المنبثقة -->
   <div id="historyModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
       <button class="modal-close" onclick="window.closeModal('historyModal')">&times;</button>
       <h3 id="historyModalTitle" style="margin-bottom: 16px;">السجل</h3>
-      <div id="historyModalContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;">
-        <!-- السجلات ستظهر هنا برمجياً -->
-      </div>
+      <div id="historyModalContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
     </div>
   </div>
 
