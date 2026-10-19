@@ -3,7 +3,6 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVe
 import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
-// دالة محصنة لاستخراج التاريخ بصيغة YYYY-MM-DD بناءً على توقيت العميل الفعلي لتجنب مشاكل المناطق الزمنية
 function getLocalYYYYMMDD(dateObj = new Date()) {
   const y = dateObj.getFullYear();
   const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -17,14 +16,11 @@ window.updateSubscriptionUI = function() {
     const todayStr = getLocalYYYYMMDD(new Date());
     const expiryStr = window.userProfile.expiryDate.replace(/\//g, '-');
 
-    // الإسقاط الفوري للاشتراك إذا تطابق تاريخ اليوم مع تاريخ الانتهاء
     if (todayStr >= expiryStr) { 
       window.userProfile.isPro = false; 
       window.userProfile.planType = 'الباقة الأساسية'; 
       window.userProfile.expiryDate = ''; 
       window.userProfile.totalSubDays = 0;
-      
-      // إجبار الحفظ السحابي للحالة المجانية فوراً
       if (window.saveCurrentWateerah) window.saveCurrentWateerah(true);
     }
   }
@@ -39,12 +35,10 @@ window.updateSubscriptionUI = function() {
 };
 
 window.setupPricingModal = function() {
-  // 1. تحديث الحالة أولاً لضمان الإسقاط قبل عرض أي نافذة
   window.updateSubscriptionUI(); 
   
   const isSubscribed = window.userProfile?.isPro || false;
   
-  // 2. التحكم في النوافذ بناءً على الحالة المحدثة
   const unsubView = document.getElementById('pricingViewUnsubscribed');
   const subView = document.getElementById('pricingViewSubscribed');
   const trialBox = document.getElementById('oneTimeTrialBox');
@@ -53,7 +47,6 @@ window.setupPricingModal = function() {
   if (subView) subView.style.display = isSubscribed ? 'block' : 'none';
   if (trialBox) trialBox.style.display = (!isSubscribed && !window.userProfile?.trialUsed) ? 'block' : 'none';
 
-  // 3. عرض تفاصيل الاشتراك إذا كان نشطاً فقط
   if (isSubscribed && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
     const now = new Date();
     now.setHours(0,0,0,0);
@@ -61,11 +54,9 @@ window.setupPricingModal = function() {
     const expiryDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-'));
     expiryDate.setHours(0,0,0,0);
     
-    // حساب الأيام المتبقية 
     const diffTime = expiryDate.getTime() - now.getTime();
     let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    // خط دفاع مزدوج: إذا الأيام 0 أو أقل يتم إسقاط الاشتراك وتحديث الواجهة مباشرة
     if (diffDays <= 0) {
       window.userProfile.isPro = false;
       window.userProfile.planType = 'الباقة الأساسية';
@@ -80,8 +71,7 @@ window.setupPricingModal = function() {
       if(badge) badge.innerText = 'الباقة الأساسية';
       const upg = document.getElementById('upgradeBtn'); 
       if(upg) upg.innerText = 'تفعيل الاشتراك';
-      
-      return; // منع تشغيل شريط التقدم للاشتراكات المنتهية
+      return; 
     }
 
     const totalDays = window.userProfile.totalSubDays || 30;
