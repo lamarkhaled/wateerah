@@ -137,7 +137,6 @@ window.renderLists = function() {
 window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
 
 window.addHabit = () => { 
-  // قفل إضافة أكثر من 3 عادات لغير المشتركين
   if (!window.userProfile?.isPro && (window.appState.habits || []).length >= 3) {
     window.showToast('النسخة المجانية تتيح 3 عادات كحد أقصى. رقّي باقتك الآن! 🌟');
     window.openModal('pricingModal');
@@ -158,3 +157,128 @@ window.calculateDistribution = () => {
   const container = document.getElementById('distributionResults');
   if(container) container.innerHTML = `<div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>`;
 };
+
+// ================= دوال ملاحظات أبل =================
+window.currentActiveNoteId = null;
+
+window.renderNotesList = function() {
+  if (!window.appState.notes) window.appState.notes = [];
+  const listContainer = document.getElementById('notesListView');
+  if (!listContainer) return;
+  
+  if (window.appState.notes.length === 0) {
+    listContainer.innerHTML = '<div style="text-align:center; color:var(--text-secondary); padding:60px 20px; font-size:0.95rem;">لا توجد ملاحظات.<br>اضغط على 📝 لإنشاء ملاحظة جديدة.</div>';
+    return;
+  }
+  
+  const sortedNotes = [...window.appState.notes].sort((a, b) => b.updatedAt - a.updatedAt);
+  
+  listContainer.innerHTML = sortedNotes.map(note => {
+    const dateObj = new Date(note.updatedAt);
+    const dateStr = dateObj.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' });
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = note.content || 'ملاحظة جديدة';
+    let rawText = tempDiv.textContent || tempDiv.innerText || '';
+    const title = rawText.split('\n')[0].substring(0, 30) || 'بدون عنوان';
+    let snippet = rawText.replace(title, '').trim().substring(0, 40);
+    if(snippet.length >= 40) snippet += '...';
+    if(snippet === '') snippet = 'لا يوجد نص إضافي';
+
+    return `
+      <div class="note-list-item" onclick="window.openNote('${note.id}')">
+        <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div>
+        <div style="display: flex; gap: 10px; font-size: 0.85rem; color: var(--text-secondary);">
+          <span style="font-weight: 500;">${dateStr}</span>
+          <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8;">${snippet}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+};
+
+window.showNotesList = function() {
+  document.getElementById('notesListView').style.display = 'block';
+  document.getElementById('noteEditorView').style.display = 'none';
+  window.currentActiveNoteId = null;
+  window.renderNotesList();
+};
+
+window.createNewNote = function() {
+  if (!window.appState.notes) window.appState.notes = [];
+  const newNote = { id: 'note_' + Date.now(), content: '', updatedAt: Date.now() };
+  window.appState.notes.unshift(newNote); 
+  window.autoSave();
+  window.openNote(newNote.id);
+};
+
+window.openNote = function(id) {
+  window.currentActiveNoteId = id;
+  const note = window.appState.notes.find(n => n.id === id);
+  if (!note) return;
+  
+  document.getElementById('notesListView').style.display = 'none';
+  document.getElementById('noteEditorView').style.display = 'flex';
+  
+  const dateObj = new Date(note.updatedAt);
+  const timeStr = dateObj.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+  const dateStr = dateObj.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric', year: 'numeric' });
+  document.getElementById('currentNoteDate').innerText = `${dateStr} في ${timeStr}`;
+  
+  const editor = document.getElementById('noteContentEditable');
+  editor.innerHTML = note.content;
+  
+  setTimeout(() => {
+    editor.focus();
+    if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }, 50);
+};
+
+window.autoSaveNote = function() {
+  if (!window.currentActiveNoteId) return;
+  const noteIndex = window.appState.notes.findIndex(n => n.id === window.currentActiveNoteId);
+  if (noteIndex > -1) {
+    const editor = document.getElementById('noteContentEditable');
+    window.appState.notes[noteIndex].content = editor.innerHTML;
+    window.appState.notes[noteIndex].updatedAt = Date.now();
+    window.autoSave();
+  }
+};
+
+window.deleteCurrentNote = function() {
+  if (!window.currentActiveNoteId) return;
+  if (confirm('هل أنت متأكد من حذف هذه الملاحظة نهائياً؟')) {
+    window.appState.notes = window.appState.notes.filter(n => n.id !== window.currentActiveNoteId);
+    window.autoSave();
+    window.showNotesList();
+  }
+};
+
+window.addNoteImage = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2.5 * 1024 * 1024) {
+    if(window.showToast) window.showToast('حجم الصورة كبير جداً. يرجى اختيار صورة أقل من 2.5 ميجابايت.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const imgBase64 = e.target.result;
+    const imgTag = `<br><img src="${imgBase64}"><br>`;
+    const editor = document.getElementById('noteContentEditable');
+    editor.innerHTML += imgTag;
+    window.autoSaveNote();
+    editor.scrollTop = editor.scrollHeight;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = ''; 
+};
+
+setTimeout(() => { if (window.renderNotesList) window.renderNotesList(); }, 800);
