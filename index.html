@@ -60,7 +60,6 @@
     <div id="mainWorkspace" class="hidden-el">
       <section class="hero-section">
         <div class="greeting-box">
-          <!-- التاريخ المباشر بدون أسهم -->
           <div id="liveDateText" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-color); margin-bottom: 6px;"></div>
           <h2 id="welcomeText" style="margin-top: 0;">صباح الخير، أهلاً بك.</h2>
           <p id="dayNightSubtext">رتّب أولوياتك بهدوء وتركيز.</p>
@@ -153,20 +152,32 @@
           <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;"><span style="font-size: 0.88rem; font-weight: 700;">توزيع الدخل الشهري</span><input type="number" id="totalIncomeInput" value="5000" oninput="window.calculateDistribution()" style="width: 160px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);"></div><div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:10px;" id="distributionResults"></div></div>
         </div>
 
-        <div id="widget-journal" class="widget-card col-12 hidden-el tab-home" draggable="true" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios);">
-          <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 16px 22px 4px; border-bottom: none;">
+        <div id="widget-journal" class="widget-card col-12 hidden-el tab-home" draggable="true" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 350px;">
+          <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
             <div class="card-title-wrap">
               <span class="drag-handle">⋮⋮</span>
               <span class="card-title" style="color: #eab308; font-weight: 600;">الملاحظات</span>
             </div>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-subtle" style="padding: 4px 10px; font-size: 0.72rem;" onclick="window.openHistoryModal('journal')">السجل 🗓️</button>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <button style="background:none; border:none; color:#eab308; font-size:1.3rem; cursor:pointer; transition: transform 0.2s;" onclick="window.createNewNote()" title="ملاحظة جديدة" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📝</button>
               <button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-journal')">إخفاء</button>
             </div>
           </div>
-          <div style="background: var(--bg-glass-strong); padding: 0 22px 22px; height: 100%;">
-            <div style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 12px; font-weight: 500;">اليوم</div>
-            <textarea id="journalText" class="apple-notes-area" placeholder="ملاحظة جديدة" oninput="window.autoSave()"></textarea>
+          <div id="notesListView" style="flex: 1; overflow-y: auto; background: var(--bg-glass-strong); display: block;"></div>
+          <div id="noteEditorView" style="display: none; flex: 1; flex-direction: column; background: var(--bg-glass-strong); padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <button style="background:none; border:none; color:#eab308; font-weight:600; cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:4px;" onclick="window.showNotesList()">
+                <span style="font-size:1.2rem;">❮</span> الملاحظات
+              </button>
+              <div style="display:flex; gap:16px; align-items: center;">
+                <label style="cursor:pointer; color:#eab308; font-size:1.3rem;" title="إدراج صورة">
+                  📷 <input type="file" accept="image/*" style="display:none;" onchange="window.addNoteImage(event)">
+                </label>
+                <button style="background:none; border:none; color:var(--danger-color); font-size:1.1rem; cursor:pointer;" onclick="window.deleteCurrentNote()" title="حذف الملاحظة">🗑️</button>
+              </div>
+            </div>
+            <div id="currentNoteDate" style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 16px;"></div>
+            <div id="noteContentEditable" class="apple-notes-editor" contenteditable="true" placeholder="ملاحظة جديدة..." oninput="window.autoSaveNote()"></div>
           </div>
         </div>
       </div>
@@ -174,18 +185,10 @@
   </main>
 
   <nav class="ios-tab-bar" id="mobileTabBar">
-    <button class="tab-btn active" onclick="window.switchTab('home')">
-      <span class="tab-icon">🏠</span><span>يومي</span>
-    </button>
-    <button class="tab-btn" onclick="window.switchTab('tasks')">
-      <span class="tab-icon">📋</span><span>المهام</span>
-    </button>
-    <button class="tab-btn" onclick="window.switchTab('finance')">
-      <span class="tab-icon">💰</span><span>المالية</span>
-    </button>
-    <button class="tab-btn" onclick="window.switchTab('vision')">
-      <span class="tab-icon">🎯</span><span>الأهداف</span>
-    </button>
+    <button class="tab-btn active" onclick="window.switchTab('home')"><span class="tab-icon">🏠</span><span>يومي</span></button>
+    <button class="tab-btn" onclick="window.switchTab('tasks')"><span class="tab-icon">📋</span><span>المهام</span></button>
+    <button class="tab-btn" onclick="window.switchTab('finance')"><span class="tab-icon">💰</span><span>المالية</span></button>
+    <button class="tab-btn" onclick="window.switchTab('vision')"><span class="tab-icon">🎯</span><span>الأهداف</span></button>
   </nav>
 
   <div id="addWidgetModal" class="modal-overlay"><div class="modal-box" style="max-width: 480px;"><button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button><h3 style="margin-bottom: 6px;">مكتبة الأدوات</h3><p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف ما تحتاجه لمساحتك.</p><div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div></div></div>
