@@ -12,7 +12,6 @@ window.updateDayNightGreeting = function() {
   const oTxt = document.getElementById('onboardingGreeting'); if(oTxt) oTxt.innerText = `${greetingWord}، أهلاً بك في وتيرة`;
   const pTxt = document.getElementById('onboardingTimePill'); if(pTxt) pTxt.innerText = isMorning ? 'الفترة الصباحية' : 'الفترة المسائية';
   const dTxt = document.getElementById('dayNightSubtext'); if(dTxt) dTxt.innerText = isMorning ? 'بداية يوم مشرقة، رتّب أولوياتك بهدوء.' : 'أمسية هادئة، راجع إنجازاتك وخطط للغد.';
-  const lTxt = document.getElementById('liveDateText'); if(lTxt) lTxt.innerText = new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
 };
 
 window.applyTheme = function(name) {
@@ -72,4 +71,22 @@ window.openAuthModal = () => { window.switchToLogin(); window.openModal('authMod
 window.switchToLogin = () => { document.getElementById('viewLogin').style.display = 'block'; document.getElementById('viewRegister').style.display = 'none'; };
 window.switchToRegister = () => { document.getElementById('viewLogin').style.display = 'none'; document.getElementById('viewRegister').style.display = 'block'; };
 window.openResetModal = () => { window.closeModal('authModal'); window.openModal('resetModal'); };
-window.dismissGlassMessage = () => { document.getElementById('activeGlassMessage').style.display = 'none'; document.getElementById('emptyGlassMessage').style.display = 'flex'; };
+
+// دالة إغلاق الإشعار الزجاجي بمجرد الضغط عليه بأي مكان
+window.dismissGlassMessage = () => { 
+  document.getElementById('activeGlassMessage').style.display = 'none'; 
+  document.getElementById('emptyGlassMessage').style.display = 'flex'; 
+};
+
+// دالة نظام الصفحات للأجهزة المحمولة (Tabs)
+window.switchTab = function(tabName) {
+  if (!event) return;
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  // في شاشات الجوال، نعرض فقط الأداة التابعة للتاب
+  if (window.innerWidth <= 768) {
+    document.querySelectorAll('.widget-card').forEach(card => card.classList.remove('active-tab-item'));
+    document.querySelectorAll('.tab-' + tabName).forEach(el => el.classList.add('active-tab-item'));
+  }
+};
