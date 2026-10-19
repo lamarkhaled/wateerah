@@ -135,7 +135,21 @@ window.renderLists = function() {
 };
 
 window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
-window.addHabit = () => { const el = document.getElementById('newHabitInput'); if(!el.value.trim())return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; window.renderLists(); window.autoSave(); };
+
+window.addHabit = () => { 
+  // قفل إضافة أكثر من 3 عادات لغير المشتركين
+  if (!window.userProfile?.isPro && (window.appState.habits || []).length >= 3) {
+    window.showToast('النسخة المجانية تتيح 3 عادات كحد أقصى. رقّي باقتك الآن! 🌟');
+    window.openModal('pricingModal');
+    return;
+  }
+  const el = document.getElementById('newHabitInput'); 
+  if(!el.value.trim()) return; 
+  window.appState.habits.push({text:el.value.trim(), done:false}); 
+  el.value=''; 
+  window.renderLists(); window.autoSave(); 
+};
+
 window.addWishlistItem = () => { const t = document.getElementById('newWishTitle'); const c = document.getElementById('newWishCost'); if(!t.value.trim())return; window.appState.wishlist.push({title:t.value.trim(), cost:parseFloat(c.value)||0}); t.value=''; c.value=''; window.renderLists(); window.autoSave(); };
 window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; window.renderLists(); window.autoSave(); };
 
