@@ -66,7 +66,7 @@
 /* ================= تنسيقات ملاحظات أبل ================= */
 .apple-notes-area { width: 100%; min-height: 220px; border: none; background: transparent; color: var(--text-primary); outline: none; resize: vertical; font-size: 1.05rem; line-height: 1.5; padding: 0; }
 .apple-notes-area::placeholder { color: var(--text-secondary); font-weight: 500; opacity: 0.6; }
-/* ================= تصميم محرر الملاحظات (Apple Notes Style) ================= */
+/* ================= تصميم محرر التدوين (Apple Notes Style with Identity) ================= */
 .apple-notes-editor {
   flex: 1;
   width: 100%;
