@@ -3,30 +3,64 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVe
 import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
+window.updateSubscriptionUI = function() {
+  // التحقق الدقيق من انتهاء الاشتراك بمقارنة الأيام بشكل صحيح
+  if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // تصفير الوقت لليوم الحالي
+    
+    const expiry = new Date(window.userProfile.expiryDate);
+    expiry.setHours(0, 0, 0, 0); // تصفير الوقت لتاريخ الانتهاء
+    
+    const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+    
+    // إذا انتهى التاريخ أو الأيام المتبقية 0 أو أقل
+    if (now > expiry || diffDays <= 0) { 
+      window.userProfile.isPro = false; 
+      window.userProfile.planType = 'الباقة الأساسية'; 
+      // حفظ التحديث فوراً ليعود العميل كعضو مجاني
+      if (window.saveCurrentWateerah) window.saveCurrentWateerah(false);
+    }
+  }
+  
+  const badge = document.getElementById('planBadge'); 
+  if(badge) badge.innerText = window.userProfile.isPro ? window.userProfile.planType : 'الباقة الأساسية';
+  
+  const upg = document.getElementById('upgradeBtn'); 
+  if(upg) upg.innerText = window.userProfile.isPro ? 'إدارة الاشتراك' : 'تفعيل الاشتراك';
+  
+  if(window.updateDayNightGreeting) window.updateDayNightGreeting();
+};
+
 window.setupPricingModal = function() {
+  // تحديث حالة الاشتراك أولاً قبل فتح النافذة لضمان عدم عرض 0 يوم
+  window.updateSubscriptionUI();
+  
   const isSubscribed = window.userProfile.isPro;
   document.getElementById('pricingViewUnsubscribed').style.display = isSubscribed ? 'none' : 'block';
   document.getElementById('pricingViewSubscribed').style.display = isSubscribed ? 'block' : 'none';
+  
   const trialBox = document.getElementById('oneTimeTrialBox');
   if(trialBox) trialBox.style.display = (!isSubscribed && !window.userProfile.trialUsed) ? 'block' : 'none';
 
   if (isSubscribed && window.userProfile.expiryDate) {
-    const now = new Date(); const expiry = new Date(window.userProfile.expiryDate);
+    const now = new Date(); 
+    now.setHours(0, 0, 0, 0);
+    const expiry = new Date(window.userProfile.expiryDate);
+    expiry.setHours(0, 0, 0, 0);
+    
     const diffDays = Math.max(0, Math.ceil((expiry - now) / (1000 * 60 * 60 * 24)));
     const totalDays = window.userProfile.totalSubDays || 30;
-    const daysRem = document.getElementById('daysRemainingText'); if(daysRem) daysRem.innerText = `${diffDays} يوم متبقي`;
-    const prog = document.getElementById('subProgressBarFill'); if(prog) prog.style.width = `${Math.min(100, Math.round((diffDays / totalDays) * 100))}%`;
-    const det = document.getElementById('subActiveDetails'); if(det) det.innerHTML = `الباقة: <strong>${window.userProfile.planType}</strong><br>تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong>`;
+    
+    const daysRem = document.getElementById('daysRemainingText'); 
+    if(daysRem) daysRem.innerText = `${diffDays} يوم متبقي`;
+    
+    const prog = document.getElementById('subProgressBarFill'); 
+    if(prog) prog.style.width = `${Math.min(100, Math.round((diffDays / totalDays) * 100))}%`;
+    
+    const det = document.getElementById('subActiveDetails'); 
+    if(det) det.innerHTML = `الباقة: <strong>${window.userProfile.planType}</strong><br>تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong>`;
   }
-};
-
-window.updateSubscriptionUI = function() {
-  if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    if (new Date() > new Date(window.userProfile.expiryDate)) { window.userProfile.isPro = false; window.userProfile.planType = 'الباقة الأساسية'; }
-  }
-  const badge = document.getElementById('planBadge'); if(badge) badge.innerText = window.userProfile.isPro ? window.userProfile.planType : 'الباقة الأساسية';
-  const upg = document.getElementById('upgradeBtn'); if(upg) upg.innerText = window.userProfile.isPro ? 'إدارة الاشتراك' : 'تفعيل الاشتراك';
-  if(window.updateDayNightGreeting) window.updateDayNightGreeting();
 };
 
 window.handleRegister = async () => {
