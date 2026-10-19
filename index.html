@@ -60,7 +60,6 @@
     <div id="mainWorkspace" class="hidden-el">
       <section class="hero-section">
         <div class="greeting-box">
-          <!-- مبدل التاريخ بنظام أبل -->
           <div class="ios-date-navigator">
             <button class="date-nav-btn" onclick="window.changeDate(-1)">❮</button>
             <div class="date-display" onclick="window.changeDate(0)">
@@ -75,7 +74,6 @@
         </div>
 
         <div class="hero-glass-messages">
-          <!-- رسالة المنصة بنظام السائل الزجاجي (بدون علامة X) -->
           <div id="activeGlassMessage" class="liquid-glass-msg" style="display: none;" onclick="window.dismissGlassMessage()" title="اضغط للإخفاء">
             <div class="msg-header">
               <span class="msg-tag">إشعار المنصة</span>
@@ -95,7 +93,6 @@
         </div>
       </section>
 
-      <!-- تم إضافة كلاس mobile-hidden لإخفاء الشريط في الجوال -->
       <section class="toolbar-ios mobile-hidden">
         <div class="toolbar-group">
           <span class="toolbar-label">المظهر:</span>
@@ -116,7 +113,6 @@
         <button class="btn btn-primary" onclick="window.openModal('addWidgetModal')">+ إضافة أول أداة</button>
       </div>
 
-      <!-- تمت إضافة كلاسات (tab-home, tab-tasks, tab-finance, tab-vision) للأدوات للعمل مع الجوال -->
       <div id="bentoGrid" class="bento-grid">
         <div id="widget-vision" class="widget-card col-12 hidden-el tab-vision" draggable="true" data-widget-id="widget-vision">
           <div class="card-header"><div class="card-title-wrap"><span class="drag-handle" title="سحب للترتيب">⋮⋮</span><span class="card-title">لوحة الأهداف (Vision Board)</span></div><div style="display: flex; gap: 8px; align-items: center;"><span style="font-size: 0.76rem; color: var(--text-secondary);">اضغط على البطاقة لفتح خطتها</span><button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-vision')">إخفاء</button></div></div>
@@ -151,15 +147,24 @@
           <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;"><span style="font-size: 0.88rem; font-weight: 700;">توزيع الدخل الشهري</span><input type="number" id="totalIncomeInput" value="5000" oninput="window.calculateDistribution()" style="width: 160px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);"></div><div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:10px;" id="distributionResults"></div></div>
         </div>
 
-        <div id="widget-journal" class="widget-card col-12 hidden-el tab-home" draggable="true" data-widget-id="widget-journal">
-          <div class="card-header"><div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">التدوين الحر</span></div><button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-journal')">إخفاء</button></div>
-          <textarea id="journalText" class="journal-area" placeholder="اكتب أفكارك بحرية..." oninput="window.autoSave()"></textarea>
+        <!-- أداة التدوين الحر بتصميم ملاحظات أبل -->
+        <div id="widget-journal" class="widget-card col-12 hidden-el tab-home" draggable="true" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios);">
+          <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 16px 22px 4px; border-bottom: none;">
+            <div class="card-title-wrap">
+              <span class="drag-handle">⋮⋮</span>
+              <span class="card-title" style="color: #eab308; font-weight: 600;">الملاحظات</span>
+            </div>
+            <button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-journal')">إخفاء</button>
+          </div>
+          <div style="background: var(--bg-glass-strong); padding: 0 22px 22px; height: 100%;">
+            <div style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 12px; font-weight: 500;">اليوم</div>
+            <textarea id="journalText" class="apple-notes-area" placeholder="ملاحظة جديدة" oninput="window.autoSave()"></textarea>
+          </div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- شريط التنقل السفلي للأجهزة المحمولة (iOS Tab Bar) -->
   <nav class="ios-tab-bar" id="mobileTabBar">
     <button class="tab-btn active" onclick="window.switchTab('home')">
       <span class="tab-icon">🏠</span><span>يومي</span>
@@ -175,7 +180,6 @@
     </button>
   </nav>
 
-  <!-- النوافذ المنبثقة تبقى كما هي تماماً -->
   <div id="addWidgetModal" class="modal-overlay"><div class="modal-box" style="max-width: 480px;"><button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button><h3 style="margin-bottom: 6px;">مكتبة الأدوات</h3><p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف ما تحتاجه لمساحتك.</p><div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div></div></div>
 
   <div id="visionDetailModal" class="modal-overlay">
@@ -260,7 +264,6 @@
     </div>
   </div>
 
-  <!-- روابط الـ JS للموديولز أسفل الصفحة لتفادي مشاكل Vercel -->
   <script type="module" src="./assets/js/firebase-config.js"></script>
   <script type="module" src="./assets/js/ui.js"></script>
   <script type="module" src="./assets/js/widgets.js"></script>
