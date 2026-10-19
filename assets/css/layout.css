@@ -30,7 +30,6 @@ main { max-width: 1240px; margin: 28px auto 0; padding: 0 20px; padding-bottom: 
   .desktop-only { display: none !important; }
   .bento-grid { display: flex; flex-direction: column; gap: 16px; }
   .widget-card { display: none; }
-  /* ستيم التحكم بالظهور برمجياً حسب التاب النشط */
   .widget-card.active-tab-item { display: block; animation: fadeIn 0.4s ease; }
 }
 
