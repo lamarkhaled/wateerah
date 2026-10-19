@@ -66,3 +66,43 @@
 /* ================= تنسيقات ملاحظات أبل ================= */
 .apple-notes-area { width: 100%; min-height: 220px; border: none; background: transparent; color: var(--text-primary); outline: none; resize: vertical; font-size: 1.05rem; line-height: 1.5; padding: 0; }
 .apple-notes-area::placeholder { color: var(--text-secondary); font-weight: 500; opacity: 0.6; }
+/* ================= تصميم محرر الملاحظات (Apple Notes Style) ================= */
+.apple-notes-editor {
+  flex: 1;
+  width: 100%;
+  min-height: 250px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  outline: none;
+  overflow-y: auto;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  padding: 0 4px;
+}
+.apple-notes-editor[placeholder]:empty:before {
+  content: attr(placeholder);
+  color: var(--text-secondary);
+  opacity: 0.6;
+  pointer-events: none;
+  display: block;
+}
+.apple-notes-editor img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 12px 0;
+  box-shadow: var(--shadow-ios);
+  display: block;
+}
+.note-list-item {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: background 0.2s;
+}
+.note-list-item:hover {
+  background: var(--bg-subtle);
+}
