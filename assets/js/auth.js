@@ -3,22 +3,29 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVe
 import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
+// دالة مساعدة لتحويل التاريخ إلى رقم صافي (YYYYMMDD) لتفادي أي خطأ زمني
+function getDateNumber(dateStr) {
+  if (!dateStr) return 0;
+  const d = new Date(dateStr.replace(/\//g, '-'));
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return parseInt(`${year}${month}${day}`, 10);
+}
+
 window.updateSubscriptionUI = function() {
   if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    // توحيد تنسيق التاريخ وتصفير الساعات لمقارنة الأيام بدقة متناهية
-    const expDateStr = window.userProfile.expiryDate.replace(/\//g, '-');
-    const expiryDate = new Date(expDateStr);
-    expiryDate.setHours(0, 0, 0, 0);
     
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // الحصول على تاريخ اليوم وتاريخ الانتهاء كأرقام صحيحة (مثال: 20261019)
+    const todayNum = getDateNumber(new Date().toISOString().slice(0, 10));
+    const expiryNum = getDateNumber(window.userProfile.expiryDate);
 
-    // إذا تجاوز تاريخ اليوم تاريخ الانتهاء أو سواه (0 أيام متبقية)
-    if (today.getTime() >= expiryDate.getTime()) { 
+    // إذا كان رقم اليوم أكبر من أو يساوي رقم الانتهاء، يسقط الاشتراك فوراً
+    if (todayNum >= expiryNum) { 
       window.userProfile.isPro = false; 
       window.userProfile.planType = 'الباقة الأساسية'; 
-      window.userProfile.expiryDate = ''; // مسح تاريخ الانتهاء لضمان عدم التعليق
-      if (window.saveCurrentWateerah) window.saveCurrentWateerah(true); // إجبار الحفظ السحابي للحالة المجانية
+      window.userProfile.expiryDate = ''; // تفريغ التاريخ
+      if (window.saveCurrentWateerah) window.saveCurrentWateerah(true); // حفظ الحالة الجديدة إجبارياً
     }
   }
   
@@ -32,7 +39,7 @@ window.updateSubscriptionUI = function() {
 };
 
 window.setupPricingModal = function() {
-  window.updateSubscriptionUI(); // تحديث الحالة أولاً
+  window.updateSubscriptionUI(); // تحديث قاطع للحالة قبل فتح النافذة
   
   const isSubscribed = window.userProfile.isPro;
   
@@ -43,18 +50,17 @@ window.setupPricingModal = function() {
   if(trialBox) trialBox.style.display = (!isSubscribed && !window.userProfile.trialUsed) ? 'block' : 'none';
 
   if (isSubscribed && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    const expDateStr = window.userProfile.expiryDate.replace(/\//g, '-');
-    const expiryDate = new Date(expDateStr);
-    expiryDate.setHours(0, 0, 0, 0);
-    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // حساب دقيق للأيام
+    const expiryDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-'));
+    expiryDate.setHours(0, 0, 0, 0);
+    
+    // حساب الأيام المتبقية
     const diffTime = expiryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    // تأمين إضافي داخل النافذة نفسها لإسقاط الاشتراك إذا علق المتصفح
+    // تأمين إضافي داخل النافذة: إذا الأيام 0 أو أقل، سحبه مباشرة وعرض صفحة الشراء
     if (diffDays <= 0) {
       window.userProfile.isPro = false;
       window.userProfile.planType = 'الباقة الأساسية';
@@ -120,11 +126,11 @@ window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeIn
     if(!snap.exists()) return window.showToast('الكود غير صحيح أو مستخدم');
     const days = parseInt(snap.data().days) || 30; let startDate = new Date();
     
-    // توحيد تنسيق التواريخ عند التمديد أو التفعيل الجديد
-    const todayStr = startDate.toISOString().slice(0, 10);
+    // التحقق برمجياً من التمديد باستخدام الأرقام الصافية أيضاً
+    const todayNum = getDateNumber(startDate.toISOString().slice(0, 10));
     if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') { 
-      const expStr = window.userProfile.expiryDate.replace(/\//g, '-');
-      if (expStr > todayStr) startDate = new Date(expStr); 
+      const expNum = getDateNumber(window.userProfile.expiryDate);
+      if (expNum > todayNum) startDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-')); 
     }
     
     const expiryDate = new Date(startDate); expiryDate.setDate(expiryDate.getDate() + days);
