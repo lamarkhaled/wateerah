@@ -19,7 +19,16 @@ window.applyTheme = function(name) {
   window.appState.theme = name; document.querySelectorAll('[data-theme-btn]').forEach(b => b.classList.toggle('active', b.getAttribute('data-theme-btn') === name));
 };
 
-window.setTheme = (name, btn) => { window.applyTheme(name); window.autoSave(); };
+window.setTheme = (name, btn) => { 
+  // قفل مظهر سكون ليلي لغير المشتركين
+  if (name === 'dark' && !window.userProfile?.isPro) {
+    window.showToast('مظهر "سكون ليلي" حصري للمشتركين في الباقة المتقدمة 🌟');
+    window.openModal('pricingModal');
+    return;
+  }
+  window.applyTheme(name); window.autoSave(); 
+};
+
 window.selectOnboardingTheme = (themeName, el) => { document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active')); el.classList.add('active'); window.applyTheme(themeName); };
 
 window.startWorkspaceFirstTime = () => { window.appState.hasStarted = true; localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState)); window.renderWorkspaceVisibility(); window.autoSave(); };
@@ -40,7 +49,7 @@ window.renderActiveWidgets = function() {
 };
 
 window.renderWidgetLibraryModal = function() {
-  const AVAILABLE_WIDGETS = [ { id: 'widget-vision', name: 'لوحة الأهداف', desc: 'بورد واقعي مع صور وخطط' }, { id: 'widget-kanban', name: 'المهام المتنقلة', desc: 'أعمدة للحالات مع الأولوية' }, { id: 'widget-focus', name: 'بوصلة التركيز', desc: 'تحديد الهدف الأهم لليوم' }, { id: 'widget-habits', name: 'متتبع العادات', desc: 'قائمة العادات اليومية' }, { id: 'widget-finance', name: 'إدارة المالية', desc: 'المحافظ، الأمنيات، والاشتراكات' }, { id: 'widget-journal', name: 'مساحة التدوين', desc: 'تدوين حر للأفكار' } ];
+  const AVAILABLE_WIDGETS = [ { id: 'widget-vision', name: 'لوحة الأهداف', desc: 'بورد واقعي مع صور وخطط' }, { id: 'widget-kanban', name: 'المهام المتنقلة', desc: 'أعمدة للحالات مع الأولوية' }, { id: 'widget-focus', name: 'بوصلة التركيز', desc: 'تحديد الهدف الأهم لليوم' }, { id: 'widget-habits', name: 'متتبع العادات', desc: 'قائمة العادات اليومية' }, { id: 'widget-finance', name: 'إدارة المالية (حصري)', desc: 'المحافظ، الأمنيات، والاشتراكات' }, { id: 'widget-journal', name: 'مساحة التدوين', desc: 'تدوين حر للأفكار' } ];
   const active = window.appState.activeWidgets || [];
   document.getElementById('widgetLibraryList').innerHTML = AVAILABLE_WIDGETS.map(w => {
     const isAdded = active.includes(w.id);
@@ -48,7 +57,18 @@ window.renderWidgetLibraryModal = function() {
   }).join('');
 };
 
-window.addWidgetToWorkspace = (wId) => { if (!window.appState.activeWidgets) window.appState.activeWidgets = []; if (!window.appState.activeWidgets.includes(wId)) window.appState.activeWidgets.push(wId); window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); };
+window.addWidgetToWorkspace = (wId) => { 
+  // قفل أداة المالية لغير المشتركين
+  if (wId === 'widget-finance' && !window.userProfile?.isPro) {
+    window.showToast('أداة "إدارة المالية الشاملة" حصرية للمشتركين 🌟');
+    window.openModal('pricingModal');
+    return;
+  }
+  if (!window.appState.activeWidgets) window.appState.activeWidgets = []; 
+  if (!window.appState.activeWidgets.includes(wId)) window.appState.activeWidgets.push(wId); 
+  window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); 
+};
+
 window.removeWidget = (wId) => { window.appState.activeWidgets = (window.appState.activeWidgets || []).filter(id => id !== wId); window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); };
 
 window.initWidgetsDragAndDrop = function() {
@@ -72,19 +92,24 @@ window.switchToLogin = () => { document.getElementById('viewLogin').style.displa
 window.switchToRegister = () => { document.getElementById('viewLogin').style.display = 'none'; document.getElementById('viewRegister').style.display = 'block'; };
 window.openResetModal = () => { window.closeModal('authModal'); window.openModal('resetModal'); };
 
-// دالة إغلاق الإشعار الزجاجي بمجرد الضغط عليه بأي مكان
 window.dismissGlassMessage = () => { 
   document.getElementById('activeGlassMessage').style.display = 'none'; 
   document.getElementById('emptyGlassMessage').style.display = 'flex'; 
 };
 
-// دالة نظام الصفحات للأجهزة المحمولة (Tabs)
 window.switchTab = function(tabName) {
   if (!event) return;
+  
+  // قفل تاب المالية في الجوال لغير المشتركين
+  if (tabName === 'finance' && !window.userProfile?.isPro) {
+    window.showToast('قسم "المالية" حصري للمشتركين 🌟');
+    window.openModal('pricingModal');
+    return;
+  }
+
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   event.currentTarget.classList.add('active');
 
-  // في شاشات الجوال، نعرض فقط الأداة التابعة للتاب
   if (window.innerWidth <= 768) {
     document.querySelectorAll('.widget-card').forEach(card => card.classList.remove('active-tab-item'));
     document.querySelectorAll('.tab-' + tabName).forEach(el => el.classList.add('active-tab-item'));
