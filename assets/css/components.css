@@ -62,3 +62,7 @@
   background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
   transform: rotate(30deg); pointer-events: none;
 }
+
+/* ================= تنسيقات ملاحظات أبل ================= */
+.apple-notes-area { width: 100%; min-height: 220px; border: none; background: transparent; color: var(--text-primary); outline: none; resize: vertical; font-size: 1.05rem; line-height: 1.5; padding: 0; }
+.apple-notes-area::placeholder { color: var(--text-secondary); font-weight: 500; opacity: 0.6; }
