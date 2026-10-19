@@ -5,15 +5,20 @@ const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
 window.updateSubscriptionUI = function() {
   if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    // تحويل التواريخ إلى نصوص لضمان المقارنة الدقيقة بدون تدخل التوقيت الزمني
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const expiryStr = window.userProfile.expiryDate.replace(/\//g, '-');
+    // توحيد تنسيق التاريخ وتصفير الساعات لمقارنة الأيام بدقة متناهية
+    const expDateStr = window.userProfile.expiryDate.replace(/\//g, '-');
+    const expiryDate = new Date(expDateStr);
+    expiryDate.setHours(0, 0, 0, 0);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // إذا تطابق تاريخ اليوم مع الانتهاء (0 يوم) أو تجاوزه، يتم الإلغاء فوراً
-    if (todayStr >= expiryStr) { 
+    // إذا تجاوز تاريخ اليوم تاريخ الانتهاء أو سواه (0 أيام متبقية)
+    if (today.getTime() >= expiryDate.getTime()) { 
       window.userProfile.isPro = false; 
       window.userProfile.planType = 'الباقة الأساسية'; 
-      if (window.saveCurrentWateerah) window.saveCurrentWateerah(false);
+      window.userProfile.expiryDate = ''; // مسح تاريخ الانتهاء لضمان عدم التعليق
+      if (window.saveCurrentWateerah) window.saveCurrentWateerah(true); // إجبار الحفظ السحابي للحالة المجانية
     }
   }
   
@@ -27,28 +32,42 @@ window.updateSubscriptionUI = function() {
 };
 
 window.setupPricingModal = function() {
-  // إجراء التحقق الحاسم أولاً قبل فتح النافذة
-  window.updateSubscriptionUI();
+  window.updateSubscriptionUI(); // تحديث الحالة أولاً
   
   const isSubscribed = window.userProfile.isPro;
   
-  // التحكم في عرض النوافذ بناءً على النتيجة النهائية
   document.getElementById('pricingViewUnsubscribed').style.display = isSubscribed ? 'none' : 'block';
   document.getElementById('pricingViewSubscribed').style.display = isSubscribed ? 'block' : 'none';
   
   const trialBox = document.getElementById('oneTimeTrialBox');
   if(trialBox) trialBox.style.display = (!isSubscribed && !window.userProfile.trialUsed) ? 'block' : 'none';
 
-  // حساب النسبة المئوية والأيام للعملاء النشطين فقط
-  if (isSubscribed && window.userProfile.expiryDate) {
-    const now = new Date(); 
-    now.setHours(0, 0, 0, 0);
-    const expiry = new Date(window.userProfile.expiryDate.replace(/\//g, '-'));
-    expiry.setHours(0, 0, 0, 0);
+  if (isSubscribed && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
+    const expDateStr = window.userProfile.expiryDate.replace(/\//g, '-');
+    const expiryDate = new Date(expDateStr);
+    expiryDate.setHours(0, 0, 0, 0);
     
-    const diffDays = Math.max(1, Math.ceil((expiry - now) / (1000 * 60 * 60 * 24)));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // حساب دقيق للأيام
+    const diffTime = expiryDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // تأمين إضافي داخل النافذة نفسها لإسقاط الاشتراك إذا علق المتصفح
+    if (diffDays <= 0) {
+      window.userProfile.isPro = false;
+      window.userProfile.planType = 'الباقة الأساسية';
+      window.userProfile.expiryDate = '';
+      if (window.saveCurrentWateerah) window.saveCurrentWateerah(true);
+      
+      document.getElementById('pricingViewUnsubscribed').style.display = 'block';
+      document.getElementById('pricingViewSubscribed').style.display = 'none';
+      if(trialBox) trialBox.style.display = (!window.userProfile.trialUsed) ? 'block' : 'none';
+      return;
+    }
+
     const totalDays = window.userProfile.totalSubDays || 30;
-    
     const daysRem = document.getElementById('daysRemainingText'); 
     if(daysRem) daysRem.innerText = `${diffDays} يوم متبقي`;
     
@@ -101,7 +120,7 @@ window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeIn
     if(!snap.exists()) return window.showToast('الكود غير صحيح أو مستخدم');
     const days = parseInt(snap.data().days) || 30; let startDate = new Date();
     
-    // توحيد تنسيق التواريخ عند إضافة الاشتراك الجديد
+    // توحيد تنسيق التواريخ عند التمديد أو التفعيل الجديد
     const todayStr = startDate.toISOString().slice(0, 10);
     if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') { 
       const expStr = window.userProfile.expiryDate.replace(/\//g, '-');
