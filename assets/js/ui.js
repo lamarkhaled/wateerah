@@ -20,7 +20,6 @@ window.applyTheme = function(name) {
 };
 
 window.setTheme = (name, btn) => { 
-  // قفل مظهر سكون ليلي لغير المشتركين
   if (name === 'dark' && !window.userProfile?.isPro) {
     window.showToast('مظهر "سكون ليلي" حصري للمشتركين في الباقة المتقدمة 🌟');
     window.openModal('pricingModal');
@@ -58,7 +57,6 @@ window.renderWidgetLibraryModal = function() {
 };
 
 window.addWidgetToWorkspace = (wId) => { 
-  // قفل أداة المالية لغير المشتركين
   if (wId === 'widget-finance' && !window.userProfile?.isPro) {
     window.showToast('أداة "إدارة المالية الشاملة" حصرية للمشتركين 🌟');
     window.openModal('pricingModal');
@@ -99,14 +97,11 @@ window.dismissGlassMessage = () => {
 
 window.switchTab = function(tabName) {
   if (!event) return;
-  
-  // قفل تاب المالية في الجوال لغير المشتركين
   if (tabName === 'finance' && !window.userProfile?.isPro) {
     window.showToast('قسم "المالية" حصري للمشتركين 🌟');
     window.openModal('pricingModal');
     return;
   }
-
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   event.currentTarget.classList.add('active');
 
