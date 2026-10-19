@@ -6,25 +6,23 @@ window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
 window.draggedKanbanIndex = null;
 
-// المتغيرات للتحكم بالتاريخ
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
 window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 30, trialUsed: false };
 window.appState = {
   hasStarted: false, theme: 'default', activeWidgets: [], widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
-  dailyRecords: {}, // هذا السجل السحري الذي سيحفظ تقدم كل يوم على حدة
+  dailyRecords: {}, 
+  notes: [],
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
 };
 
 let saveTimer; window.autoSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => window.saveCurrentWateerah(false), 700); };
 
 window.saveCurrentWateerah = async (manual) => {
-  // حفظ بيانات اليوم الحالي في السجل اليومي قبل المزامنة
   if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
   window.appState.dailyRecords[window.currentDateStr] = {
     focusGoal: document.getElementById('focusGoalInput')?.value || '',
-    journal: document.getElementById('journalText')?.value || '',
     habits: window.appState.habits || []
   };
 
@@ -34,41 +32,63 @@ window.saveCurrentWateerah = async (manual) => {
   try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); if(manual && window.showToast) window.showToast('تم الحفظ والمزامنة سحابياً'); } catch(e) {}
 };
 
-// الدالة السحرية لتغيير التاريخ وفتح صفحة جديدة
-window.changeDate = function(offset) {
-  // 1. احفظ اليوم الحالي قبل ما ننتقل
-  if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
-  window.appState.dailyRecords[window.currentDateStr] = {
-    focusGoal: document.getElementById('focusGoalInput')?.value || '',
-    journal: document.getElementById('journalText')?.value || '',
-    habits: window.appState.habits || []
-  };
-
-  // 2. غير التاريخ
-  if (offset === 0) { window.currentDateObj = new Date(); } 
-  else { window.currentDateObj.setDate(window.currentDateObj.getDate() + offset); }
-  
+window.loadTodayDate = function() {
+  window.currentDateObj = new Date();
   window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
-  const todayStr = new Date().toISOString().slice(0, 10);
-  
-  const dateLabel = document.getElementById('dateLabel');
-  if (dateLabel) dateLabel.innerText = (window.currentDateStr === todayStr) ? 'اليوم' : 'يوم آخر';
   
   const liveDate = document.getElementById('liveDateText');
-  if (liveDate) liveDate.innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', month: 'short', day: 'numeric' });
+  if (liveDate) liveDate.innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
 
-  // 3. اسحب بيانات اليوم الجديد
-  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', journal: '', habits: [] };
+  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', habits: [] };
   window.appState.habits = daily.habits || [];
   
   const focusInput = document.getElementById('focusGoalInput');
   if(focusInput) focusInput.value = daily.focusGoal || '';
   
-  const journalInput = document.getElementById('journalText');
-  if(journalInput) journalInput.value = daily.journal || '';
-  
   if(window.renderLists) window.renderLists();
+  if(window.renderNotesList) window.renderNotesList();
   window.saveCurrentWateerah(false);
+};
+
+window.openHistoryModal = function(type) {
+  const container = document.getElementById('historyModalContent');
+  const title = document.getElementById('historyModalTitle');
+  container.innerHTML = '';
+  
+  window.saveCurrentWateerah(false);
+  
+  const records = window.appState.dailyRecords || {};
+  const dates = Object.keys(records).sort((a, b) => new Date(b) - new Date(a));
+  
+  let hasContent = false;
+
+  dates.forEach(date => {
+    const data = records[date];
+    let contentHTML = '';
+    
+    const dateObj = new Date(date);
+    const displayDate = dateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+
+    if (type === 'focus' && data.focusGoal && data.focusGoal.trim() !== '') {
+      title.innerText = 'سجل التركيز';
+      contentHTML = `<div style="background:var(--bg-glass-strong); padding:14px; border-radius:12px; border:1px solid var(--border-color);"><div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:6px;">${displayDate}</div><div style="font-weight:600; color:var(--accent-color);">${data.focusGoal}</div></div>`;
+      hasContent = true;
+    } 
+    else if (type === 'habits' && data.habits && data.habits.length > 0) {
+      title.innerText = 'سجل العادات';
+      const habitsList = data.habits.map(h => `<li style="display:flex; align-items:center; gap:8px; margin-bottom:6px;"><span style="color:${h.done ? 'var(--accent-color)' : 'var(--text-secondary)'}; font-weight:bold;">${h.done ? '✓' : '—'}</span><span style="${h.done ? 'text-decoration:line-through; opacity:0.6;' : ''}">${h.text}</span></li>`).join('');
+      contentHTML = `<div style="background:var(--bg-glass-strong); padding:14px; border-radius:12px; border:1px solid var(--border-color);"><div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:10px;">${displayDate}</div><ul style="list-style:none; padding:0; margin:0; font-size:0.9rem;">${habitsList}</ul></div>`;
+      hasContent = true;
+    }
+    
+    if (contentHTML) container.innerHTML += contentHTML;
+  });
+  
+  if (!hasContent) {
+    container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا توجد سجلات سابقة محفوظة بعد.</div>';
+  }
+  
+  window.openModal('historyModal');
 };
 
 window.saveProfile = async () => {
@@ -102,8 +122,8 @@ setTimeout(() => {
   if(window.initWidgetsDragAndDrop) window.initWidgetsDragAndDrop(); 
   listenToCloudMessages(); 
   
-  // تشغيل التاريخ والصفحة الأولى
-  window.changeDate(0);
+  window.loadTodayDate();
+  
   if (window.innerWidth <= 768) {
     document.querySelectorAll('.widget-card').forEach(card => card.classList.remove('active-tab-item'));
     document.querySelectorAll('.tab-home').forEach(el => el.classList.add('active-tab-item'));
@@ -126,12 +146,12 @@ onAuthStateChanged(auth, async (user) => {
         
         document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; document.getElementById('profileNameInput').value = window.userProfile.name || '';
         
-        window.changeDate(0);
+        window.loadTodayDate();
         if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
       } else { 
         if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
         if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-        window.changeDate(0);
+        window.loadTodayDate();
       }
   }, 200);
 });
