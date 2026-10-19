@@ -4,21 +4,15 @@ import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebase
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
 window.updateSubscriptionUI = function() {
-  // التحقق الدقيق من انتهاء الاشتراك بمقارنة الأيام بشكل صحيح
   if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0); // تصفير الوقت لليوم الحالي
-    
-    const expiry = new Date(window.userProfile.expiryDate);
-    expiry.setHours(0, 0, 0, 0); // تصفير الوقت لتاريخ الانتهاء
-    
-    const diffDays = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
-    
-    // إذا انتهى التاريخ أو الأيام المتبقية 0 أو أقل
-    if (now > expiry || diffDays <= 0) { 
+    // تحويل التواريخ إلى نصوص لضمان المقارنة الدقيقة بدون تدخل التوقيت الزمني
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const expiryStr = window.userProfile.expiryDate.replace(/\//g, '-');
+
+    // إذا تطابق تاريخ اليوم مع الانتهاء (0 يوم) أو تجاوزه، يتم الإلغاء فوراً
+    if (todayStr >= expiryStr) { 
       window.userProfile.isPro = false; 
       window.userProfile.planType = 'الباقة الأساسية'; 
-      // حفظ التحديث فوراً ليعود العميل كعضو مجاني
       if (window.saveCurrentWateerah) window.saveCurrentWateerah(false);
     }
   }
@@ -33,30 +27,33 @@ window.updateSubscriptionUI = function() {
 };
 
 window.setupPricingModal = function() {
-  // تحديث حالة الاشتراك أولاً قبل فتح النافذة لضمان عدم عرض 0 يوم
+  // إجراء التحقق الحاسم أولاً قبل فتح النافذة
   window.updateSubscriptionUI();
   
   const isSubscribed = window.userProfile.isPro;
+  
+  // التحكم في عرض النوافذ بناءً على النتيجة النهائية
   document.getElementById('pricingViewUnsubscribed').style.display = isSubscribed ? 'none' : 'block';
   document.getElementById('pricingViewSubscribed').style.display = isSubscribed ? 'block' : 'none';
   
   const trialBox = document.getElementById('oneTimeTrialBox');
   if(trialBox) trialBox.style.display = (!isSubscribed && !window.userProfile.trialUsed) ? 'block' : 'none';
 
+  // حساب النسبة المئوية والأيام للعملاء النشطين فقط
   if (isSubscribed && window.userProfile.expiryDate) {
     const now = new Date(); 
     now.setHours(0, 0, 0, 0);
-    const expiry = new Date(window.userProfile.expiryDate);
+    const expiry = new Date(window.userProfile.expiryDate.replace(/\//g, '-'));
     expiry.setHours(0, 0, 0, 0);
     
-    const diffDays = Math.max(0, Math.ceil((expiry - now) / (1000 * 60 * 60 * 24)));
+    const diffDays = Math.max(1, Math.ceil((expiry - now) / (1000 * 60 * 60 * 24)));
     const totalDays = window.userProfile.totalSubDays || 30;
     
     const daysRem = document.getElementById('daysRemainingText'); 
     if(daysRem) daysRem.innerText = `${diffDays} يوم متبقي`;
     
     const prog = document.getElementById('subProgressBarFill'); 
-    if(prog) prog.style.width = `${Math.min(100, Math.round((diffDays / totalDays) * 100))}%`;
+    if(prog) prog.style.width = `${Math.min(100, Math.max(0, Math.round((diffDays / totalDays) * 100)))}%`;
     
     const det = document.getElementById('subActiveDetails'); 
     if(det) det.innerHTML = `الباقة: <strong>${window.userProfile.planType}</strong><br>تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong>`;
@@ -84,7 +81,9 @@ window.handleLogin = async () => {
 };
 
 window.handleLogout = async () => { await signOut(auth); location.reload(); };
+
 window.handleResetPassword = async () => { const email = document.getElementById('resetEmail').value.trim(); if(!email) return window.showToast('أدخل البريد'); try { await sendPasswordResetEmail(auth, email); window.showToast('تم إرسال رابط الاستعادة'); window.closeModal('resetModal'); } catch(e) { window.showToast('البريد غير مسجل'); } };
+
 window.resendVerificationEmailDirectly = async () => { if(!window.unverifiedUserObject) return window.showToast('سجل دخولك أولاً'); try { await sendEmailVerification(window.unverifiedUserObject); window.showToast('تم إرسال الرابط'); window.closeModal('verificationNoticeModal'); } catch(e) {} };
 
 window.activateOneTimeFreeTrial = async () => {
@@ -101,10 +100,18 @@ window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeIn
     const codeRef = doc(db, "activationCodes", code); const snap = await getDoc(codeRef);
     if(!snap.exists()) return window.showToast('الكود غير صحيح أو مستخدم');
     const days = parseInt(snap.data().days) || 30; let startDate = new Date();
-    if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') { const currentExpiry = new Date(window.userProfile.expiryDate); if (currentExpiry > startDate) startDate = currentExpiry; }
+    
+    // توحيد تنسيق التواريخ عند إضافة الاشتراك الجديد
+    const todayStr = startDate.toISOString().slice(0, 10);
+    if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') { 
+      const expStr = window.userProfile.expiryDate.replace(/\//g, '-');
+      if (expStr > todayStr) startDate = new Date(expStr); 
+    }
+    
     const expiryDate = new Date(startDate); expiryDate.setDate(expiryDate.getDate() + days);
     window.userProfile.isPro = true; window.userProfile.planType = 'عضوية نشطة'; window.userProfile.expiryDate = expiryDate.toISOString().slice(0, 10);
     window.userProfile.totalSubDays = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+    
     await deleteDoc(codeRef); await window.saveCurrentWateerah(true); window.updateSubscriptionUI();
     if(document.getElementById('userActivationCodeInput')) document.getElementById('userActivationCodeInput').value = ''; if(document.getElementById('userRenewalCodeInput')) document.getElementById('userRenewalCodeInput').value = '';
     window.openModal('pricingModal'); window.showToast(`تم تمديد الاشتراك لـ ${days} يوم!`);
