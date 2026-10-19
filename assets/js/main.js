@@ -2,26 +2,58 @@ import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
 import { doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// تمت إزالة الـ imports الداخلية لمنع التعارض في Vercel
-
 window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
 window.draggedKanbanIndex = null;
 
+// المتغيرات الجديدة للتحكم بالتاريخ
+window.currentDateObj = new Date();
+window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
+
 window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 30, trialUsed: false };
 window.appState = {
   hasStarted: false, theme: 'default', activeWidgets: [], widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
-  focusGoal: '', journal: '', habits: [], visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
+  dailyRecords: {}, // هذا السجل السحري الذي سيحفظ تقدم كل يوم على حدة
+  visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
 };
 
 let saveTimer; window.autoSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => window.saveCurrentWateerah(false), 700); };
 
 window.saveCurrentWateerah = async (manual) => {
-  window.appState.focusGoal = document.getElementById('focusGoalInput')?.value || ''; window.appState.journal = document.getElementById('journalText')?.value || '';
+  // حفظ بيانات اليوم الحالي في السجل
+  if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
+  window.appState.dailyRecords[window.currentDateStr] = {
+    focusGoal: document.getElementById('focusGoalInput')?.value || '',
+    journal: document.getElementById('journalText')?.value || '',
+    habits: window.appState.habits || []
+  };
+
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   const user = auth.currentUser;
   if (!user) { if(manual && window.showToast) window.showToast('تم الحفظ محلياً'); return; }
   try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); if(manual && window.showToast) window.showToast('تم الحفظ والمزامنة سحابياً'); } catch(e) {}
+};
+
+// الدالة السحرية لتغيير التاريخ وفتح صفحة جديدة
+window.changeDate = function(offset) {
+  if (offset === 0) { window.currentDateObj = new Date(); } 
+  else { window.currentDateObj.setDate(window.currentDateObj.getDate() + offset); }
+  
+  window.saveCurrentWateerah(false); // حفظ اليوم الحالي قبل الانتقال
+  
+  window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  
+  document.getElementById('dateLabel').innerText = (window.currentDateStr === todayStr) ? 'اليوم' : 'يوم آخر';
+  document.getElementById('liveDateText').innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', month: 'short', day: 'numeric' });
+
+  // تحميل بيانات اليوم المحدد (أو صفحة فارغة إذا كان يوم جديد)
+  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', journal: '', habits: [] };
+  window.appState.habits = daily.habits;
+  document.getElementById('focusGoalInput').value = daily.focusGoal;
+  document.getElementById('journalText').value = daily.journal;
+  
+  window.renderLists();
 };
 
 window.saveProfile = async () => {
@@ -42,7 +74,6 @@ function listenToCloudMessages() {
     const a = document.getElementById('activeGlassMessage'); const e = document.getElementById('emptyGlassMessage'); if(a) a.style.display = 'block'; if(e) e.style.display = 'none';
     const txt = document.getElementById('glassMessageText'); if(txt) txt.innerText = data.message;
     const imgEl = document.getElementById('glassMessageImg'); if (data.imageUrl && imgEl) { imgEl.src = data.imageUrl; imgEl.style.display = 'block'; } else if(imgEl) { imgEl.style.display = 'none'; }
-    const timerEl = document.getElementById('msgRemainingTime'); if (data.duration > 0 && timerEl) timerEl.innerText = `تختفي بعد ${Math.max(1, Math.ceil(data.duration - elapsedMin))} د`; else if(timerEl) timerEl.innerText = '';
   });
 }
 
@@ -54,7 +85,9 @@ setTimeout(() => {
   if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
   if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
   if(window.initWidgetsDragAndDrop) window.initWidgetsDragAndDrop(); 
-  listenToCloudMessages(); 
+  listenToCloudMessages();
+  window.changeDate(0); // تفعيل اليوم الحالي فوراً
+  if(window.innerWidth <= 768) window.switchTab('home'); // تفعيل التاب الأول للموبايل
 }, 200);
 
 onAuthStateChanged(auth, async (user) => {
@@ -71,18 +104,14 @@ onAuthStateChanged(auth, async (user) => {
         if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
         if(window.updateSubscriptionUI) window.updateSubscriptionUI();
         
-        const hdrName = document.getElementById('headerUserName'); if(hdrName) hdrName.innerText = window.userProfile.name || user.email;
-        const hdrAv = document.getElementById('headerAvatar'); if(hdrAv) hdrAv.innerText = (window.userProfile.name || 'ل')[0];
-        const prfInp = document.getElementById('profileNameInput'); if(prfInp) prfInp.value = window.userProfile.name || '';
-        const fGoal = document.getElementById('focusGoalInput'); if(fGoal) fGoal.value = window.appState.focusGoal || '';
-        const jTxt = document.getElementById('journalText'); if(jTxt) jTxt.value = window.appState.journal || '';
+        document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; document.getElementById('profileNameInput').value = window.userProfile.name || '';
         
+        window.changeDate(0); // سحب بيانات اليوم الحالي من السحاب
         if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-        if(window.renderLists) window.renderLists();
       } else { 
         if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
         if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-        if(window.renderLists) window.renderLists(); 
+        window.changeDate(0); 
       }
   }, 200);
 });
