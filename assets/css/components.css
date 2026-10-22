@@ -9,8 +9,8 @@
 .add-widget-plus { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-color); color: #FFF; border: none; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: var(--transition); } .add-widget-plus:hover { transform: scale(1.08); }
 .delete-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem; opacity: 0.5; transition: var(--transition); } .delete-btn:hover { opacity: 1; color: var(--danger-color); }
 .remove-widget-btn { background: none; border: none; color: var(--text-secondary); font-size: 0.78rem; cursor: pointer; padding: 4px 8px; border-radius: 6px; } .remove-widget-btn:hover { background: var(--danger-light); color: var(--danger-color); }
-.widget-card { background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-ios); transition: transform 0.2s ease, box-shadow 0.2s ease; } .widget-card.dragging { opacity: 0.45; transform: scale(0.98); border: 1px dashed var(--accent-color); }
-.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); } .card-title-wrap { display: flex; align-items: center; gap: 10px; } .card-title { font-size: 1.02rem; font-weight: 600; } .drag-handle { cursor: grab; color: var(--text-secondary); opacity: 0.5; font-size: 1.1rem; padding: 2px 6px; user-select: none; } .drag-handle:active { cursor: grabbing; }
+.widget-card { background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-ios); transition: transform 0.2s ease, box-shadow 0.2s ease; width: 100%; } 
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); } .card-title-wrap { display: flex; align-items: center; gap: 10px; } .card-title { font-size: 1.02rem; font-weight: 600; } 
 .item-list { list-style: none; display: flex; flex-direction: column; gap: 8px; } .list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-sm); gap: 10px; } .item-left { display: flex; align-items: center; gap: 10px; flex: 1; } .checkbox { width: 19px; height: 19px; border-radius: 6px; border: 1.8px solid var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; flex-shrink: 0; } .list-item.completed .checkbox { background: var(--accent-color); border-color: var(--accent-color); color: #FFF; } .list-item.completed .item-text-input { text-decoration: line-through; opacity: 0.6; } .item-text-input { border: none; background: transparent; color: var(--text-primary); font-size: 0.88rem; width: 100%; outline: none; }
 .focus-input { width: 100%; border: 1px solid var(--border-color); background: var(--bg-glass-strong); padding: 14px 18px; border-radius: var(--radius-md); font-size: 0.98rem; color: var(--text-primary); outline: none; } .focus-input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 4px var(--accent-light); }
 .add-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; } .add-row input, .add-row select { flex: 1; min-width: 120px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-glass-strong); color: var(--text-primary); outline: none; font-size: 0.85rem; }
@@ -27,10 +27,15 @@
 .form-group { margin-bottom: 14px; } .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); } .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.88rem; } .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-color); box-shadow: 0 0 0 4px var(--accent-light); }
 .progress-bar-bg { width: 100%; height: 8px; background: var(--bg-subtle); border-radius: 99px; overflow: hidden; } .progress-bar-fill { height: 100%; background: var(--accent-color); width: 0%; transition: width 0.3s ease; }
 #toastContainer { position: fixed; bottom: 24px; left: 24px; z-index: 3000; display: flex; flex-direction: column; gap: 8px; } .toast { background: var(--text-primary); color: var(--bg-primary); padding: 11px 18px; border-radius: 12px; font-size: 0.84rem; font-weight: 500; box-shadow: var(--shadow-float); }
-.ios-date-navigator { display: inline-flex; align-items: center; gap: 16px; background: var(--bg-glass-strong); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 999px; margin-bottom: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
-.date-nav-btn { background: none; border: none; font-size: 1.1rem; color: var(--text-secondary); cursor: pointer; padding: 4px; transition: var(--transition); } .date-nav-btn:hover { color: var(--accent-color); transform: scale(1.1); } .date-display { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 .liquid-glass-msg { background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 28px; padding: 22px; box-shadow: 0 15px 45px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s; position: relative; overflow: hidden; }
 [data-theme="dark"] .liquid-glass-msg { background: linear-gradient(135deg, rgba(40, 40, 40, 0.4) 0%, rgba(20, 20, 20, 0.1) 100%); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 45px rgba(0,0,0,0.3); } .liquid-glass-msg:active { transform: scale(0.96); } .liquid-glass-msg::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); transform: rotate(30deg); pointer-events: none; }
+
+/* ================= تصميم الشاشة الرئيسية (App Launcher) ================= */
+.app-launcher-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; padding: 10px 0 30px; }
+.app-icon-card { background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios); border: 1px solid var(--border-color); border-radius: 28px; padding: 28px 16px; text-align: center; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-ios); display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.app-icon-card:hover { transform: translateY(-6px) scale(1.03); box-shadow: var(--shadow-float); background: var(--bg-glass-strong); border-color: var(--accent-color); }
+.app-icon { font-size: 3.5rem; line-height: 1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+.app-icon-title { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
 
 /* ================= تصميم محرر التدوين ================= */
 .apple-notes-editor { flex: 1; width: 100%; min-height: 250px; border: none; background: transparent; color: var(--text-primary); outline: none; overflow-y: auto; font-size: 1.05rem; line-height: 1.7; padding: 0 4px; }
@@ -38,66 +43,23 @@
 .apple-notes-editor img { max-width: 100%; border-radius: 12px; margin: 12px 0; box-shadow: var(--shadow-ios); display: block; }
 .note-list-item { padding: 14px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; flex-direction: column; gap: 6px; transition: background 0.2s; } .note-list-item:hover { background: var(--bg-subtle); }
 
-/* ================= تحسينات وتصغير العناصر للجوال (تنسيق احترافي) ================= */
+/* ================= تحسينات الجوال المتقدمة ================= */
 @media (max-width: 768px) {
-  /* الهيدر والمسافات العامة */
-  header { padding: 10px 16px; }
-  .brand h1 { font-size: 1.3rem; }
-  .brand p { font-size: 0.75rem; }
-  main { padding: 0 12px; margin-top: 16px; padding-bottom: 100px; }
-  
-  /* بطاقات الأدوات */
-  .widget-card { padding: 16px; border-radius: 18px; }
-  .card-header { margin-bottom: 12px; padding-bottom: 10px; }
-  .card-title { font-size: 0.95rem; }
-  
-  /* الأزرار والمدخلات */
-  .btn { padding: 6px 12px; font-size: 0.75rem; }
-  .focus-input { padding: 12px 14px; font-size: 0.9rem; }
-  .item-text-input { font-size: 0.8rem; }
+  header { padding: 10px 16px; } .brand h1 { font-size: 1.3rem; } .brand p { font-size: 0.75rem; }
+  main { padding: 0 12px; margin-top: 16px; padding-bottom: 50px; }
+  .widget-card { padding: 16px; border-radius: 18px; } .card-header { margin-bottom: 12px; padding-bottom: 10px; } .card-title { font-size: 1.05rem; }
+  .btn { padding: 6px 12px; font-size: 0.75rem; } .focus-input { padding: 12px 14px; font-size: 0.9rem; } .item-text-input { font-size: 0.8rem; }
   .add-row input, .add-row select { padding: 8px 12px; font-size: 0.8rem; }
-  
-  /* القوائم (العادات والأمنيات) */
-  .list-item { padding: 8px 12px; }
-  .checkbox { width: 17px; height: 17px; font-size: 0.65rem; border-width: 1.5px; }
-  
-  /* الترحيب والإشعارات */
-  .greeting-box { padding: 18px 20px; border-radius: 18px; }
-  .greeting-box h2 { font-size: 1.4rem; }
-  .greeting-box p { font-size: 0.8rem; }
-  .hero-glass-messages { padding: 16px 18px; border-radius: 18px; }
-  .liquid-glass-msg { padding: 16px; border-radius: 20px; }
-  
-  /* التاريخ */
-  .ios-date-navigator { padding: 4px 12px; gap: 12px; }
-  .date-nav-btn { font-size: 1rem; }
-  
-  /* لوحة الأهداف (صغرناها لتأخذ مساحة أقل وأرتب) */
+  .list-item { padding: 8px 12px; } .checkbox { width: 17px; height: 17px; font-size: 0.65rem; border-width: 1.5px; }
+  .greeting-box { padding: 18px 20px; border-radius: 18px; } .greeting-box h2 { font-size: 1.4rem; } .greeting-box p { font-size: 0.8rem; }
+  .hero-glass-messages { padding: 16px 18px; border-radius: 18px; } .liquid-glass-msg { padding: 16px; border-radius: 20px; }
   .corkboard-surface { padding: 16px; min-height: 220px; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); border-width: 6px; border-radius: 14px; }
-  .polaroid-item { padding: 6px 6px 10px 6px; }
-  .polaroid-img { height: 100px; }
-  .polaroid-caption { font-size: 0.78rem; margin-top: 6px; }
-  
-  /* التدوين والملاحظات (يتجاوز ستايل الـ HTML المدمج) */
-  #widget-journal .card-header { padding: 12px 16px !important; }
-  #noteEditorView, #widget-journal > div:nth-child(2) { padding: 0 16px 16px !important; }
-  .apple-notes-editor { font-size: 0.95rem; min-height: 180px; }
-  .note-list-item { padding: 10px 16px; }
-  
-  /* المهام المتنقلة */
-  .kanban-col { padding: 10px; min-height: 180px; }
-  .kanban-card { padding: 10px; }
-  .kanban-card-title { font-size: 0.82rem; }
-  .kanban-col-header { font-size: 0.8rem; }
-  
-  /* النوافذ المنبثقة */
-  .modal-box { padding: 22px 18px; border-radius: 20px; margin: 12px; width: calc(100% - 24px); }
-  .modal-close { top: 12px; left: 12px; width: 28px; height: 28px; font-size: 1rem; }
-  .form-group label { font-size: 0.75rem; }
-  .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; font-size: 0.85rem; }
-  
-  /* شريط التنقل السفلي */
-  .ios-tab-bar { padding: 10px 16px 20px; }
-  .tab-icon { font-size: 1.25rem; }
-  .tab-btn { font-size: 0.68rem; gap: 2px; }
+  .polaroid-item { padding: 6px 6px 10px 6px; } .polaroid-img { height: 100px; } .polaroid-caption { font-size: 0.78rem; margin-top: 6px; }
+  #widget-journal .card-header { padding: 12px 16px !important; } #noteEditorView, #widget-journal > div:nth-child(2) { padding: 0 16px 16px !important; }
+  .apple-notes-editor { font-size: 0.95rem; min-height: 180px; } .note-list-item { padding: 10px 16px; }
+  .kanban-col { padding: 10px; min-height: 180px; } .kanban-card { padding: 10px; } .kanban-card-title { font-size: 0.82rem; } .kanban-col-header { font-size: 0.8rem; }
+  .modal-box { padding: 22px 18px; border-radius: 20px; margin: 12px; width: calc(100% - 24px); } .modal-close { top: 12px; left: 12px; width: 28px; height: 28px; font-size: 1rem; }
+  .form-group label { font-size: 0.75rem; } .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; font-size: 0.85rem; }
+  .app-launcher-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 10px 10px 30px; }
+  .app-icon-card { padding: 24px 12px; border-radius: 24px; } .app-icon { font-size: 3rem; } .app-icon-title { font-size: 0.88rem; }
 }
