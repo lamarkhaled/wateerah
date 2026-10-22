@@ -119,15 +119,9 @@ setTimeout(() => {
   if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
   if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
   if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-  if(window.initWidgetsDragAndDrop) window.initWidgetsDragAndDrop(); 
   listenToCloudMessages(); 
   
   window.loadTodayDate();
-  
-  if (window.innerWidth <= 768) {
-    document.querySelectorAll('.widget-card').forEach(card => card.classList.remove('active-tab-item'));
-    document.querySelectorAll('.tab-home').forEach(el => el.classList.add('active-tab-item'));
-  }
 }, 200);
 
 onAuthStateChanged(auth, async (user) => {
@@ -135,7 +129,6 @@ onAuthStateChanged(auth, async (user) => {
       if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
         const guestBtn = document.getElementById('guestAuthBtn'); if(guestBtn) guestBtn.style.display = 'none';
         const pill = document.getElementById('userProfilePill'); if(pill) pill.style.display = 'flex';
-        const syncInd = document.getElementById('syncIndicator'); if(syncInd) syncInd.innerText = 'متصل ومتزامن سحابياً';
         const uidDisp = document.getElementById('profileUidDisplay'); if(uidDisp) uidDisp.value = user.uid;
 
         if (user.email === ADMIN_EMAIL) { const adminBtn = document.getElementById('adminPanelBtn'); if(adminBtn) adminBtn.style.display = 'inline-flex'; }
