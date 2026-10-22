@@ -85,64 +85,70 @@
         </div>
       </section>
 
-      <section class="toolbar-ios mobile-hidden">
+      <!-- شريط التحكم العلوي -->
+      <section class="toolbar-ios">
         <div class="toolbar-group">
           <span class="toolbar-label">المظهر:</span>
           <button class="chip active" data-theme-btn="default" onclick="window.setTheme('default', this)">ورق دافئ</button>
           <button class="chip" data-theme-btn="minimal" onclick="window.setTheme('minimal', this)">صباح نقي</button>
           <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
         </div>
-        <div class="toolbar-group">
-          <span class="toolbar-label">أدواتي:</span>
-          <div id="activeWidgetsChips" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
-          <button class="add-widget-plus" title="إضافة أداة جديدة" onclick="window.openModal('addWidgetModal')">+</button>
+        
+        <!-- زر فتح المكتبة -->
+        <div class="toolbar-group" id="toolbarToolsContainer">
+          <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة ➕</button>
+        </div>
+        
+        <!-- زر العودة للشاشة الرئيسية (يظهر فقط عند فتح تطبيق) -->
+        <div class="toolbar-group" id="homeBtnContainer" style="display: none;">
+          <button class="btn btn-primary" style="font-weight: 700; padding: 8px 16px;" onclick="window.goHome()">🏠 العودة للرئيسية</button>
         </div>
       </section>
 
+      <!-- حالة المساحة الفارغة -->
       <div id="emptyWorkspaceState" class="hidden-el">
-        <h3>مساحتك فارغة وجاهزة للتشكيل</h3>
-        <p>اضغط على زر (+) لإضافة الأدوات التي تحتاجها وترتيبها بالسحب والإفلات.</p>
-        <button class="btn btn-primary" onclick="window.openModal('addWidgetModal')">+ إضافة أول أداة</button>
+        <h3>لا توجد تطبيقات مثبتة</h3>
+        <p>اضغط على زر (المكتبة ➕) لتنزيل التطبيقات والأدوات التي تحتاجها.</p>
+        <button class="btn btn-primary" onclick="window.openModal('addWidgetModal')">فتح المكتبة</button>
       </div>
 
-      <div id="bentoGrid" class="bento-grid">
-        <div id="widget-vision" class="widget-card col-12 hidden-el tab-vision" draggable="true" data-widget-id="widget-vision">
-          <div class="card-header"><div class="card-title-wrap"><span class="drag-handle" title="سحب للترتيب">⋮⋮</span><span class="card-title">لوحة الأهداف (Vision Board)</span></div><div style="display: flex; gap: 8px; align-items: center;"><span style="font-size: 0.76rem; color: var(--text-secondary);">اضغط على البطاقة لفتح خطتها</span><button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-vision')">إخفاء</button></div></div>
+      <!-- الشاشة الرئيسية: شبكة التطبيقات -->
+      <div id="appLauncherGrid" class="app-launcher-grid"></div>
+
+      <!-- حاوية الصفحات (التطبيقات المفتوحة) -->
+      <div id="pageContainer" style="display: none;">
+        
+        <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
+          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div><span style="font-size: 0.8rem; color: var(--text-secondary);">اضغط على البطاقة لفتح خطتها</span></div>
           <div id="corkboardContainer" class="corkboard-surface"></div>
           <div class="add-row" style="margin-top: 16px;"><input type="text" id="newVisionTitle" placeholder="عنوان الهدف..."><input type="text" id="newVisionImg" placeholder="رابط الصورة (اختياري)..."><input type="date" id="newVisionDate"><button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت</button></div>
         </div>
 
-        <div id="widget-kanban" class="widget-card col-12 hidden-el tab-tasks" draggable="true" data-widget-id="widget-kanban">
-          <div class="card-header"><div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">لوحة العمل والمهام المتنقلة</span></div><button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-kanban')">إخفاء</button></div>
+        <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
+          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div></div>
           <div class="add-row" style="margin-top: 0; margin-bottom: 18px;"><input type="text" id="newKanbanTitle" placeholder="عنوان المهمة..."><select id="newKanbanStatus"><option value="idea">فكرة</option><option value="scheduled">مجدول</option><option value="progress">تنفيذ</option><option value="done">مكتمل</option></select><select id="newKanbanPriority"><option value="urgent">عاجل</option><option value="normal" selected>عادي</option><option value="low">غير مهم</option></select><input type="date" id="newKanbanDate"><button class="btn btn-primary" onclick="window.addKanbanTask()">إضافة</button></div>
           <div class="kanban-grid"><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'idea')"><div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div><div class="kanban-cards-wrap" id="col-idea"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div></div>
         </div>
 
-        <div id="widget-focus" class="widget-card col-6 hidden-el tab-home" draggable="true" data-widget-id="widget-focus">
+        <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
           <div class="card-header">
-            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">بوصلة التركيز اليومي</span></div>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-subtle" style="padding: 4px 10px; font-size: 0.72rem;" onclick="window.openHistoryModal('focus')">السجل 🗓️</button>
-              <button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-focus')">إخفاء</button>
-            </div>
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
+            <button class="btn btn-subtle" onclick="window.openHistoryModal('focus')">السجل 🗓️</button>
           </div>
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
 
-        <div id="widget-habits" class="widget-card col-6 hidden-el tab-home" draggable="true" data-widget-id="widget-habits">
+        <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
           <div class="card-header">
-            <div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">متتبع العادات اليومية</span></div>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-subtle" style="padding: 4px 10px; font-size: 0.72rem;" onclick="window.openHistoryModal('habits')">السجل 🗓️</button>
-              <button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-habits')">إخفاء</button>
-            </div>
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">متتبع العادات</span></div>
+            <button class="btn btn-subtle" onclick="window.openHistoryModal('habits')">السجل 🗓️</button>
           </div>
           <ul id="habitsList" class="item-list"></ul>
           <div class="add-row"><input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') window.addHabit()"><button class="btn btn-primary" onclick="window.addHabit()">إضافة</button></div>
         </div>
 
-        <div id="widget-finance" class="widget-card col-12 hidden-el tab-finance" draggable="true" data-widget-id="widget-finance">
-          <div class="card-header"><div class="card-title-wrap"><span class="drag-handle">⋮⋮</span><span class="card-title">إدارة المالية الشاملة</span></div><button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-finance')">إخفاء</button></div>
+        <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
+          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">البنوك والحسابات المالية</div><div id="banksContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px;"></div><div class="add-row"><input type="text" id="newBankName" placeholder="اسم البنك (مثل: الراجحي)..."><button class="btn btn-primary" onclick="window.addBank()">إضافة بنك</button></div></div>
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">قائمة الأمنيات</div><ul id="wishlistList" class="item-list"></ul><div class="add-row"><input type="text" id="newWishTitle" placeholder="الأمنية..."><input type="number" id="newWishCost" placeholder="التكلفة"><button class="btn btn-primary" onclick="window.addWishlistItem()">إضافة</button></div></div>
@@ -151,28 +157,18 @@
           <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;"><span style="font-size: 0.88rem; font-weight: 700;">توزيع الدخل الشهري</span><input type="number" id="totalIncomeInput" value="5000" oninput="window.calculateDistribution()" style="width: 160px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);"></div><div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:10px;" id="distributionResults"></div></div>
         </div>
 
-        <div id="widget-journal" class="widget-card col-12 hidden-el tab-home" draggable="true" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 350px;">
-          <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-            <div class="card-title-wrap">
-              <span class="drag-handle">⋮⋮</span>
-              <span class="card-title" style="color: var(--accent-color); font-weight: 700;">التدوين</span>
-            </div>
-            <div style="display: flex; gap: 12px; align-items: center;">
-              <button style="background:none; border:none; color:var(--accent-color); font-size:1.3rem; cursor:pointer; transition: transform 0.2s;" onclick="window.createNewNote()" title="تدوينة جديدة" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📝</button>
-              <button class="remove-widget-btn desktop-only" onclick="window.removeWidget('widget-journal')">إخفاء</button>
-            </div>
+        <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
+          <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <div class="card-title-wrap"><span class="card-title" style="color: var(--accent-color); font-size:1.2rem; font-weight: 700;">التدوين</span></div>
+            <button style="background:none; border:none; color:var(--accent-color); font-size:1.4rem; cursor:pointer; transition: transform 0.2s;" onclick="window.createNewNote()" title="تدوينة جديدة" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">📝</button>
           </div>
           <div id="notesListView" style="flex: 1; overflow-y: auto; background: var(--bg-glass-strong); display: block;"></div>
           <div id="noteEditorView" style="display: none; flex: 1; flex-direction: column; background: var(--bg-glass-strong); padding: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <button style="background:none; border:none; color:var(--accent-color); font-weight:700; cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:4px;" onclick="window.showNotesList()">
-                <span style="font-size:1.2rem;">❮</span> التدوين
-              </button>
+              <button style="background:none; border:none; color:var(--accent-color); font-weight:700; cursor:pointer; font-size:1rem; display:flex; align-items:center; gap:4px;" onclick="window.showNotesList()"><span style="font-size:1.2rem;">❮</span> القائمة</button>
               <div style="display:flex; gap:16px; align-items: center;">
-                <label style="cursor:pointer; color:var(--accent-color); font-size:1.3rem;" title="إدراج صورة">
-                  📷 <input type="file" accept="image/*" style="display:none;" onchange="window.addNoteImage(event)">
-                </label>
-                <button style="background:none; border:none; color:var(--danger-color); font-size:1.1rem; cursor:pointer;" onclick="window.deleteCurrentNote()" title="حذف التدوينة">🗑️</button>
+                <label style="cursor:pointer; color:var(--accent-color); font-size:1.4rem;" title="إدراج صورة">📷 <input type="file" accept="image/*" style="display:none;" onchange="window.addNoteImage(event)"></label>
+                <button style="background:none; border:none; color:var(--danger-color); font-size:1.2rem; cursor:pointer;" onclick="window.deleteCurrentNote()" title="حذف التدوينة">🗑️</button>
               </div>
             </div>
             <div id="currentNoteDate" style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 16px;"></div>
@@ -183,14 +179,8 @@
     </div>
   </main>
 
-  <nav class="ios-tab-bar" id="mobileTabBar">
-    <button class="tab-btn active" onclick="window.switchTab('home')"><span class="tab-icon">🏠</span><span>يومي</span></button>
-    <button class="tab-btn" onclick="window.switchTab('tasks')"><span class="tab-icon">📋</span><span>المهام</span></button>
-    <button class="tab-btn" onclick="window.switchTab('finance')"><span class="tab-icon">💰</span><span>المالية</span></button>
-    <button class="tab-btn" onclick="window.switchTab('vision')"><span class="tab-icon">🎯</span><span>الأهداف</span></button>
-  </nav>
-
-  <div id="addWidgetModal" class="modal-overlay"><div class="modal-box" style="max-width: 480px;"><button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button><h3 style="margin-bottom: 6px;">مكتبة الأدوات</h3><p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف ما تحتاجه لمساحتك.</p><div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div></div></div>
+  <!-- النوافذ المنبثقة (المكتبة، السجل، وغيرها) -->
+  <div id="addWidgetModal" class="modal-overlay"><div class="modal-box" style="max-width: 480px;"><button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button><h3 style="margin-bottom: 6px;">المكتبة</h3><p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف وثبت التطبيقات في شاشتك الرئيسية.</p><div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div></div></div>
 
   <div id="visionDetailModal" class="modal-overlay">
     <div class="modal-box">
