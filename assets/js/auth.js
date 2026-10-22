@@ -3,6 +3,9 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVe
 import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
+// إجبار Firebase على إرسال كافة الإيميلات باللغة العربية
+auth.languageCode = 'ar';
+
 function getLocalYYYYMMDD(dateObj = new Date()) {
   const y = dateObj.getFullYear();
   const m = String(dateObj.getMonth() + 1).padStart(2, '0');
