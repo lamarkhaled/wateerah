@@ -14,7 +14,6 @@
 .item-list { list-style: none; display: flex; flex-direction: column; gap: 8px; } .list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-sm); gap: 10px; } .item-left { display: flex; align-items: center; gap: 10px; flex: 1; } .checkbox { width: 19px; height: 19px; border-radius: 6px; border: 1.8px solid var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; flex-shrink: 0; } .list-item.completed .checkbox { background: var(--accent-color); border-color: var(--accent-color); color: #FFF; } .list-item.completed .item-text-input { text-decoration: line-through; opacity: 0.6; } .item-text-input { border: none; background: transparent; color: var(--text-primary); font-size: 0.88rem; width: 100%; outline: none; }
 .focus-input { width: 100%; border: 1px solid var(--border-color); background: var(--bg-glass-strong); padding: 14px 18px; border-radius: var(--radius-md); font-size: 0.98rem; color: var(--text-primary); outline: none; } .focus-input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 4px var(--accent-light); }
 .add-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; } .add-row input, .add-row select { flex: 1; min-width: 120px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-glass-strong); color: var(--text-primary); outline: none; font-size: 0.85rem; }
-.journal-area { width: 100%; min-height: 120px; border: 1px solid var(--border-color); background: var(--bg-glass-strong); border-radius: var(--radius-md); padding: 14px; color: var(--text-primary); outline: none; resize: vertical; }
 #onboardingScreen { max-width: 560px; margin: 60px auto; text-align: center; background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios); border: 1px solid var(--border-glass); border-radius: 28px; padding: 48px 32px; box-shadow: var(--shadow-float); } #onboardingScreen h2 { font-size: 2rem; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; } #onboardingScreen p { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 28px; }
 .theme-selector-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; } .theme-card { padding: 16px 12px; border-radius: var(--radius-md); border: 2px solid var(--border-color); cursor: pointer; transition: var(--transition); background: var(--bg-glass-strong); font-size: 0.85rem; font-weight: 600; } .theme-card.active { border-color: var(--accent-color); background: var(--accent-light); color: var(--accent-color); }
 .time-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: var(--bg-subtle); color: var(--text-secondary); margin-bottom: 16px; }
@@ -28,81 +27,13 @@
 .form-group { margin-bottom: 14px; } .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); } .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.88rem; } .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-color); box-shadow: 0 0 0 4px var(--accent-light); }
 .progress-bar-bg { width: 100%; height: 8px; background: var(--bg-subtle); border-radius: 99px; overflow: hidden; } .progress-bar-fill { height: 100%; background: var(--accent-color); width: 0%; transition: width 0.3s ease; }
 #toastContainer { position: fixed; bottom: 24px; left: 24px; z-index: 3000; display: flex; flex-direction: column; gap: 8px; } .toast { background: var(--text-primary); color: var(--bg-primary); padding: 11px 18px; border-radius: 12px; font-size: 0.84rem; font-weight: 500; box-shadow: var(--shadow-float); }
+.ios-date-navigator { display: inline-flex; align-items: center; gap: 16px; background: var(--bg-glass-strong); border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 999px; margin-bottom: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
+.date-nav-btn { background: none; border: none; font-size: 1.1rem; color: var(--text-secondary); cursor: pointer; padding: 4px; transition: var(--transition); } .date-nav-btn:hover { color: var(--accent-color); transform: scale(1.1); } .date-display { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+.liquid-glass-msg { background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 28px; padding: 22px; box-shadow: 0 15px 45px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s; position: relative; overflow: hidden; }
+[data-theme="dark"] .liquid-glass-msg { background: linear-gradient(135deg, rgba(40, 40, 40, 0.4) 0%, rgba(20, 20, 20, 0.1) 100%); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 45px rgba(0,0,0,0.3); } .liquid-glass-msg:active { transform: scale(0.96); } .liquid-glass-msg::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); transform: rotate(30deg); pointer-events: none; }
 
-/* ================= مبدل التاريخ بأسلوب iOS ================= */
-.ios-date-navigator {
-  display: inline-flex; align-items: center; gap: 16px;
-  background: var(--bg-glass-strong); border: 1px solid var(--border-color);
-  padding: 6px 14px; border-radius: 999px; margin-bottom: 8px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
-}
-.date-nav-btn {
-  background: none; border: none; font-size: 1.1rem; color: var(--text-secondary);
-  cursor: pointer; padding: 4px; transition: var(--transition);
-}
-.date-nav-btn:hover { color: var(--accent-color); transform: scale(1.1); }
-.date-display { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-
-/* ================= إشعار السائل الزجاجي السلس (بدون X) ================= */
-.liquid-glass-msg {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
-  backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 28px;
-  padding: 22px; box-shadow: 0 15px 45px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.7);
-  cursor: pointer; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s;
-  position: relative; overflow: hidden;
-}
-[data-theme="dark"] .liquid-glass-msg {
-  background: linear-gradient(135deg, rgba(40, 40, 40, 0.4) 0%, rgba(20, 20, 20, 0.1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 45px rgba(0,0,0,0.3);
-}
-.liquid-glass-msg:active { transform: scale(0.96); }
-.liquid-glass-msg::after {
-  content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-  transform: rotate(30deg); pointer-events: none;
-}
-
-/* ================= تنسيقات ملاحظات أبل ================= */
-.apple-notes-area { width: 100%; min-height: 220px; border: none; background: transparent; color: var(--text-primary); outline: none; resize: vertical; font-size: 1.05rem; line-height: 1.5; padding: 0; }
-.apple-notes-area::placeholder { color: var(--text-secondary); font-weight: 500; opacity: 0.6; }
 /* ================= تصميم محرر التدوين (Apple Notes Style with Identity) ================= */
-.apple-notes-editor {
-  flex: 1;
-  width: 100%;
-  min-height: 250px;
-  border: none;
-  background: transparent;
-  color: var(--text-primary);
-  outline: none;
-  overflow-y: auto;
-  font-size: 1.05rem;
-  line-height: 1.7;
-  padding: 0 4px;
-}
-.apple-notes-editor[placeholder]:empty:before {
-  content: attr(placeholder);
-  color: var(--text-secondary);
-  opacity: 0.6;
-  pointer-events: none;
-  display: block;
-}
-.apple-notes-editor img {
-  max-width: 100%;
-  border-radius: 12px;
-  margin: 12px 0;
-  box-shadow: var(--shadow-ios);
-  display: block;
-}
-.note-list-item {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border-color);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: background 0.2s;
-}
-.note-list-item:hover {
-  background: var(--bg-subtle);
-}
+.apple-notes-editor { flex: 1; width: 100%; min-height: 250px; border: none; background: transparent; color: var(--text-primary); outline: none; overflow-y: auto; font-size: 1.05rem; line-height: 1.7; padding: 0 4px; }
+.apple-notes-editor[placeholder]:empty:before { content: attr(placeholder); color: var(--text-secondary); opacity: 0.6; pointer-events: none; display: block; }
+.apple-notes-editor img { max-width: 100%; border-radius: 12px; margin: 12px 0; box-shadow: var(--shadow-ios); display: block; }
+.note-list-item { padding: 14px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; flex-direction: column; gap: 6px; transition: background 0.2s; } .note-list-item:hover { background: var(--bg-subtle); }
