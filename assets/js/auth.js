@@ -3,8 +3,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVe
 import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
-// إجبار Firebase على إرسال كافة الإيميلات باللغة العربية
-auth.languageCode = 'ar';
+auth.languageCode = 'ar'; // إجبار الإيميلات بالعربي
 
 function getLocalYYYYMMDD(dateObj = new Date()) {
   const y = dateObj.getFullYear();
@@ -15,7 +14,6 @@ function getLocalYYYYMMDD(dateObj = new Date()) {
 
 window.updateSubscriptionUI = function() {
   if (window.userProfile && window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    
     const todayStr = getLocalYYYYMMDD(new Date());
     const expiryStr = window.userProfile.expiryDate.replace(/\//g, '-');
 
@@ -41,7 +39,6 @@ window.setupPricingModal = function() {
   window.updateSubscriptionUI(); 
   
   const isSubscribed = window.userProfile?.isPro || false;
-  
   const unsubView = document.getElementById('pricingViewUnsubscribed');
   const subView = document.getElementById('pricingViewSubscribed');
   const trialBox = document.getElementById('oneTimeTrialBox');
@@ -53,7 +50,6 @@ window.setupPricingModal = function() {
   if (isSubscribed && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
     const now = new Date();
     now.setHours(0,0,0,0);
-    
     const expiryDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-'));
     expiryDate.setHours(0,0,0,0);
     
@@ -94,7 +90,6 @@ window.handleRegister = async () => {
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass); await sendEmailVerification(cred.user);
     window.userProfile.name = name || 'صديقنا'; window.userProfile.isPro = true; window.userProfile.planType = 'تجربة مجانية'; window.userProfile.trialUsed = true; window.userProfile.totalSubDays = 2;
-    
     const trialExpiry = new Date(); trialExpiry.setDate(trialExpiry.getDate() + 2); 
     window.userProfile.expiryDate = getLocalYYYYMMDD(trialExpiry);
     
