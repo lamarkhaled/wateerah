@@ -5,13 +5,25 @@ window.showToast = function(msg) {
 };
 
 window.updateDayNightGreeting = function() {
-  const hour = new Date().getHours(); const isMorning = hour >= 4 && hour < 17; const greetingWord = isMorning ? 'صباح الخير' : 'مساء الخير';
-  if (!isMorning) document.body.classList.add('night-mode-glow'); else document.body.classList.remove('night-mode-glow');
+  const hour = new Date().getHours(); 
+  const isMorning = hour >= 4 && hour < 17; 
+  const greetingWord = isMorning ? 'صباح الخير ☀️' : 'مساء الخير 🌙';
+  
+  if (!isMorning) document.body.classList.add('night-mode-glow'); 
+  else document.body.classList.remove('night-mode-glow');
+  
   const userName = window.userProfile?.name || 'صديقنا';
-  const wTxt = document.getElementById('welcomeText'); if(wTxt) wTxt.innerText = `${greetingWord}، أهلاً بك يا ${userName}.`;
-  const oTxt = document.getElementById('onboardingGreeting'); if(oTxt) oTxt.innerText = `${greetingWord}، أهلاً بك في وتيرة`;
-  const pTxt = document.getElementById('onboardingTimePill'); if(pTxt) pTxt.innerText = isMorning ? 'الفترة الصباحية' : 'الفترة المسائية';
-  const dTxt = document.getElementById('dayNightSubtext'); if(dTxt) dTxt.innerText = isMorning ? 'بداية يوم مشرقة، رتّب أولوياتك بهدوء.' : 'أمسية هادئة، راجع إنجازاتك وخطط للغد.';
+  const wTxt = document.getElementById('welcomeText'); 
+  if(wTxt) wTxt.innerText = `${greetingWord}، أهلاً بك يا ${userName}.`;
+  
+  const oTxt = document.getElementById('onboardingGreeting'); 
+  if(oTxt) oTxt.innerText = `${greetingWord}، أهلاً بك في وتيرة`;
+  
+  const pTxt = document.getElementById('onboardingTimePill'); 
+  if(pTxt) pTxt.innerText = isMorning ? 'الفترة الصباحية' : 'الفترة المسائية';
+  
+  const dTxt = document.getElementById('dayNightSubtext'); 
+  if(dTxt) dTxt.innerText = isMorning ? 'بداية يوم مشرقة، رتّب أولوياتك بهدوء.' : 'أمسية هادئة، راجع إنجازاتك وخطط للغد.';
 };
 
 window.applyTheme = function(name) {
