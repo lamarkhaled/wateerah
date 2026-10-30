@@ -8,11 +8,30 @@ window.renderVisionBoard = function() {
 };
 
 window.addVisionItem = () => {
-  const title = document.getElementById('newVisionTitle').value.trim(); const img = document.getElementById('newVisionImg').value.trim(); const targetDate = document.getElementById('newVisionDate').value;
+  const title = document.getElementById('newVisionTitle').value.trim();
+  const targetDate = document.getElementById('newVisionDate').value;
+  const fileInput = document.getElementById('newVisionImgFile');
+  const file = fileInput ? fileInput.files[0] : null;
+
   if (!title) return window.showToast('أدخل عنوان الهدف');
-  if (!window.appState.visionBoard) window.appState.visionBoard = [];
-  window.appState.visionBoard.push({ title, img: img || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500', targetDate: targetDate || '', plan: '', tasks: [] });
-  document.getElementById('newVisionTitle').value = ''; document.getElementById('newVisionImg').value = ''; document.getElementById('newVisionDate').value = ''; window.renderVisionBoard(); window.autoSave(); window.showToast('تم تثبيت الهدف');
+
+  const finalizeSave = (imgData) => {
+    if (!window.appState.visionBoard) window.appState.visionBoard = [];
+    window.appState.visionBoard.push({ title, img: imgData || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500', targetDate: targetDate || '', plan: '', tasks: [] });
+    document.getElementById('newVisionTitle').value = '';
+    if(fileInput) fileInput.value = '';
+    document.getElementById('newVisionDate').value = '';
+    window.renderVisionBoard(); window.autoSave(); window.showToast('تم تثبيت الهدف');
+  };
+
+  if (file) {
+    if (file.size > 2.5 * 1024 * 1024) return window.showToast('حجم الصورة كبير جداً (الحد الأقصى 2.5 ميجابايت).');
+    const reader = new FileReader();
+    reader.onload = (e) => finalizeSave(e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    finalizeSave('');
+  }
 };
 
 window.openVisionDetail = (idx) => {
@@ -158,7 +177,6 @@ window.calculateDistribution = () => {
   if(container) container.innerHTML = `<div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>`;
 };
 
-// ================= دوال التدوين (هوية وتيرة) =================
 window.currentActiveNoteId = null;
 
 window.renderNotesList = function() {
@@ -185,15 +203,7 @@ window.renderNotesList = function() {
     if(snippet.length >= 40) snippet += '...';
     if(snippet === '') snippet = 'لا يوجد نص إضافي';
 
-    return `
-      <div class="note-list-item" onclick="window.openNote('${note.id}')">
-        <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div>
-        <div style="display: flex; gap: 10px; font-size: 0.85rem; color: var(--text-secondary);">
-          <span style="font-weight: 500;">${dateStr}</span>
-          <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8;">${snippet}</span>
-        </div>
-      </div>
-    `;
+    return `<div class="note-list-item" onclick="window.openNote('${note.id}')"><div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div><div style="display: flex; gap: 10px; font-size: 0.85rem; color: var(--text-secondary);"><span style="font-weight: 500;">${dateStr}</span><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8;">${snippet}</span></div></div>`;
   }).join('');
 };
 
