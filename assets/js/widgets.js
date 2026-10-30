@@ -140,17 +140,102 @@ window.addAccount = (bIdx) => {
 };
 window.deleteAccount = (bIdx, aIdx) => { window.appState.banks[bIdx].accounts.splice(aIdx, 1); window.renderLists(); window.autoSave(); };
 window.updateAccountName = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].name = val; window.autoSave(); };
-window.updateAccountBalance = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].balance = parseFloat(val) || 0; window.autoSave(); window.calculateDistribution(); };
+window.updateAccountBalance = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].balance = parseFloat(val) || 0; window.autoSave(); };
 
+// ================= دوال التوزيع المئوي للدخل =================
+window.renderAllocations = function() {
+  const container = document.getElementById('allocationsContainer');
+  if (!container) return;
+  
+  if (!window.appState.allocations || window.appState.allocations.length === 0) {
+    window.appState.allocations = [
+      {name: 'التزامات ومصاريف', pct: 40}, 
+      {name: 'ادخار وطوارئ', pct: 30}, 
+      {name: 'استثمار', pct: 20}, 
+      {name: 'صدقات', pct: 10}
+    ];
+  }
+
+  const incomeEl = document.getElementById('totalIncomeInput');
+  const income = incomeEl ? (parseFloat(incomeEl.value) || 0) : 5000;
+  let totalPct = 0;
+
+  container.innerHTML = window.appState.allocations.map((al, idx) => {
+    const p = parseFloat(al.pct) || 0;
+    totalPct += p;
+    const amount = (income * (p / 100)).toFixed(2);
+    return `
+      <div class="list-item" style="padding: 10px 14px; background: var(--bg-subtle);">
+        <div class="item-left" style="gap: 12px; flex: 1; flex-wrap: wrap;">
+          <input type="text" class="item-text-input" value="${al.name}" onchange="window.updateAllocation(${idx}, 'name', this.value)" style="font-weight: 700; flex: 1.5; min-width: 100px;" placeholder="اسم البند">
+          <div style="display: flex; align-items: center; gap: 4px; flex: 1;">
+            <input type="number" class="item-text-input" value="${al.pct}" onchange="window.updateAllocation(${idx}, 'pct', this.value)" style="color: var(--accent-color); font-weight: 700; width: 60px; text-align: left; background: var(--bg-primary); padding: 4px; border-radius: 6px; border: 1px solid var(--border-color);"> 
+            <span style="font-size: 0.8rem; font-weight: 700;">%</span>
+          </div>
+          <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-color); flex: 1.5; text-align: left; border-right: 1px solid var(--border-color); padding-right: 12px; min-width: 90px;">${amount} ر.س</span>
+        </div>
+        <button class="delete-btn" onclick="window.deleteAllocation(${idx})">&times;</button>
+      </div>
+    `;
+  }).join('');
+
+  const warning = document.getElementById('allocationWarning');
+  const currTotal = document.getElementById('currentTotalPct');
+  const summary = document.getElementById('allocationSummary');
+  
+  if (warning && currTotal && summary) {
+    if (totalPct > 100) {
+      warning.style.display = 'block';
+      currTotal.innerText = totalPct;
+      summary.innerText = `تجاوزت الحد! (المتبقي: ${100 - totalPct}%)`;
+      summary.style.color = 'var(--danger-color)';
+    } else {
+      warning.style.display = 'none';
+      summary.innerText = `إجمالي الموزع: ${totalPct}% | المتبقي: ${100 - totalPct}%`;
+      summary.style.color = 'var(--text-secondary)';
+    }
+  }
+};
+
+window.addAllocation = () => {
+  const nameEl = document.getElementById('newAllocName');
+  const pctEl = document.getElementById('newAllocPct');
+  const name = nameEl.value.trim();
+  const pct = parseFloat(pctEl.value) || 0;
+  
+  if (!name) return window.showToast('أدخل اسم البند للتوزيع');
+  
+  if (!window.appState.allocations) window.appState.allocations = [];
+  window.appState.allocations.push({name, pct});
+  
+  nameEl.value = ''; pctEl.value = '';
+  window.renderAllocations();
+  window.autoSave();
+};
+
+window.updateAllocation = (idx, field, val) => {
+  if (field === 'pct') val = parseFloat(val) || 0;
+  window.appState.allocations[idx][field] = val;
+  window.renderAllocations();
+  window.autoSave();
+};
+
+window.deleteAllocation = (idx) => {
+  window.appState.allocations.splice(idx, 1);
+  window.renderAllocations();
+  window.autoSave();
+};
+
+// ================= إعادة تشغيل جميع القوائم =================
 window.renderLists = function() {
   window.renderVisionBoard(); 
   window.renderKanbanBoard();
   window.renderBanksList(); 
+  window.renderAllocations();
 
   document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
   document.getElementById('wishlistList').innerHTML = (window.appState.wishlist || []).map((w, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${w.title}" onchange="window.appState.wishlist[${i}].title=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600; color:var(--danger-color);">${w.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.wishlist.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
   document.getElementById('subscriptionsList').innerHTML = (window.appState.subscriptions || []).map((s, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600;">${s.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
-  window.calculateDistribution();
 };
 
 window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
@@ -171,12 +256,7 @@ window.addHabit = () => {
 window.addWishlistItem = () => { const t = document.getElementById('newWishTitle'); const c = document.getElementById('newWishCost'); if(!t.value.trim())return; window.appState.wishlist.push({title:t.value.trim(), cost:parseFloat(c.value)||0}); t.value=''; c.value=''; window.renderLists(); window.autoSave(); };
 window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; window.renderLists(); window.autoSave(); };
 
-window.calculateDistribution = () => {
-  const income = parseFloat(document.getElementById('totalIncomeInput')?.value) || 5000;
-  const container = document.getElementById('distributionResults');
-  if(container) container.innerHTML = `<div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">التزامات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">معيشة (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">أعمال (25%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.25} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">استثمار (30%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.3} ر.س</div></div><div style="background:var(--bg-glass-strong); padding:10px; border-radius:10px; border:1px solid var(--border-color); text-align:center;"><div style="font-size:0.72rem; color:var(--text-secondary);">صدقات (10%)</div><div style="font-weight:700; color:var(--accent-color);">${income*0.1} ر.س</div></div>`;
-};
-
+// ================= دوال التدوين (هوية وتيرة) =================
 window.currentActiveNoteId = null;
 
 window.renderNotesList = function() {
@@ -203,7 +283,15 @@ window.renderNotesList = function() {
     if(snippet.length >= 40) snippet += '...';
     if(snippet === '') snippet = 'لا يوجد نص إضافي';
 
-    return `<div class="note-list-item" onclick="window.openNote('${note.id}')"><div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div><div style="display: flex; gap: 10px; font-size: 0.85rem; color: var(--text-secondary);"><span style="font-weight: 500;">${dateStr}</span><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8;">${snippet}</span></div></div>`;
+    return `
+      <div class="note-list-item" onclick="window.openNote('${note.id}')">
+        <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div>
+        <div style="display: flex; gap: 10px; font-size: 0.85rem; color: var(--text-secondary);">
+          <span style="font-weight: 500;">${dateStr}</span>
+          <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8;">${snippet}</span>
+        </div>
+      </div>
+    `;
   }).join('');
 };
 
