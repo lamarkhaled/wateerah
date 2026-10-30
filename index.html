@@ -92,9 +92,11 @@
           <button class="chip" data-theme-btn="minimal" onclick="window.setTheme('minimal', this)">صباح نقي</button>
           <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
         </div>
+        
         <div class="toolbar-group" id="toolbarToolsContainer">
           <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة ➕</button>
         </div>
+        
         <div class="toolbar-group" id="homeBtnContainer" style="display: none;">
           <button class="btn btn-primary" style="font-weight: 700; padding: 8px 16px;" onclick="window.goHome()">🏠 العودة للرئيسية</button>
         </div>
@@ -148,12 +150,36 @@
 
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
+          
+          <!-- قسم التوزيع الديناميكي الجديد (بالأعلى) -->
+          <div style="margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+              <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل (نسبة مئوية)</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.85rem;">المبلغ الإجمالي:</span>
+                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderAllocations(); window.autoSave();" style="width: 140px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-weight: bold;">
+                <span style="font-size: 0.85rem;">ر.س</span>
+              </div>
+            </div>
+            
+            <div id="allocationWarning" style="color: var(--danger-color); font-size: 0.85rem; font-weight: 700; display: none; margin-bottom: 8px; background: var(--danger-light); padding: 8px 12px; border-radius: 8px;">⚠️ تنبيه: مجموع النسب يتجاوز 100% (الحالي: <span id="currentTotalPct"></span>%)</div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px;" id="allocationSummary">المتبقي للتوزيع: 0%</div>
+            
+            <div id="allocationsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
+            
+            <div class="add-row">
+              <input type="text" id="newAllocName" placeholder="اسم البند (مثال: ادخار)..." style="flex: 2;">
+              <input type="number" id="newAllocPct" placeholder="النسبة %" style="flex: 1; max-width: 100px;">
+              <button class="btn btn-primary" onclick="window.addAllocation()">إضافة بند</button>
+            </div>
+          </div>
+
+          <!-- البنوك والأمنيات (بالأسفل) -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">البنوك والحسابات المالية</div><div id="banksContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px;"></div><div class="add-row"><input type="text" id="newBankName" placeholder="اسم البنك (مثل: الراجحي)..."><button class="btn btn-primary" onclick="window.addBank()">إضافة بنك</button></div></div>
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">قائمة الأمنيات</div><ul id="wishlistList" class="item-list"></ul><div class="add-row"><input type="text" id="newWishTitle" placeholder="الأمنية..."><input type="number" id="newWishCost" placeholder="التكلفة"><button class="btn btn-primary" onclick="window.addWishlistItem()">إضافة</button></div></div>
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الاشتراكات الشهرية</div><ul id="subscriptionsList" class="item-list"></ul><div class="add-row"><input type="text" id="newSubName" placeholder="الاشتراك..."><input type="number" id="newSubCost" placeholder="المبلغ"><button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button></div></div>
           </div>
-          <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;"><span style="font-size: 0.88rem; font-weight: 700;">توزيع الدخل الشهري</span><input type="number" id="totalIncomeInput" value="5000" oninput="window.calculateDistribution()" style="width: 160px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);"></div><div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:10px;" id="distributionResults"></div></div>
         </div>
 
         <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
