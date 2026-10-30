@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/f
 window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
 window.draggedKanbanIndex = null;
+window.isDataLoadedFromCloud = false; // قفل أمان لعدم مسح الاشتراكات
 
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
@@ -29,6 +30,10 @@ window.saveCurrentWateerah = async (manual) => {
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   const user = auth.currentUser;
   if (!user) { if(manual && window.showToast) window.showToast('تم الحفظ محلياً'); return; }
+
+  // منع المزامنة وحماية الحساب من الإلغاء إذا لم يتم جلب بيانات العميل بعد
+  if (!window.isDataLoadedFromCloud && !manual) return;
+
   try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); if(manual && window.showToast) window.showToast('تم الحفظ والمزامنة سحابياً'); } catch(e) {}
 };
 
@@ -120,7 +125,6 @@ setTimeout(() => {
   if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
   if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
   listenToCloudMessages(); 
-  
   window.loadTodayDate();
 }, 200);
 
@@ -134,6 +138,9 @@ onAuthStateChanged(auth, async (user) => {
         if (user.email === ADMIN_EMAIL) { const adminBtn = document.getElementById('adminPanelBtn'); if(adminBtn) adminBtn.style.display = 'inline-flex'; }
 
         try { const snap = await getDoc(doc(db, "users", user.uid)); if(snap.exists()) { const d = snap.data(); if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; if(d.state) window.appState = { ...window.appState, ...d.state }; } } catch(e) {}
+        
+        window.isDataLoadedFromCloud = true; // تم التحميل بأمان
+
         if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
         if(window.updateSubscriptionUI) window.updateSubscriptionUI();
         
@@ -142,6 +149,7 @@ onAuthStateChanged(auth, async (user) => {
         window.loadTodayDate();
         if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
       } else { 
+        window.isDataLoadedFromCloud = true;
         if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
         if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
         window.loadTodayDate();
