@@ -66,27 +66,25 @@ window.renderActiveWidgets = function() {
   const emptyState = document.getElementById('emptyWorkspaceState');
 
   if (active.length === 0) {
-    emptyState.classList.remove('hidden-el');
-    launcher.style.display = 'none';
+    if(emptyState) emptyState.classList.remove('hidden-el');
+    if(launcher) launcher.style.display = 'none';
   } else {
-    emptyState.classList.add('hidden-el');
-    launcher.style.display = 'grid';
+    if(emptyState) emptyState.classList.add('hidden-el');
+    if(launcher) launcher.style.display = 'grid';
   }
 
-  launcher.innerHTML = active.map(wId => {
-    const info = AVAILABLE_APPS.find(w => w.id === wId);
-    if(!info) return '';
-    return `
-      <div class="app-icon-card" onclick="window.openPage('${wId}')">
-        <div class="app-icon">${info.icon}</div>
-        <div class="app-icon-title">${info.name}</div>
-      </div>
-    `;
-  }).join('');
-
-  // إخفاء جميع صفحات التطبيقات
-  document.querySelectorAll('.widget-card').forEach(card => card.style.display = 'none');
-  document.getElementById('pageContainer').style.display = 'none';
+  if(launcher) {
+    launcher.innerHTML = active.map(wId => {
+      const info = AVAILABLE_APPS.find(w => w.id === wId);
+      if(!info) return '';
+      return `
+        <div class="app-icon-card" onclick="window.openPage('${wId}')">
+          <div class="app-icon">${info.icon}</div>
+          <div class="app-icon-title">${info.name}</div>
+        </div>
+      `;
+    }).join('');
+  }
 };
 
 window.openPage = function(wId) {
@@ -95,22 +93,55 @@ window.openPage = function(wId) {
     window.openModal('pricingModal');
     return;
   }
-  document.getElementById('appLauncherGrid').style.display = 'none';
-  document.getElementById('emptyWorkspaceState').classList.add('hidden-el');
-  document.getElementById('pageContainer').style.display = 'block';
+  
+  // إخفاء الشاشة الرئيسية
+  const launcher = document.getElementById('appLauncherGrid');
+  if (launcher) launcher.style.display = 'none';
+  
+  const emptyState = document.getElementById('emptyWorkspaceState');
+  if (emptyState) emptyState.classList.add('hidden-el');
+  
+  const pageContainer = document.getElementById('pageContainer');
+  if (pageContainer) pageContainer.style.display = 'block';
 
-  document.querySelectorAll('.widget-card').forEach(card => card.style.display = 'none');
+  // التأكد من إخفاء الكلاس الإجباري عن جميع البطاقات
+  document.querySelectorAll('.widget-card').forEach(card => {
+    card.classList.add('hidden-el');
+    card.style.display = 'none';
+  });
+  
+  // إظهار الصفحة المستهدفة فقط وإزالة الإخفاء عنها
   const target = document.getElementById(wId);
-  if(target) target.style.display = 'block';
+  if(target) {
+    target.classList.remove('hidden-el');
+    target.style.display = 'block';
+  }
 
-  document.getElementById('homeBtnContainer').style.display = 'flex';
-  document.getElementById('toolbarToolsContainer').style.display = 'none';
+  // تبديل أزرار الشريط العلوي
+  const homeBtn = document.getElementById('homeBtnContainer');
+  const toolsBtn = document.getElementById('toolbarToolsContainer');
+  if (homeBtn) homeBtn.style.display = 'flex';
+  if (toolsBtn) toolsBtn.style.display = 'none';
 };
 
 window.goHome = function() {
+  const pageContainer = document.getElementById('pageContainer');
+  if (pageContainer) pageContainer.style.display = 'none';
+  
+  // إعادة إخفاء جميع الصفحات
+  document.querySelectorAll('.widget-card').forEach(card => {
+    card.classList.add('hidden-el');
+    card.style.display = 'none';
+  });
+
+  // إعادة بناء وعرض الشاشة الرئيسية
   window.renderActiveWidgets();
-  document.getElementById('homeBtnContainer').style.display = 'none';
-  document.getElementById('toolbarToolsContainer').style.display = 'flex';
+  
+  // تبديل أزرار الشريط العلوي
+  const homeBtn = document.getElementById('homeBtnContainer');
+  const toolsBtn = document.getElementById('toolbarToolsContainer');
+  if (homeBtn) homeBtn.style.display = 'none';
+  if (toolsBtn) toolsBtn.style.display = 'flex';
 };
 
 window.renderWidgetLibraryModal = function() {
@@ -123,21 +154,24 @@ window.renderWidgetLibraryModal = function() {
     { id: 'widget-habits', name: 'العادات', icon: '✨', desc: 'متتبع العادات اليومية' }
   ];
   const active = window.appState.activeWidgets || [];
-  document.getElementById('widgetLibraryList').innerHTML = AVAILABLE_APPS.map(w => {
-    const isAdded = active.includes(w.id);
-    return `
-      <div class="list-item" style="padding: 12px 16px;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:1.8rem;">${w.icon}</span>
-          <div>
-            <div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div>
-            <div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div>
+  const libraryList = document.getElementById('widgetLibraryList');
+  if (libraryList) {
+    libraryList.innerHTML = AVAILABLE_APPS.map(w => {
+      const isAdded = active.includes(w.id);
+      return `
+        <div class="list-item" style="padding: 12px 16px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:1.8rem;">${w.icon}</span>
+            <div>
+              <div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div>
+            </div>
           </div>
+          ${isAdded ? `<button class="btn btn-danger" onclick="window.removeWidget('${w.id}')">إزالة</button>` : `<button class="btn btn-primary" onclick="window.addWidgetToWorkspace('${w.id}')">تنزيل</button>`}
         </div>
-        ${isAdded ? `<button class="btn btn-danger" onclick="window.removeWidget('${w.id}')">إزالة</button>` : `<button class="btn btn-primary" onclick="window.addWidgetToWorkspace('${w.id}')">تنزيل</button>`}
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+  }
 };
 
 window.addWidgetToWorkspace = (wId) => { 
@@ -160,15 +194,33 @@ window.openModal = async id => {
   if (id === 'addWidgetModal') window.renderWidgetLibraryModal();
   if (id === 'pricingModal' && window.setupPricingModal) window.setupPricingModal();
   if (id === 'adminModal' && window.loadAdminUsers) { await window.loadAdminUsers(); await window.loadAdminCodes(); }
-  document.getElementById(id).classList.add('open');
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.add('open');
 };
-window.closeModal = id => document.getElementById(id).classList.remove('open');
+
+window.closeModal = id => {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove('open');
+};
+
 window.openAuthModal = () => { window.switchToLogin(); window.openModal('authModal'); };
-window.switchToLogin = () => { document.getElementById('viewLogin').style.display = 'block'; document.getElementById('viewRegister').style.display = 'none'; };
-window.switchToRegister = () => { document.getElementById('viewLogin').style.display = 'none'; document.getElementById('viewRegister').style.display = 'block'; };
+window.switchToLogin = () => { 
+  const vLogin = document.getElementById('viewLogin');
+  const vReg = document.getElementById('viewRegister');
+  if(vLogin) vLogin.style.display = 'block'; 
+  if(vReg) vReg.style.display = 'none'; 
+};
+window.switchToRegister = () => { 
+  const vLogin = document.getElementById('viewLogin');
+  const vReg = document.getElementById('viewRegister');
+  if(vLogin) vLogin.style.display = 'none'; 
+  if(vReg) vReg.style.display = 'block'; 
+};
 window.openResetModal = () => { window.closeModal('authModal'); window.openModal('resetModal'); };
 
 window.dismissGlassMessage = () => { 
-  document.getElementById('activeGlassMessage').style.display = 'none'; 
-  document.getElementById('emptyGlassMessage').style.display = 'flex'; 
+  const aMsg = document.getElementById('activeGlassMessage');
+  const eMsg = document.getElementById('emptyGlassMessage');
+  if(aMsg) aMsg.style.display = 'none'; 
+  if(eMsg) eMsg.style.display = 'flex'; 
 };
