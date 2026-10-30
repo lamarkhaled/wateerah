@@ -50,7 +50,6 @@ window.renderWorkspaceVisibility = function() {
   else { onb.classList.add('hidden-el'); mainW.classList.remove('hidden-el'); window.goHome(); }
 };
 
-// ================= نظام التطبيقات والشاشة الرئيسية =================
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
@@ -77,12 +76,7 @@ window.renderActiveWidgets = function() {
     launcher.innerHTML = active.map(wId => {
       const info = AVAILABLE_APPS.find(w => w.id === wId);
       if(!info) return '';
-      return `
-        <div class="app-icon-card" onclick="window.openPage('${wId}')">
-          <div class="app-icon">${info.icon}</div>
-          <div class="app-icon-title">${info.name}</div>
-        </div>
-      `;
+      return `<div class="app-icon-card" onclick="window.openPage('${wId}')"><div class="app-icon">${info.icon}</div><div class="app-icon-title">${info.name}</div></div>`;
     }).join('');
   }
 };
@@ -94,7 +88,6 @@ window.openPage = function(wId) {
     return;
   }
   
-  // إخفاء الشاشة الرئيسية
   const launcher = document.getElementById('appLauncherGrid');
   if (launcher) launcher.style.display = 'none';
   
@@ -104,20 +97,17 @@ window.openPage = function(wId) {
   const pageContainer = document.getElementById('pageContainer');
   if (pageContainer) pageContainer.style.display = 'block';
 
-  // التأكد من إخفاء الكلاس الإجباري عن جميع البطاقات
   document.querySelectorAll('.widget-card').forEach(card => {
     card.classList.add('hidden-el');
     card.style.display = 'none';
   });
   
-  // إظهار الصفحة المستهدفة فقط وإزالة الإخفاء عنها
   const target = document.getElementById(wId);
   if(target) {
     target.classList.remove('hidden-el');
     target.style.display = 'block';
   }
 
-  // تبديل أزرار الشريط العلوي
   const homeBtn = document.getElementById('homeBtnContainer');
   const toolsBtn = document.getElementById('toolbarToolsContainer');
   if (homeBtn) homeBtn.style.display = 'flex';
@@ -128,16 +118,13 @@ window.goHome = function() {
   const pageContainer = document.getElementById('pageContainer');
   if (pageContainer) pageContainer.style.display = 'none';
   
-  // إعادة إخفاء جميع الصفحات
   document.querySelectorAll('.widget-card').forEach(card => {
     card.classList.add('hidden-el');
     card.style.display = 'none';
   });
 
-  // إعادة بناء وعرض الشاشة الرئيسية
   window.renderActiveWidgets();
   
-  // تبديل أزرار الشريط العلوي
   const homeBtn = document.getElementById('homeBtnContainer');
   const toolsBtn = document.getElementById('toolbarToolsContainer');
   if (homeBtn) homeBtn.style.display = 'none';
@@ -158,18 +145,7 @@ window.renderWidgetLibraryModal = function() {
   if (libraryList) {
     libraryList.innerHTML = AVAILABLE_APPS.map(w => {
       const isAdded = active.includes(w.id);
-      return `
-        <div class="list-item" style="padding: 12px 16px;">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <span style="font-size:1.8rem;">${w.icon}</span>
-            <div>
-              <div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div>
-              <div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div>
-            </div>
-          </div>
-          ${isAdded ? `<button class="btn btn-danger" onclick="window.removeWidget('${w.id}')">إزالة</button>` : `<button class="btn btn-primary" onclick="window.addWidgetToWorkspace('${w.id}')">تنزيل</button>`}
-        </div>
-      `;
+      return `<div class="list-item" style="padding: 12px 16px;"><div style="display:flex; align-items:center; gap:12px;"><span style="font-size:1.8rem;">${w.icon}</span><div><div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div><div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div></div></div>${isAdded ? `<button class="btn btn-danger" onclick="window.removeWidget('${w.id}')">إزالة</button>` : `<button class="btn btn-primary" onclick="window.addWidgetToWorkspace('${w.id}')">تنزيل</button>`}</div>`;
     }).join('');
   }
 };
