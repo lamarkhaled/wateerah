@@ -3,21 +3,21 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVe
 import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
-auth.languageCode = 'ar'; // إجبار الإيميلات بالعربي
+auth.languageCode = 'ar'; // إرسال الإيميلات بالعربي
 
 function getLocalYYYYMMDD(dateObj = new Date()) {
   const y = dateObj.getFullYear();
   const m = String(dateObj.getMonth() + 1).padStart(2, '0');
   const d = String(dateObj.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return parseInt(`${y}${m}${d}`, 10);
 }
 
 window.updateSubscriptionUI = function() {
   if (window.userProfile && window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    const todayStr = getLocalYYYYMMDD(new Date());
-    const expiryStr = window.userProfile.expiryDate.replace(/\//g, '-');
+    const todayNum = getLocalYYYYMMDD(new Date());
+    const expiryNum = getLocalYYYYMMDD(new Date(window.userProfile.expiryDate.replace(/\//g, '-')));
 
-    if (todayStr >= expiryStr) { 
+    if (todayNum >= expiryNum) { 
       window.userProfile.isPro = false; 
       window.userProfile.planType = 'الباقة الأساسية'; 
       window.userProfile.expiryDate = ''; 
@@ -91,7 +91,7 @@ window.handleRegister = async () => {
     const cred = await createUserWithEmailAndPassword(auth, email, pass); await sendEmailVerification(cred.user);
     window.userProfile.name = name || 'صديقنا'; window.userProfile.isPro = true; window.userProfile.planType = 'تجربة مجانية'; window.userProfile.trialUsed = true; window.userProfile.totalSubDays = 2;
     const trialExpiry = new Date(); trialExpiry.setDate(trialExpiry.getDate() + 2); 
-    window.userProfile.expiryDate = getLocalYYYYMMDD(trialExpiry);
+    window.userProfile.expiryDate = `${trialExpiry.getFullYear()}-${String(trialExpiry.getMonth() + 1).padStart(2, '0')}-${String(trialExpiry.getDate()).padStart(2, '0')}`;
     
     await setDoc(doc(db, "users", cred.user.uid), { email, profile: window.userProfile, state: window.appState, status: 'نشط', createdAt: new Date().toISOString() });
     window.showToast('تم إنشاء الحساب ومنحك تجربة مجانية'); window.closeModal('authModal');
@@ -118,7 +118,7 @@ window.activateOneTimeFreeTrial = async () => {
   const expiry = new Date(); expiry.setDate(expiry.getDate() + 2);
   
   window.userProfile.isPro = true; window.userProfile.trialUsed = true; window.userProfile.totalSubDays = 2; window.userProfile.planType = 'تجربة مجانية'; 
-  window.userProfile.expiryDate = getLocalYYYYMMDD(expiry);
+  window.userProfile.expiryDate = `${expiry.getFullYear()}-${String(expiry.getMonth() + 1).padStart(2, '0')}-${String(expiry.getDate()).padStart(2, '0')}`;
   
   window.updateSubscriptionUI(); await window.saveCurrentWateerah(true); window.closeModal('pricingModal'); window.showToast('تم تفعيل التجربة');
 };
@@ -131,15 +131,15 @@ window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeIn
     if(!snap.exists()) return window.showToast('الكود غير صحيح أو مستخدم');
     const days = parseInt(snap.data().days) || 30; let startDate = new Date();
     
-    const todayStr = getLocalYYYYMMDD(startDate);
+    const todayNum = getLocalYYYYMMDD(startDate);
     if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') { 
-      const expStr = window.userProfile.expiryDate.replace(/\//g, '-');
-      if (expStr > todayStr) startDate = new Date(expStr); 
+      const expNum = getLocalYYYYMMDD(new Date(window.userProfile.expiryDate.replace(/\//g, '-')));
+      if (expNum > todayNum) startDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-')); 
     }
     
     const expiryDate = new Date(startDate); expiryDate.setDate(expiryDate.getDate() + days);
     window.userProfile.isPro = true; window.userProfile.planType = 'عضوية نشطة'; 
-    window.userProfile.expiryDate = getLocalYYYYMMDD(expiryDate);
+    window.userProfile.expiryDate = `${expiryDate.getFullYear()}-${String(expiryDate.getMonth() + 1).padStart(2, '0')}-${String(expiryDate.getDate()).padStart(2, '0')}`;
     window.userProfile.totalSubDays = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
     
     await deleteDoc(codeRef); await window.saveCurrentWateerah(true); window.updateSubscriptionUI();
