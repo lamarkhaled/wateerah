@@ -85,7 +85,6 @@
         </div>
       </section>
 
-      <!-- شريط التحكم العلوي -->
       <section class="toolbar-ios">
         <div class="toolbar-group">
           <span class="toolbar-label">المظهر:</span>
@@ -93,35 +92,35 @@
           <button class="chip" data-theme-btn="minimal" onclick="window.setTheme('minimal', this)">صباح نقي</button>
           <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
         </div>
-        
-        <!-- زر فتح المكتبة -->
         <div class="toolbar-group" id="toolbarToolsContainer">
           <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة ➕</button>
         </div>
-        
-        <!-- زر العودة للشاشة الرئيسية (يظهر فقط عند فتح تطبيق) -->
         <div class="toolbar-group" id="homeBtnContainer" style="display: none;">
           <button class="btn btn-primary" style="font-weight: 700; padding: 8px 16px;" onclick="window.goHome()">🏠 العودة للرئيسية</button>
         </div>
       </section>
 
-      <!-- حالة المساحة الفارغة -->
       <div id="emptyWorkspaceState" class="hidden-el">
         <h3>لا توجد تطبيقات مثبتة</h3>
         <p>اضغط على زر (المكتبة ➕) لتنزيل التطبيقات والأدوات التي تحتاجها.</p>
         <button class="btn btn-primary" onclick="window.openModal('addWidgetModal')">فتح المكتبة</button>
       </div>
 
-      <!-- الشاشة الرئيسية: شبكة التطبيقات -->
       <div id="appLauncherGrid" class="app-launcher-grid"></div>
 
-      <!-- حاوية الصفحات (التطبيقات المفتوحة) -->
       <div id="pageContainer" style="display: none;">
         
         <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div><span style="font-size: 0.8rem; color: var(--text-secondary);">اضغط على البطاقة لفتح خطتها</span></div>
           <div id="corkboardContainer" class="corkboard-surface"></div>
-          <div class="add-row" style="margin-top: 16px;"><input type="text" id="newVisionTitle" placeholder="عنوان الهدف..."><input type="text" id="newVisionImg" placeholder="رابط الصورة (اختياري)..."><input type="date" id="newVisionDate"><button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت</button></div>
+          <div class="add-row" style="margin-top: 16px; align-items: stretch;">
+            <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex:2;">
+            <label style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;" title="إدراج صورة من جهازك">
+              📷 رفع صورة <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;">
+            </label>
+            <input type="date" id="newVisionDate" style="flex:1;">
+            <button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت</button>
+          </div>
         </div>
 
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
@@ -179,7 +178,6 @@
     </div>
   </main>
 
-  <!-- النوافذ المنبثقة (المكتبة، السجل، وغيرها) -->
   <div id="addWidgetModal" class="modal-overlay"><div class="modal-box" style="max-width: 480px;"><button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button><h3 style="margin-bottom: 6px;">المكتبة</h3><p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف وثبت التطبيقات في شاشتك الرئيسية.</p><div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div></div></div>
 
   <div id="visionDetailModal" class="modal-overlay">
