@@ -12,7 +12,7 @@ window.isDataLoadedFromCloud = false;
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
-window.userProfile = { name: 'لمار', planType: 'الباقة المتقدمة', isPro: true, expiryDate: 'دائم', totalSubDays: 365, trialUsed: true };
+window.userProfile = { name: 'صديقنا', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 0, trialUsed: false };
 window.appState = {
   hasStarted: true, 
   theme: 'default', 
@@ -31,6 +31,7 @@ window.autoSave = () => {
 window.saveCurrentWateerah = async (manual) => {
   if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
   window.appState.dailyRecords[window.currentDateStr] = { focusGoal: document.getElementById('focusGoalInput')?.value || '', habits: window.appState.habits || [] };
+  
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   
   const user = auth.currentUser;
@@ -85,8 +86,11 @@ onAuthStateChanged(auth, async (user) => {
     if(lockBtn) lockBtn.style.display = 'inline-block';
     if(profilePill) profilePill.style.display = 'flex';
 
-    if (user.email === ADMIN_EMAIL) { if(adminBtn) adminBtn.style.display = 'inline-flex'; } 
-    else { if(adminBtn) adminBtn.style.display = 'none'; }
+    if (user.email === ADMIN_EMAIL) { 
+        if(adminBtn) adminBtn.style.display = 'inline-flex'; 
+    } else { 
+        if(adminBtn) adminBtn.style.display = 'none'; 
+    }
 
     const uidDisp = document.getElementById('profileUidDisplay'); 
     if(uidDisp) uidDisp.value = user.uid;
@@ -103,6 +107,8 @@ onAuthStateChanged(auth, async (user) => {
       } 
     } catch(e) {}
     
+    if (window.updateSubscriptionUI) window.updateSubscriptionUI();
+
     const headerName = document.getElementById('headerUserName');
     const headerAvatar = document.getElementById('headerAvatar');
     const profileNameInput = document.getElementById('profileNameInput');
