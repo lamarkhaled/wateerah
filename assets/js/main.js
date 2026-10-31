@@ -48,7 +48,12 @@ window.saveCurrentWateerah = async (manual) => {
   if (!user) return;
 
   try { 
-    await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); 
+    await setDoc(doc(db, "users", user.uid), { 
+      email: user.email, 
+      profile: window.userProfile, 
+      state: window.appState, 
+      updatedAt: new Date().toISOString() 
+    }, { merge: true }); 
   } catch(e) {}
 };
 
@@ -80,7 +85,7 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-// تحميل البيانات المحلية فوراً لضمان سرعة العرض
+// 1. تحميل البيانات المحلية أولاً لضمان عدم ضياع أي شيء
 const savedLocal = localStorage.getItem('wateerah_local_state');
 if (savedLocal) { 
   try { 
@@ -95,7 +100,7 @@ setTimeout(() => {
   window.loadTodayDate();
 }, 100);
 
-// نظام الحماية المستقر (لا يتدخل إلا عند تسجيل الخروج المتعمد)
+// 2. التحقق من الحساب وسحب البيانات السحابية القديمة (إن وجدت) دون كتابة فوقها بشكل خاطئ
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
@@ -121,11 +126,15 @@ onAuthStateChanged(auth, async (user) => {
       if(snap.exists()) { 
         const d = snap.data(); 
         if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
-        if(d.state) {
+        if(d.state && Object.keys(d.state).length > 0) {
+           // دمج البيانات الذكي: إذا كان في السحابة بيانات، نعتمدها ونحدث المحلي
            window.appState = { ...window.appState, ...d.state };
            localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
         }
-      } 
+      } else {
+        // إذا كان الحساب جديداً تماماً في السحابة، نقوم برفع الحالة المحلية الحالية له فوراً
+        await window.saveCurrentWateerah(true);
+      }
     } catch(e) {}
     
     const headerName = document.getElementById('headerUserName');
@@ -140,7 +149,6 @@ onAuthStateChanged(auth, async (user) => {
     if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
   } else {
-    // تفعيل نافذة القفل فقط إذا لم يكن هناك مستخدم مسجل
     if(authModal) authModal.classList.add('open');
     if(lockBtn) lockBtn.style.display = 'none';
     if(guestBtn) guestBtn.style.display = 'inline-block';
