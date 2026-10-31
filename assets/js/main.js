@@ -85,20 +85,6 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-const savedLocal = localStorage.getItem('wateerah_local_state');
-if (savedLocal) { 
-  try { 
-    window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; 
-  } catch(e) {} 
-}
-
-setTimeout(() => { 
-  if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
-  if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
-  if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-  window.loadTodayDate();
-}, 100);
-
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
@@ -130,9 +116,7 @@ onAuthStateChanged(auth, async (user) => {
            window.appState = { ...window.appState, ...d.state };
            localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
         }
-      } else {
-        await window.saveCurrentWateerah(true);
-      }
+      } 
     } catch(e) {}
     
     const headerName = document.getElementById('headerUserName');
@@ -140,7 +124,7 @@ onAuthStateChanged(auth, async (user) => {
     const profileNameInput = document.getElementById('profileNameInput');
     if(headerName) headerName.innerText = window.userProfile.name || user.email; 
     if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'ل')[0]; 
-    if(profilePill) profilePill.value = window.userProfile.name || '';
+    if(profileNameInput) profileNameInput.value = window.userProfile.name || '';
     
     window.loadTodayDate();
     if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
