@@ -43,10 +43,13 @@ window.saveCurrentWateerah = async (manual) => {
     habits: window.appState.habits || []
   };
 
+  // حفظ محلياً على الجهاز
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
+  
   const user = auth.currentUser;
   if (!user) return;
 
+  // مزامنة سحابية مع حسابك لكي يظهر في الأجهزة الأخرى
   try { 
     await setDoc(doc(db, "users", user.uid), { 
       email: user.email, 
@@ -54,6 +57,7 @@ window.saveCurrentWateerah = async (manual) => {
       state: window.appState, 
       updatedAt: new Date().toISOString() 
     }, { merge: true }); 
+    if(manual && window.showToast) window.showToast('تمت المزامنة سحابياً بنجاح ☁️');
   } catch(e) {}
 };
 
@@ -85,7 +89,7 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-// استرجاع البيانات المحفوظة محلياً فوراً
+// 1. استرجاع البيانات المحفوظة محلياً فوراً
 const savedLocal = localStorage.getItem('wateerah_local_state');
 if (savedLocal) { 
   try { 
@@ -100,6 +104,7 @@ setTimeout(() => {
   window.loadTodayDate();
 }, 100);
 
+// 2. إدارة حالة الاتصال والمزامنة عند تسجيل الدخول
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
@@ -126,11 +131,14 @@ onAuthStateChanged(auth, async (user) => {
         const d = snap.data(); 
         if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
         if(d.state && Object.keys(d.state).length > 0) {
-           // دمج البيانات السحابية والمحلية بذكاء
+           // سحب البيانات من السحابة لضمان تطابق الأجهزة (لابتوب وآيباد)
            window.appState = { ...window.appState, ...d.state };
            localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
         }
-      } 
+      } else {
+        // إذا كان الحساب جديداً، يتم رفع البيانات الحالية للسحابة
+        await window.saveCurrentWateerah(true);
+      }
     } catch(e) {}
     
     const headerName = document.getElementById('headerUserName');
@@ -145,7 +153,6 @@ onAuthStateChanged(auth, async (user) => {
     if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
   } else {
-    // فتح نافذة الدخول إذا لم يكن مسجلاً
     if(authModal) authModal.classList.add('open');
     if(lockBtn) lockBtn.style.display = 'none';
     if(guestBtn) guestBtn.style.display = 'inline-block';
