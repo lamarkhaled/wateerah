@@ -15,7 +15,8 @@ window.appState = {
   hasStarted: false, theme: 'default', activeWidgets: [], widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
   dailyRecords: {}, 
   notes: [],
-  allocations: [], // سجل التوزيع المالي الجديد
+  allocations: [],
+  monthlyExpenses: [],
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
 };
 
@@ -128,7 +129,14 @@ setTimeout(() => {
   window.loadTodayDate();
 }, 200);
 
+let userSnapshotUnsubscribe = null;
+
 onAuthStateChanged(auth, async (user) => {
+  if (userSnapshotUnsubscribe) {
+      userSnapshotUnsubscribe();
+      userSnapshotUnsubscribe = null;
+  }
+
   setTimeout(async () => {
       if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
         const guestBtn = document.getElementById('guestAuthBtn'); if(guestBtn) guestBtn.style.display = 'none';
@@ -137,17 +145,28 @@ onAuthStateChanged(auth, async (user) => {
 
         if (user.email === ADMIN_EMAIL) { const adminBtn = document.getElementById('adminPanelBtn'); if(adminBtn) adminBtn.style.display = 'inline-flex'; }
 
-        try { const snap = await getDoc(doc(db, "users", user.uid)); if(snap.exists()) { const d = snap.data(); if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; if(d.state) window.appState = { ...window.appState, ...d.state }; } } catch(e) {}
-        
-        window.isDataLoadedFromCloud = true; 
+        // نظام المزامنة اللحظية الجديد 
+        userSnapshotUnsubscribe = onSnapshot(doc(db, "users", user.uid), (snap) => {
+            if(snap.exists()) {
+                const d = snap.data(); 
+                if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
+                if(d.state) window.appState = { ...window.appState, ...d.state };
+                
+                window.isDataLoadedFromCloud = true;
 
-        if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
-        if(window.updateSubscriptionUI) window.updateSubscriptionUI();
+                if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
+                if(window.updateSubscriptionUI) window.updateSubscriptionUI();
+                
+                document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; 
+                document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; 
+                document.getElementById('profileNameInput').value = window.userProfile.name || '';
+                
+                window.loadTodayDate();
+                if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
+                if(window.renderLists) window.renderLists(); // تحديث الواجهة فوراً
+            }
+        });
         
-        document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; document.getElementById('profileNameInput').value = window.userProfile.name || '';
-        
-        window.loadTodayDate();
-        if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
       } else { 
         window.isDataLoadedFromCloud = true;
         if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
