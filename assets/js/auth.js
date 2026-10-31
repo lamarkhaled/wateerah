@@ -1,8 +1,8 @@
 import { auth, db } from './firebase-config.js';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
-// دالة التبديل بين نماذج شاشة القفل (تسجيل دخول، إنشاء حساب، استعادة كلمة المرور)
 window.switchAuthView = function(view) {
   const loginView = document.getElementById('viewLogin');
   const regView = document.getElementById('viewRegister');
@@ -62,7 +62,6 @@ window.handleRegister = async () => {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     window.userProfile.name = name || 'لمار';
     
-    // حفظ ملف المستخدم الأولي في السحابة
     await setDoc(doc(db, "users", cred.user.uid), { 
       email: email, 
       profile: window.userProfile, 
