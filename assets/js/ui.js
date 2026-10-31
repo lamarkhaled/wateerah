@@ -32,11 +32,6 @@ window.applyTheme = function(name) {
 };
 
 window.setTheme = (name, btn) => { 
-  if (name === 'dark' && !window.userProfile?.isPro) {
-    window.showToast('مظهر "سكون ليلي" حصري للمشتركين في الباقة المتقدمة 🌟');
-    window.openModal('pricingModal');
-    return;
-  }
   window.applyTheme(name); window.autoSave(); 
 };
 
@@ -50,12 +45,11 @@ window.renderWorkspaceVisibility = function() {
   else { onb.classList.add('hidden-el'); mainW.classList.remove('hidden-el'); window.goHome(); }
 };
 
-// ================= نظام التطبيقات والشاشة الرئيسية =================
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
     { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
-    { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية (حصري)' },
+    { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
     { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة' },
     { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم' },
     { id: 'widget-habits', name: 'العادات', icon: '✨', desc: 'متتبع العادات اليومية' }
@@ -88,12 +82,6 @@ window.renderActiveWidgets = function() {
 };
 
 window.openPage = function(wId) {
-  if (wId === 'widget-finance' && !window.userProfile?.isPro) {
-    window.showToast('تطبيق "المالية" حصري للمشتركين 🌟');
-    window.openModal('pricingModal');
-    return;
-  }
-  
   // إخفاء الشاشة الرئيسية
   const launcher = document.getElementById('appLauncherGrid');
   if (launcher) launcher.style.display = 'none';
@@ -104,20 +92,20 @@ window.openPage = function(wId) {
   const pageContainer = document.getElementById('pageContainer');
   if (pageContainer) pageContainer.style.display = 'block';
 
-  // التأكد من إخفاء الكلاس الإجباري عن جميع البطاقات
+  // التأكد من إخفاء جميع البطاقات
   document.querySelectorAll('.widget-card').forEach(card => {
     card.classList.add('hidden-el');
     card.style.display = 'none';
   });
   
-  // إظهار الصفحة المستهدفة فقط وإزالة الإخفاء عنها
+  // إظهار الصفحة المستهدفة فقط 
   const target = document.getElementById(wId);
   if(target) {
     target.classList.remove('hidden-el');
     target.style.display = 'block';
   }
 
-  // تبديل أزرار الشريط العلوي
+  // تبديل أزرار الشريط العلوي للعودة
   const homeBtn = document.getElementById('homeBtnContainer');
   const toolsBtn = document.getElementById('toolbarToolsContainer');
   if (homeBtn) homeBtn.style.display = 'flex';
@@ -128,16 +116,13 @@ window.goHome = function() {
   const pageContainer = document.getElementById('pageContainer');
   if (pageContainer) pageContainer.style.display = 'none';
   
-  // إعادة إخفاء جميع الصفحات
   document.querySelectorAll('.widget-card').forEach(card => {
     card.classList.add('hidden-el');
     card.style.display = 'none';
   });
 
-  // إعادة بناء وعرض الشاشة الرئيسية
   window.renderActiveWidgets();
   
-  // تبديل أزرار الشريط العلوي
   const homeBtn = document.getElementById('homeBtnContainer');
   const toolsBtn = document.getElementById('toolbarToolsContainer');
   if (homeBtn) homeBtn.style.display = 'none';
@@ -148,7 +133,7 @@ window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
     { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
-    { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية (حصري للمشتركين)' },
+    { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
     { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة والصور' },
     { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم لليوم' },
     { id: 'widget-habits', name: 'العادات', icon: '✨', desc: 'متتبع العادات اليومية' }
@@ -175,11 +160,6 @@ window.renderWidgetLibraryModal = function() {
 };
 
 window.addWidgetToWorkspace = (wId) => { 
-  if (wId === 'widget-finance' && !window.userProfile?.isPro) {
-    window.showToast('تطبيق "المالية" حصري للمشتركين 🌟');
-    window.openModal('pricingModal');
-    return;
-  }
   if (!window.appState.activeWidgets) window.appState.activeWidgets = []; 
   if (!window.appState.activeWidgets.includes(wId)) window.appState.activeWidgets.push(wId); 
   window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); 
@@ -204,23 +184,8 @@ window.closeModal = id => {
 };
 
 window.openAuthModal = () => { window.switchToLogin(); window.openModal('authModal'); };
-window.switchToLogin = () => { 
-  const vLogin = document.getElementById('viewLogin');
-  const vReg = document.getElementById('viewRegister');
-  if(vLogin) vLogin.style.display = 'block'; 
-  if(vReg) vReg.style.display = 'none'; 
-};
-window.switchToRegister = () => { 
-  const vLogin = document.getElementById('viewLogin');
-  const vReg = document.getElementById('viewRegister');
-  if(vLogin) vLogin.style.display = 'none'; 
-  if(vReg) vReg.style.display = 'block'; 
-};
+window.switchToLogin = () => { const vLogin = document.getElementById('viewLogin'); const vReg = document.getElementById('viewRegister'); if(vLogin) vLogin.style.display = 'block'; if(vReg) vReg.style.display = 'none'; };
+window.switchToRegister = () => { const vLogin = document.getElementById('viewLogin'); const vReg = document.getElementById('viewRegister'); if(vLogin) vLogin.style.display = 'none'; if(vReg) vReg.style.display = 'block'; };
 window.openResetModal = () => { window.closeModal('authModal'); window.openModal('resetModal'); };
 
-window.dismissGlassMessage = () => { 
-  const aMsg = document.getElementById('activeGlassMessage');
-  const eMsg = document.getElementById('emptyGlassMessage');
-  if(aMsg) aMsg.style.display = 'none'; 
-  if(eMsg) eMsg.style.display = 'flex'; 
-};
+window.dismissGlassMessage = () => { const aMsg = document.getElementById('activeGlassMessage'); const eMsg = document.getElementById('emptyGlassMessage'); if(aMsg) aMsg.style.display = 'none'; if(eMsg) eMsg.style.display = 'flex'; };
