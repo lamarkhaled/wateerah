@@ -151,7 +151,7 @@
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
           
-          <!-- قسم التوزيع الديناميكي الجديد (بالأعلى) -->
+          <!-- قسم التوزيع الديناميكي -->
           <div style="margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
               <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل (نسبة مئوية)</span>
@@ -174,10 +174,28 @@
             </div>
           </div>
 
-          <!-- البنوك والأمنيات (بالأسفل) -->
+          <!-- قسم قائمة الأمنيات (متطور ومستقل) -->
+          <div style="margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
+            <div style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">قائمة الأمنيات (الادخار للأهداف)</div>
+            <div id="wishlistCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 16px;"></div>
+            
+            <div class="add-row" style="align-items: stretch;">
+              <input type="text" id="newWishTitle" placeholder="اسم الغرض..." style="flex:2;">
+              <input type="number" id="newWishCost" placeholder="السعر الإجمالي" style="flex:1;">
+              <input type="text" id="newWishStore" placeholder="من أين؟ (مثال: أمازون)" style="flex:1.5;">
+            </div>
+            <div class="add-row" style="margin-top: 8px; align-items: stretch;">
+              <input type="url" id="newWishLink" placeholder="رابط المنتج (اختياري)..." style="flex:2;">
+              <label style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;" title="إدراج صورة الغرض">
+                📷 إرفاق صورة <input type="file" id="newWishImgFile" accept="image/*" style="display:none;">
+              </label>
+              <button class="btn btn-primary" style="flex:1;" onclick="window.addWishlistItem()">إضافة للأمنيات</button>
+            </div>
+          </div>
+
+          <!-- البنوك والاشتراكات -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">البنوك والحسابات المالية</div><div id="banksContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px;"></div><div class="add-row"><input type="text" id="newBankName" placeholder="اسم البنك (مثل: الراجحي)..."><button class="btn btn-primary" onclick="window.addBank()">إضافة بنك</button></div></div>
-            <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">قائمة الأمنيات</div><ul id="wishlistList" class="item-list"></ul><div class="add-row"><input type="text" id="newWishTitle" placeholder="الأمنية..."><input type="number" id="newWishCost" placeholder="التكلفة"><button class="btn btn-primary" onclick="window.addWishlistItem()">إضافة</button></div></div>
             <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الاشتراكات الشهرية</div><ul id="subscriptionsList" class="item-list"></ul><div class="add-row"><input type="text" id="newSubName" placeholder="الاشتراك..."><input type="number" id="newSubCost" placeholder="المبلغ"><button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button></div></div>
           </div>
         </div>
