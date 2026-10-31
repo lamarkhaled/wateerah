@@ -2,7 +2,9 @@ window.showToast = function(msg) {
   const c = document.getElementById('toastContainer');
   if(!c) return;
   const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
-  c.appendChild(t); setTimeout(() => t.remove(), 3200);
+  c.appendChild(t); 
+  // زيادة وقت بقاء الرسالة إلى 7 ثوانٍ بدلاً من 3 ثوانٍ
+  setTimeout(() => t.remove(), 7000); 
 };
 
 window.updateDayNightGreeting = function() {
