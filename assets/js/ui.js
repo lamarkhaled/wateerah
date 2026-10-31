@@ -15,15 +15,6 @@ window.updateDayNightGreeting = function() {
   const userName = window.userProfile?.name || 'صديقنا';
   const wTxt = document.getElementById('welcomeText'); 
   if(wTxt) wTxt.innerText = `${greetingWord}، أهلاً بك يا ${userName}.`;
-  
-  const oTxt = document.getElementById('onboardingGreeting'); 
-  if(oTxt) oTxt.innerText = `${greetingWord}، أهلاً بك في وتيرة`;
-  
-  const pTxt = document.getElementById('onboardingTimePill'); 
-  if(pTxt) pTxt.innerText = isMorning ? 'الفترة الصباحية' : 'الفترة المسائية';
-  
-  const dTxt = document.getElementById('dayNightSubtext'); 
-  if(dTxt) dTxt.innerText = isMorning ? 'بداية يوم مشرقة، رتّب أولوياتك بهدوء.' : 'أمسية هادئة، راجع إنجازاتك وخطط للغد.';
 };
 
 window.applyTheme = function(name) {
@@ -31,13 +22,15 @@ window.applyTheme = function(name) {
   window.appState.theme = name; document.querySelectorAll('[data-theme-btn]').forEach(b => b.classList.toggle('active', b.getAttribute('data-theme-btn') === name));
 };
 
-window.setTheme = (name, btn) => { 
-  window.applyTheme(name); window.autoSave(); 
-};
-
+window.setTheme = (name, btn) => { window.applyTheme(name); window.autoSave(); };
 window.selectOnboardingTheme = (themeName, el) => { document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active')); el.classList.add('active'); window.applyTheme(themeName); };
 
-window.startWorkspaceFirstTime = () => { window.appState.hasStarted = true; localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState)); window.renderWorkspaceVisibility(); window.autoSave(); };
+window.startWorkspaceFirstTime = () => { 
+  window.appState.hasStarted = true; 
+  localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState)); 
+  window.renderWorkspaceVisibility(); 
+  window.autoSave(); 
+};
 
 window.renderWorkspaceVisibility = function() {
   const onb = document.getElementById('onboardingScreen'); 
@@ -49,7 +42,6 @@ window.renderWorkspaceVisibility = function() {
   } else { 
     onb.classList.add('hidden-el'); 
     mainW.classList.remove('hidden-el'); 
-    
     const pageContainer = document.getElementById('pageContainer');
     if (!pageContainer || pageContainer.style.display !== 'block') {
         window.goHome(); 
@@ -61,7 +53,7 @@ window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
     { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
-    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'مشاريع التصميم وتسويق العسل' },
+    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'إدارة المشاريع والحملات' },
     { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
     { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة' },
     { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم' },
@@ -95,25 +87,13 @@ window.renderActiveWidgets = function() {
 };
 
 window.openPage = function(wId) {
-  const launcher = document.getElementById('appLauncherGrid');
-  if (launcher) launcher.style.display = 'none';
-  
-  const emptyState = document.getElementById('emptyWorkspaceState');
-  if (emptyState) emptyState.classList.add('hidden-el');
-  
-  const pageContainer = document.getElementById('pageContainer');
-  if (pageContainer) pageContainer.style.display = 'block';
+  const launcher = document.getElementById('appLauncherGrid'); if (launcher) launcher.style.display = 'none';
+  const emptyState = document.getElementById('emptyWorkspaceState'); if (emptyState) emptyState.classList.add('hidden-el');
+  const pageContainer = document.getElementById('pageContainer'); if (pageContainer) pageContainer.style.display = 'block';
 
-  document.querySelectorAll('.widget-card').forEach(card => {
-    card.classList.add('hidden-el');
-    card.style.display = 'none';
-  });
-  
+  document.querySelectorAll('.widget-card').forEach(card => { card.classList.add('hidden-el'); card.style.display = 'none'; });
   const target = document.getElementById(wId);
-  if(target) {
-    target.classList.remove('hidden-el');
-    target.style.display = 'block';
-  }
+  if(target) { target.classList.remove('hidden-el'); target.style.display = 'block'; }
 
   const homeBtn = document.getElementById('homeBtnContainer');
   const toolsBtn = document.getElementById('toolbarToolsContainer');
@@ -122,14 +102,8 @@ window.openPage = function(wId) {
 };
 
 window.goHome = function() {
-  const pageContainer = document.getElementById('pageContainer');
-  if (pageContainer) pageContainer.style.display = 'none';
-  
-  document.querySelectorAll('.widget-card').forEach(card => {
-    card.classList.add('hidden-el');
-    card.style.display = 'none';
-  });
-
+  const pageContainer = document.getElementById('pageContainer'); if (pageContainer) pageContainer.style.display = 'none';
+  document.querySelectorAll('.widget-card').forEach(card => { card.classList.add('hidden-el'); card.style.display = 'none'; });
   window.renderActiveWidgets();
   
   const homeBtn = document.getElementById('homeBtnContainer');
@@ -142,9 +116,9 @@ window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
     { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
-    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'مشاريع التصميم وتسويق العسل' },
+    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'إدارة المشاريع والحملات' },
     { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
-    { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة والصور' },
+    { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة' },
     { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم لليوم' },
     { id: 'widget-habits', name: 'العادات', icon: '✨', desc: 'متتبع العادات اليومية' }
   ];
@@ -182,19 +156,11 @@ window.removeWidget = (wId) => {
 
 window.openModal = async id => {
   if (id === 'addWidgetModal') window.renderWidgetLibraryModal();
-  if (id === 'pricingModal' && window.setupPricingModal) window.setupPricingModal();
-  if (id === 'adminModal' && window.loadAdminUsers) { await window.loadAdminUsers(); await window.loadAdminCodes(); }
-  const modal = document.getElementById(id);
-  if (modal) modal.classList.add('open');
+  const modal = document.getElementById(id); if (modal) modal.classList.add('open');
 };
 
 window.closeModal = id => {
-  const modal = document.getElementById(id);
-  if (modal) modal.classList.remove('open');
+  const modal = document.getElementById(id); if (modal) modal.classList.remove('open');
 };
 
-window.openAuthModal = () => { window.switchToLogin(); window.openModal('authModal'); };
-window.switchToLogin = () => { const vLogin = document.getElementById('viewLogin'); const vReg = document.getElementById('viewRegister'); if(vLogin) vLogin.style.display = 'block'; if(vReg) vReg.style.display = 'none'; };
-window.switchToRegister = () => { const vLogin = document.getElementById('viewLogin'); const vReg = document.getElementById('viewRegister'); if(vLogin) vLogin.style.display = 'none'; if(vReg) vReg.style.display = 'block'; };
-window.openResetModal = () => { window.closeModal('authModal'); window.openModal('resetModal'); };
-window.dismissGlassMessage = () => { const aMsg = document.getElementById('activeGlassMessage'); const eMsg = document.getElementById('emptyGlassMessage'); if(aMsg) aMsg.style.display = 'none'; if(eMsg) eMsg.style.display = 'flex'; };
+window.openAuthModal = () => { window.openModal('authModal'); };
