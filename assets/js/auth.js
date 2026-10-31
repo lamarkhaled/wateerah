@@ -3,7 +3,28 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVe
 import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
-auth.languageCode = 'ar'; // إرسال الإيميلات بالعربي
+auth.languageCode = 'ar';
+
+window.switchAuthView = function(view) {
+  const loginView = document.getElementById('viewLogin');
+  const regView = document.getElementById('viewRegister');
+  const resetView = document.getElementById('viewReset');
+  const sub = document.getElementById('authModalSub');
+
+  if(!loginView || !regView || !resetView) return;
+  loginView.style.display = 'none'; regView.style.display = 'none'; resetView.style.display = 'none';
+
+  if (view === 'login') {
+    loginView.style.display = 'block';
+    if(sub) sub.innerText = 'سجلي دخولك للوصول إلى مساحتك الخاصة';
+  } else if (view === 'register') {
+    regView.style.display = 'block';
+    if(sub) sub.innerText = 'أنشئي حسابك الجديد لتبدئي ترتيب حياتك';
+  } else if (view === 'reset') {
+    resetView.style.display = 'block';
+    if(sub) sub.innerText = 'أدخلي بريدك لإرسال رابط الاستعادة';
+  }
+};
 
 function getLocalYYYYMMDD(dateObj = new Date()) {
   const y = dateObj.getFullYear();
@@ -37,7 +58,6 @@ window.updateSubscriptionUI = function() {
 
 window.setupPricingModal = function() {
   window.updateSubscriptionUI(); 
-  
   const isSubscribed = window.userProfile?.isPro || false;
   const unsubView = document.getElementById('pricingViewUnsubscribed');
   const subView = document.getElementById('pricingViewSubscribed');
@@ -48,30 +68,12 @@ window.setupPricingModal = function() {
   if (trialBox) trialBox.style.display = (!isSubscribed && !window.userProfile?.trialUsed) ? 'block' : 'none';
 
   if (isSubscribed && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    const now = new Date();
-    now.setHours(0,0,0,0);
-    const expiryDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-'));
-    expiryDate.setHours(0,0,0,0);
+    const now = new Date(); now.setHours(0,0,0,0);
+    const expiryDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-')); expiryDate.setHours(0,0,0,0);
     
-    const diffTime = expiryDate.getTime() - now.getTime();
-    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    let diffDays = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     
-    if (diffDays <= 0) {
-      window.userProfile.isPro = false;
-      window.userProfile.planType = 'الباقة الأساسية';
-      window.userProfile.expiryDate = '';
-      if (window.saveCurrentWateerah) window.saveCurrentWateerah(true);
-      
-      if (unsubView) unsubView.style.display = 'block';
-      if (subView) subView.style.display = 'none';
-      if (trialBox) trialBox.style.display = (!window.userProfile?.trialUsed) ? 'block' : 'none';
-      
-      const badge = document.getElementById('planBadge'); 
-      if(badge) badge.innerText = 'الباقة الأساسية';
-      const upg = document.getElementById('upgradeBtn'); 
-      if(upg) upg.innerText = 'تفعيل الاشتراك';
-      return; 
-    }
+    if (diffDays <= 0) return window.updateSubscriptionUI();
 
     const totalDays = window.userProfile.totalSubDays || 30;
     const daysRem = document.getElementById('daysRemainingText'); 
@@ -86,50 +88,87 @@ window.setupPricingModal = function() {
 };
 
 window.handleRegister = async () => {
-  const name = document.getElementById('regName').value.trim(); const email = document.getElementById('regEmail').value.trim(); const pass = document.getElementById('regPassword').value;
+  const name = document.getElementById('regName')?.value.trim(); 
+  const email = document.getElementById('regEmail')?.value.trim(); 
+  const pass = document.getElementById('regPassword')?.value;
+  if(!email || !pass) return window.showToast('يرجى تعبئة كافة الحقول المطلوبة');
+
   try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass); await sendEmailVerification(cred.user);
-    window.userProfile.name = name || 'صديقنا'; window.userProfile.isPro = true; window.userProfile.planType = 'تجربة مجانية'; window.userProfile.trialUsed = true; window.userProfile.totalSubDays = 2;
-    const trialExpiry = new Date(); trialExpiry.setDate(trialExpiry.getDate() + 2); 
-    window.userProfile.expiryDate = `${trialExpiry.getFullYear()}-${String(trialExpiry.getMonth() + 1).padStart(2, '0')}-${String(trialExpiry.getDate()).padStart(2, '0')}`;
+    await signOut(auth); localStorage.removeItem('wateerah_local_state');
+    const cred = await createUserWithEmailAndPassword(auth, email, pass); 
+    await sendEmailVerification(cred.user);
     
+    window.userProfile = { name: name || 'صديقنا', isPro: false, planType: 'الباقة الأساسية', trialUsed: false, totalSubDays: 0, expiryDate: '' };
+    
+    window.appState = {
+      hasStarted: true, theme: 'default', 
+      activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
+      widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
+      dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
+      visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] }
+    };
+
     await setDoc(doc(db, "users", cred.user.uid), { email, profile: window.userProfile, state: window.appState, status: 'نشط', createdAt: new Date().toISOString() });
-    window.showToast('تم إنشاء الحساب ومنحك تجربة مجانية'); window.closeModal('authModal');
-  } catch(e) { window.showToast('خطأ: ' + e.message); }
+    
+    window.unverifiedUserObject = cred.user;
+    await signOut(auth);
+    document.getElementById('authModal').style.display = 'none';
+    window.openModal('verificationNoticeModal');
+    window.showToast('تم إرسال رابط التفعيل إلى بريدك الإلكتروني.');
+
+  } catch(e) { window.showToast('حدث خطأ في التسجيل، تأكدي من صحة البريد أو أنه غير مستخدم مسبقاً.'); }
 };
 
 window.handleLogin = async () => {
-  const email = document.getElementById('loginEmail').value.trim(); const pass = document.getElementById('loginPassword').value;
+  const email = document.getElementById('loginEmail')?.value.trim(); 
+  const pass = document.getElementById('loginPassword')?.value;
+  if(!email || !pass) return window.showToast('يرجى إدخال البريد وكلمة المرور');
+
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
-    if (!cred.user.emailVerified && cred.user.email !== ADMIN_EMAIL) { window.unverifiedUserObject = cred.user; window.closeModal('authModal'); window.openModal('verificationNoticeModal'); await signOut(auth); return; }
-    window.closeModal('authModal'); window.showToast('مرحباً بك مجدداً!');
-    location.reload();
-  } catch(e) { window.showToast('بيانات الدخول غير صحيحة'); }
+    if (!cred.user.emailVerified && cred.user.email !== ADMIN_EMAIL) { 
+        window.unverifiedUserObject = cred.user; 
+        document.getElementById('authModal').style.display = 'none';
+        window.openModal('verificationNoticeModal'); 
+        await signOut(auth); 
+        return; 
+    }
+    window.showToast('مرحباً بك مجدداً في مساحتك الخاصة!');
+    // تم إلغاء location.reload() لكي تفتح المنصة بسلاسة ويبقى التنبيه ظاهراً
+  } catch(e) { window.showToast('عذراً، البريد الإلكتروني أو كلمة المرور غير صحيحة.'); }
 };
 
 window.handleLogout = async () => { await signOut(auth); localStorage.removeItem('wateerah_local_state'); location.reload(); };
 
-window.handleResetPassword = async () => { const email = document.getElementById('resetEmail').value.trim(); if(!email) return window.showToast('أدخل البريد'); try { await sendPasswordResetEmail(auth, email); window.showToast('تم إرسال رابط الاستعادة'); window.closeModal('resetModal'); } catch(e) { window.showToast('البريد غير مسجل'); } };
+window.handleResetPassword = async () => { 
+    const email = document.getElementById('resetEmail')?.value.trim(); 
+    if(!email) return window.showToast('يرجى إدخال البريد الإلكتروني أولاً.'); 
+    try { await sendPasswordResetEmail(auth, email); window.showToast('تم إرسال رابط الاستعادة إلى بريدك بنجاح.'); window.switchAuthView('login'); } 
+    catch(e) { window.showToast('البريد غير مسجل لدينا أو حدث خطأ.'); } 
+};
 
-window.resendVerificationEmailDirectly = async () => { if(!window.unverifiedUserObject) return window.showToast('سجل دخولك أولاً'); try { await sendEmailVerification(window.unverifiedUserObject); window.showToast('تم إرسال الرابط'); window.closeModal('verificationNoticeModal'); } catch(e) {} };
+window.resendVerificationEmailDirectly = async () => { 
+    if(!window.unverifiedUserObject) return window.showToast('الرجاء تسجيل الدخول أولاً.'); 
+    try { await sendEmailVerification(window.unverifiedUserObject); window.showToast('تم إعادة إرسال رابط التفعيل.'); window.closeModal('verificationNoticeModal'); } 
+    catch(e) {} 
+};
 
 window.activateOneTimeFreeTrial = async () => {
-  if (!auth.currentUser) return window.showToast('سجل الدخول أولاً'); if (window.userProfile.trialUsed) return window.showToast('استخدمت التجربة مسبقاً');
+  if (!auth.currentUser) return window.showToast('يجب تسجيل الدخول لتفعيل التجربة.'); 
+  if (window.userProfile.trialUsed) return window.showToast('عذراً، لقد استخدمت التجربة المجانية مسبقاً.');
   const expiry = new Date(); expiry.setDate(expiry.getDate() + 2);
-  
   window.userProfile.isPro = true; window.userProfile.trialUsed = true; window.userProfile.totalSubDays = 2; window.userProfile.planType = 'تجربة مجانية'; 
   window.userProfile.expiryDate = `${expiry.getFullYear()}-${String(expiry.getMonth() + 1).padStart(2, '0')}-${String(expiry.getDate()).padStart(2, '0')}`;
-  
-  window.updateSubscriptionUI(); await window.saveCurrentWateerah(true); window.closeModal('pricingModal'); window.showToast('تم تفعيل التجربة');
+  window.updateSubscriptionUI(); await window.saveCurrentWateerah(true); window.closeModal('pricingModal'); window.showToast('تم تفعيل التجربة المجانية بنجاح!');
 };
 
 window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeInput') => {
   const code = document.getElementById(inputId)?.value.trim();
-  if(!code) return window.showToast('أدخل الكود'); if(!auth.currentUser) return window.showToast('سجل الدخول أولاً');
+  if(!code) return window.showToast('الرجاء إدخال كود التفعيل.'); 
+  if(!auth.currentUser) return window.showToast('يجب تسجيل الدخول أولاً.');
   try {
     const codeRef = doc(db, "activationCodes", code); const snap = await getDoc(codeRef);
-    if(!snap.exists()) return window.showToast('الكود غير صحيح أو مستخدم');
+    if(!snap.exists()) return window.showToast('عذراً، الكود غير صحيح أو مستخدم مسبقاً.');
     const days = parseInt(snap.data().days) || 30; let startDate = new Date();
     
     const todayNum = getLocalYYYYMMDD(startDate);
@@ -145,6 +184,6 @@ window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeIn
     
     await deleteDoc(codeRef); await window.saveCurrentWateerah(true); window.updateSubscriptionUI();
     if(document.getElementById('userActivationCodeInput')) document.getElementById('userActivationCodeInput').value = ''; if(document.getElementById('userRenewalCodeInput')) document.getElementById('userRenewalCodeInput').value = '';
-    window.openModal('pricingModal'); window.showToast(`تم تمديد الاشتراك لـ ${days} يوم!`);
-  } catch(e) { window.showToast('حدث خطأ'); }
+    window.openModal('pricingModal'); window.showToast(`تهانينا! تم تمديد الاشتراك لمدة ${days} يوم.`);
+  } catch(e) { window.showToast('حدث خطأ أثناء تفعيل الكود.'); }
 };
