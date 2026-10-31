@@ -40,9 +40,22 @@ window.selectOnboardingTheme = (themeName, el) => { document.querySelectorAll('.
 window.startWorkspaceFirstTime = () => { window.appState.hasStarted = true; localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState)); window.renderWorkspaceVisibility(); window.autoSave(); };
 
 window.renderWorkspaceVisibility = function() {
-  const onb = document.getElementById('onboardingScreen'); const mainW = document.getElementById('mainWorkspace');
-  if (!window.appState.hasStarted) { onb.classList.remove('hidden-el'); mainW.classList.add('hidden-el'); }
-  else { onb.classList.add('hidden-el'); mainW.classList.remove('hidden-el'); window.goHome(); }
+  const onb = document.getElementById('onboardingScreen'); 
+  const mainW = document.getElementById('mainWorkspace');
+  
+  if (!window.appState.hasStarted) { 
+    onb.classList.remove('hidden-el'); 
+    mainW.classList.add('hidden-el'); 
+  } else { 
+    onb.classList.add('hidden-el'); 
+    mainW.classList.remove('hidden-el'); 
+    
+    // الإصلاح الجذري: لا تقم بإجبار المستخدم على العودة للرئيسية إذا كان يتصفح أي صفحة حالياً!
+    const pageContainer = document.getElementById('pageContainer');
+    if (!pageContainer || pageContainer.style.display !== 'block') {
+        window.goHome(); 
+    }
+  }
 };
 
 window.renderActiveWidgets = function() {
@@ -82,7 +95,6 @@ window.renderActiveWidgets = function() {
 };
 
 window.openPage = function(wId) {
-  // إخفاء الشاشة الرئيسية
   const launcher = document.getElementById('appLauncherGrid');
   if (launcher) launcher.style.display = 'none';
   
@@ -92,20 +104,17 @@ window.openPage = function(wId) {
   const pageContainer = document.getElementById('pageContainer');
   if (pageContainer) pageContainer.style.display = 'block';
 
-  // التأكد من إخفاء جميع البطاقات
   document.querySelectorAll('.widget-card').forEach(card => {
     card.classList.add('hidden-el');
     card.style.display = 'none';
   });
   
-  // إظهار الصفحة المستهدفة فقط 
   const target = document.getElementById(wId);
   if(target) {
     target.classList.remove('hidden-el');
     target.style.display = 'block';
   }
 
-  // تبديل أزرار الشريط العلوي للعودة
   const homeBtn = document.getElementById('homeBtnContainer');
   const toolsBtn = document.getElementById('toolbarToolsContainer');
   if (homeBtn) homeBtn.style.display = 'flex';
