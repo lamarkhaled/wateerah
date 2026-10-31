@@ -101,7 +101,6 @@ window.openPage = function(wId) {
     target.style.display = 'block'; 
   }
 
-  // استدعاء دالة الرسم الخاصة بالصفحة المفتوحة لتجنب ظهور المحتوى فارغاً أو نقاط ثلاث
   if (wId === 'widget-finance' && window.renderLists) window.renderLists();
   if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
   if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
@@ -167,13 +166,21 @@ window.removeWidget = (wId) => {
   window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); 
 };
 
-window.openModal = async id => {
-  if (id === 'addWidgetModal') window.renderWidgetLibraryModal();
-  const modal = document.getElementById(id); if (modal) modal.classList.add('open');
+window.openModal = async function(id) {
+  if (id === 'addWidgetModal' && window.renderWidgetLibraryModal) window.renderWidgetLibraryModal();
+  if (id === 'pricingModal' && window.setupPricingModal) window.setupPricingModal();
+  
+  const modal = document.getElementById(id); 
+  if (modal) {
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+  }
 };
 
-window.closeModal = id => {
-  const modal = document.getElementById(id); if (modal) modal.classList.remove('open');
+window.closeModal = function(id) {
+  const modal = document.getElementById(id); 
+  if (modal) {
+      modal.classList.remove('open');
+      setTimeout(() => modal.style.display = '', 300);
+  }
 };
-
-window.openAuthModal = () => { window.openModal('authModal'); };
