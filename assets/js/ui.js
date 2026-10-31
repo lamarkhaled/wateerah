@@ -8,7 +8,7 @@ window.showToast = function(msg) {
 window.updateDayNightGreeting = function() {
   const hour = new Date().getHours(); 
   const isMorning = hour >= 4 && hour < 17; 
-  const greetingWord = isMorning ? 'صباح الخير ☀️' : 'مساء الخير 🌙';
+  const greetingWord = isMorning ? 'صباح الخير' : 'مساء الخير';
   
   if (!isMorning) document.body.classList.add('night-mode-glow'); 
   else document.body.classList.remove('night-mode-glow');
@@ -77,7 +77,7 @@ window.renderActiveWidgets = function() {
       if(!info) return '';
       return `
         <div class="app-icon-card" onclick="window.openPage('${wId}')">
-          <div class="app-icon">${info.icon}</div>
+          <div class="app-icon" style="font-size: 24px; margin-bottom: 8px;">${info.icon}</div>
           <div class="app-icon-title">${info.name}</div>
         </div>
       `;
@@ -90,25 +90,23 @@ window.openPage = function(wId) {
   const emptyState = document.getElementById('emptyWorkspaceState'); if (emptyState) emptyState.classList.add('hidden-el');
   const pageContainer = document.getElementById('pageContainer'); if (pageContainer) pageContainer.style.display = 'block';
 
-  // إخفاء جميع البطاقات والتطبيقات أولاً
   document.querySelectorAll('.widget-card').forEach(card => { 
     card.classList.add('hidden-el'); 
     card.style.display = 'none'; 
   });
   
-  // إظهار البطاقة أو الميزة المطلوبة حصرياً
   const target = document.getElementById(wId);
   if(target) { 
     target.classList.remove('hidden-el'); 
     target.style.display = 'block'; 
   }
 
-  // إعادة رسم البيانات الداخلية للتطبيق المفتوح لتجنب ظهور شاشة فارغة
-  if (wId === 'widget-finance' && window.renderLists) window.renderLists();
-  if (wId === 'widget-business' && window.renderBusinessWidget) window.renderBusinessWidget();
-  if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
-  if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
-  if (wId === 'widget-habits' && window.renderLists) window.renderLists();
+  try {
+      if (wId === 'widget-finance' && window.renderLists) window.renderLists();
+      if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
+      if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
+      if (wId === 'widget-habits' && window.renderLists) window.renderLists();
+  } catch(e) {}
 
   const homeBtn = document.getElementById('homeBtnContainer');
   const toolsBtn = document.getElementById('toolbarToolsContainer');
@@ -169,13 +167,21 @@ window.removeWidget = (wId) => {
   window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); 
 };
 
-window.openModal = async id => {
-  if (id === 'addWidgetModal') window.renderWidgetLibraryModal();
-  const modal = document.getElementById(id); if (modal) modal.classList.add('open');
+window.openModal = async function(id) {
+  if (id === 'addWidgetModal' && window.renderWidgetLibraryModal) window.renderWidgetLibraryModal();
+  if (id === 'pricingModal' && window.setupPricingModal) window.setupPricingModal();
+  
+  const modal = document.getElementById(id); 
+  if (modal) {
+      modal.classList.add('open');
+      if (id === 'authModal') modal.style.display = 'flex';
+  }
 };
 
-window.closeModal = id => {
-  const modal = document.getElementById(id); if (modal) modal.classList.remove('open');
+window.closeModal = function(id) {
+  const modal = document.getElementById(id); 
+  if (modal) {
+      modal.classList.remove('open');
+      if (id === 'authModal') modal.style.display = 'none';
+  }
 };
-
-window.openAuthModal = () => { window.openModal('authModal'); };
