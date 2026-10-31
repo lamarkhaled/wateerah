@@ -59,10 +59,8 @@ window.renderBanksList = function() {
   }).join('');
   if(overview) { overview.innerHTML = `مجموع الأرصدة الكلي: <strong style="color: var(--accent-color); font-size: 1.1rem;">${grandTotal}</strong> ر.س`; }
 };
-
 window.openBankDetails = function(bIdx) { window.currentBankIndex = bIdx; document.getElementById('widget-finance').style.display = 'none'; const detailsPage = document.getElementById('bankDetailsPage'); if(detailsPage) { detailsPage.classList.remove('hidden-el'); detailsPage.style.display = 'block'; } window.renderBankDetailsView(); };
 window.closeBankDetails = function() { window.currentBankIndex = null; const detailsPage = document.getElementById('bankDetailsPage'); if(detailsPage) { detailsPage.style.display = 'none'; detailsPage.classList.add('hidden-el'); } const financePage = document.getElementById('widget-finance'); if(financePage) { financePage.classList.remove('hidden-el'); financePage.style.display = 'block'; } window.renderBanksList(); window.calculateDistribution(); };
-
 window.renderBankDetailsView = function() {
   if (window.currentBankIndex === null) return; const bank = window.appState.banks[window.currentBankIndex]; if (!bank) return window.closeBankDetails();
   let bankTotal = 0; (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; });
@@ -97,7 +95,6 @@ window.renderBankDetailsView = function() {
     `;
   }).join('');
 };
-
 window.addBank = () => { const name = document.getElementById('newBankName').value.trim(); if (!name) return window.showToast('أدخل اسم البنك'); if (!window.appState.banks) window.appState.banks = []; window.appState.banks.push({ name, accounts: [] }); document.getElementById('newBankName').value = ''; if(document.getElementById('addBankForm')) document.getElementById('addBankForm').style.display = 'none'; if(document.getElementById('addBankPlusBtn')) document.getElementById('addBankPlusBtn').style.display = 'flex'; window.renderLists(); window.autoSave(); window.showToast('تمت إضافة البنك بنجاح'); };
 window.deleteCurrentBank = () => { if (window.currentBankIndex === null) return; if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) { window.appState.banks.splice(window.currentBankIndex, 1); window.autoSave(); window.showToast('تم حذف البنك'); window.closeBankDetails(); } };
 window.addAccountToCurrentBank = () => { if (window.currentBankIndex === null) return; const nameEl = document.getElementById('newAccName'); const purposeEl = document.getElementById('newAccPurpose'); const targetEl = document.getElementById('newAccTarget'); const balEl = document.getElementById('newAccBalance'); const name = nameEl.value.trim(); const purpose = purposeEl.value.trim(); const target = parseFloat(targetEl.value) || 0; const balance = parseFloat(balEl.value) || 0; if (!name) return window.showToast('أدخل اسم الحساب'); if (!window.appState.banks[window.currentBankIndex].accounts) window.appState.banks[window.currentBankIndex].accounts = []; window.appState.banks[window.currentBankIndex].accounts.push({ name, purpose, target, balance, history: [] }); nameEl.value = ''; purposeEl.value = ''; targetEl.value = ''; balEl.value = ''; if(document.getElementById('addAccForm')) document.getElementById('addAccForm').style.display = 'none'; if(document.getElementById('addAccPlusBtn')) document.getElementById('addAccPlusBtn').style.display = 'flex'; window.renderBankDetailsView(); window.autoSave(); };
@@ -212,10 +209,61 @@ window.toggleMonthlyExpense = (i) => { window.appState.monthlyExpenses[i].paid =
 window.deleteMonthlyExpense = (i) => { window.appState.monthlyExpenses.splice(i, 1); window.renderMonthlyExpenses(); window.autoSave(); };
 
 
-// ================= نظام الاشتراكات الشهرية الذكي =================
+// ================= نظام الاشتراكات الشهرية الذكي والخصم التلقائي =================
+window.processAutoSubscriptions = function() {
+  if(!window.appState.subscriptions || !window.appState.banks) return false;
+  const today = new Date();
+  const currentMonthStr = `${today.getFullYear()}-${today.getMonth() + 1}`;
+  const currentDay = today.getDate();
+  let updated = false;
+
+  window.appState.subscriptions.forEach(sub => {
+    if(sub.linkedAcc && sub.day && currentDay >= sub.day && sub.lastPaidMonth !== currentMonthStr) {
+      const [bIdx, aIdx] = sub.linkedAcc.split('_');
+      const bank = window.appState.banks[bIdx];
+      if(bank && bank.accounts && bank.accounts[aIdx]) {
+         const acc = bank.accounts[aIdx];
+         acc.balance = (parseFloat(acc.balance) || 0) - (parseFloat(sub.cost) || 0);
+         if(!acc.history) acc.history = [];
+         acc.history.unshift({
+            type: 'sub',
+            amount: parseFloat(sub.cost) || 0,
+            reason: `خصم تلقائي: ${sub.name}`,
+            date: today.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+         });
+         sub.lastPaidMonth = currentMonthStr;
+         updated = true;
+      }
+    }
+  });
+  return updated;
+};
+
+window.openAddSubForm = () => {
+  const sel = document.getElementById('newSubAccountSelect');
+  if(sel) {
+    let options = '<option value="">اختر الحساب للخصم التلقائي (اختياري)...</option>';
+    (window.appState.banks || []).forEach((bank, bIdx) => {
+      (bank.accounts || []).forEach((acc, aIdx) => {
+        options += `<option value="${bIdx}_${aIdx}">${bank.name} - ${acc.name} (${acc.balance} ر.س)</option>`;
+      });
+    });
+    sel.innerHTML = options;
+  }
+  document.getElementById('addSubForm').style.display='block';
+  document.getElementById('addSubPlusBtn').style.display='none';
+};
+
 window.renderSubscriptions = function() {
   const container = document.getElementById('subscriptionsContainer');
   if (!container) return;
+  
+  if(window.processAutoSubscriptions()) {
+     window.autoSave();
+     window.renderBanksList();
+     if (window.currentBankIndex !== null) window.renderBankDetailsView();
+  }
+
   if (!window.appState.subscriptions) window.appState.subscriptions = [];
   
   let totalCost = 0;
@@ -224,7 +272,6 @@ window.renderSubscriptions = function() {
     const cost = parseFloat(s.cost) || 0;
     totalCost += cost;
     
-    // أيقونات تلقائية ذكية بناءً على الكلمات
     let icon = '🔄';
     const nameLower = s.name.toLowerCase();
     if(nameLower.includes('netflix') || nameLower.includes('نتفلكس') || nameLower.includes('شاهد') || nameLower.includes('osn') || nameLower.includes('youtube')) icon = '🍿';
@@ -235,6 +282,19 @@ window.renderSubscriptions = function() {
     else if(nameLower.includes('stc') || nameLower.includes('mobily') || nameLower.includes('zain') || nameLower.includes('موبايلي') || nameLower.includes('زين') || nameLower.includes('جوال') || nameLower.includes('انترنت')) icon = '📱';
     else if(nameLower.includes('game') || nameLower.includes('لعب') || nameLower.includes('xbox') || nameLower.includes('playstation') || nameLower.includes('بليستيشن')) icon = '🎮';
 
+    let accName = 'غير مرتبط بحساب';
+    if(s.linkedAcc) {
+       const [bIdx, aIdx] = s.linkedAcc.split('_');
+       if(window.appState.banks[bIdx] && window.appState.banks[bIdx].accounts[aIdx]) {
+          accName = window.appState.banks[bIdx].accounts[aIdx].name;
+       }
+    }
+    
+    const today = new Date();
+    const currentMonthStr = `${today.getFullYear()}-${today.getMonth() + 1}`;
+    const isPaid = s.lastPaidMonth === currentMonthStr;
+    const paidBadge = isPaid ? `<span style="font-size: 0.65rem; background: var(--accent-light); color: var(--accent-color); padding: 2px 6px; border-radius: 4px; margin-right: 6px;">تم الدفع ✅</span>` : `<span style="font-size: 0.65rem; background: var(--warning-light); color: var(--warning-color); padding: 2px 6px; border-radius: 4px; margin-right: 6px;">قادم ⏳</span>`;
+
     return `
       <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; position: relative; box-shadow: var(--shadow-ios); transition: transform 0.2s;">
          <button class="delete-btn" style="position: absolute; top: 10px; left: 10px; font-size: 1.1rem; opacity: 0.6;" onclick="window.deleteSubscription(${idx})">&times;</button>
@@ -243,7 +303,9 @@ window.renderSubscriptions = function() {
            <div style="width: 42px; height: 42px; border-radius: 12px; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid var(--border-color); flex-shrink: 0;">${icon}</div>
            <div style="flex: 1;">
              <input type="text" value="${s.name}" onchange="window.updateSubscription(${idx}, 'name', this.value)" style="font-weight: 700; font-size: 0.95rem; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0; width: 100%; margin-bottom: 2px;" placeholder="اسم الاشتراك">
-             <div style="font-size: 0.75rem; color: var(--accent-color); font-weight: 600;">تجديد تلقائي</div>
+             <div style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600; display:flex; align-items:center;">
+                يوم ${s.day || 1} • يخصم من: ${accName} ${paidBadge}
+             </div>
            </div>
          </div>
          
@@ -272,16 +334,33 @@ window.renderSubscriptions = function() {
 };
 
 window.addSubscription = () => { 
-  const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); 
-  if(!n.value.trim()) return window.showToast('أدخل اسم الاشتراك'); 
+  const n = document.getElementById('newSubName'); 
+  const c = document.getElementById('newSubCost'); 
+  const d = document.getElementById('newSubDay'); 
+  const sel = document.getElementById('newSubAccountSelect');
+  
+  const name = n.value.trim(); 
+  const cost = parseFloat(c.value)||0; 
+  const day = parseInt(d.value)||1;
+  const linkedAcc = sel ? sel.value : '';
+
+  if(!name) return window.showToast('أدخل اسم الاشتراك'); 
   if(!window.appState.subscriptions) window.appState.subscriptions = []; 
-  window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); 
-  n.value=''; c.value=''; 
+  
+  window.appState.subscriptions.push({
+     name: name, 
+     cost: cost, 
+     day: day, 
+     linkedAcc: linkedAcc, 
+     lastPaidMonth: '' 
+  }); 
+  
+  n.value=''; c.value=''; d.value=''; 
   
   if(document.getElementById('addSubForm')) document.getElementById('addSubForm').style.display = 'none';
   if(document.getElementById('addSubPlusBtn')) document.getElementById('addSubPlusBtn').style.display = 'flex';
   
-  window.renderSubscriptions(); window.autoSave(); 
+  window.renderLists(); window.autoSave(); 
 };
 
 window.updateSubscription = (idx, field, val) => {
@@ -297,8 +376,7 @@ window.deleteSubscription = (idx) => {
   }
 };
 
-
-// ================= التهيئة العامة للويدجت =================
+// ================= التهيئة العامة =================
 window.renderLists = function() {
   window.renderVisionBoard(); window.renderKanbanBoard(); window.renderBanksList(); 
   if (window.currentBankIndex !== null) window.renderBankDetailsView();
