@@ -34,7 +34,7 @@
         <button id="iosInstallBtn" class="btn btn-subtle" onclick="window.openModal('iosGuideModal')">تثبيت التطبيق</button>
         <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="window.openModal('adminModal')">لوحة التحكم</button>
         <button id="lockScreenBtn" class="btn btn-danger" style="display: none; padding: 6px 12px; font-size: 0.8rem;" onclick="window.handleLogout()">قفل الشاشة 🔒</button>
-        <span id="planBadge" class="pro-badge" onclick="window.openModal('pricingModal')">الباقة المتقدمة</span>
+        <span id="planBadge" class="pro-badge" onclick="window.openModal('pricingModal')">الباقة الأساسية</span>
         <button id="upgradeBtn" class="btn" onclick="window.openModal('pricingModal')">إدارة الاشتراك</button>
         <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="window.openModal('profileModal')">
           <div id="headerAvatar" class="avatar-circle">ل</div>
@@ -48,7 +48,7 @@
     <section id="onboardingScreen" class="hidden-el">
       <div class="time-pill" id="onboardingTimePill">الفترة الصباحية</div>
       <h2 id="onboardingGreeting">صباح الخير ☀️، أهلاً بك في وتيرة</h2>
-      <p>مساحتك الخاصة بنظام iOS الشفاف والنقي. اختر المظهر المفضل لديك للبدء.</p>
+      <p>مساحتك الخاصة اختر المظهر المفضل لديك للبدء.</p>
       <div class="theme-selector-grid">
         <div class="theme-card active" onclick="window.selectOnboardingTheme('default', this)">ورق دافئ</div>
         <div class="theme-card" onclick="window.selectOnboardingTheme('minimal', this)">صباح نقي</div>
@@ -64,24 +64,6 @@
           <h2 id="welcomeText" style="margin-top: 0;">صباح الخير ☀️، أهلاً بك.</h2>
           <p id="dayNightSubtext">رتّب أولوياتك بهدوء وتركيز.</p>
         </div>
-
-        <div class="hero-glass-messages">
-          <div id="activeGlassMessage" class="liquid-glass-msg" style="display: none;" onclick="window.dismissGlassMessage()" title="اضغط للإخفاء">
-            <div class="msg-header">
-              <span class="msg-tag">إشعار المنصة</span>
-              <span class="msg-timer" id="msgRemainingTime"></span>
-            </div>
-            <p id="glassMessageText" style="font-size: 0.95rem; font-weight: 500; color: var(--text-primary); line-height: 1.6; margin-top: 6px;"></p>
-          </div>
-          
-          <div id="emptyGlassMessage" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="font-size: 0.85rem; font-weight: 600;">صندوق الرسائل والتنبيهات</div>
-              <div style="font-size: 0.78rem; color: var(--text-secondary);">تظهر هنا الرسائل الإدارية بصيغة السائل الزجاجي.</div>
-            </div>
-            <button class="btn btn-subtle" onclick="window.saveCurrentWateerah(true)">حفظ فوري</button>
-          </div>
-        </div>
       </section>
 
       <section class="toolbar-ios">
@@ -91,11 +73,9 @@
           <button class="chip" data-theme-btn="minimal" onclick="window.setTheme('minimal', this)">صباح نقي</button>
           <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
         </div>
-        
         <div class="toolbar-group" id="toolbarToolsContainer">
           <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة ➕</button>
         </div>
-        
         <div class="toolbar-group" id="homeBtnContainer" style="display: none;">
           <button class="btn btn-primary" style="font-weight: 700; padding: 8px 16px;" onclick="window.goHome()">🏠 العودة للرئيسية</button>
         </div>
@@ -110,6 +90,7 @@
       <div id="appLauncherGrid" class="app-launcher-grid"></div>
 
       <div id="pageContainer" style="display: none;">
+        <!-- بطاقات التطبيقات -->
         <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision"></div>
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban"></div>
         <div id="widget-business" class="widget-card col-12 hidden-el" data-widget-id="widget-business"></div>
@@ -121,13 +102,12 @@
     </div>
   </main>
 
-  <!-- صفحة تسجيل الدخول المستقلة (كاملة الشاشة) -->
+  <!-- صفحة الدخول والتسجيل (كاملة الشاشة) -->
   <div id="authModal" style="display: none; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05); text-align: center; backdrop-filter: blur(10px);">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
       <p id="authModalSub" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.5;">سجلي دخولك للوصول إلى مساحتك الخاصة</p>
       
-      <!-- نموذج الدخول -->
       <div id="viewLogin">
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني</label><input type="email" id="loginEmail" placeholder="name@example.com" style="padding: 14px; font-size: 1rem; border-radius: 12px;"></div>
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">كلمة المرور</label><input type="password" id="loginPassword" placeholder="••••••••" style="padding: 14px; font-size: 1rem; border-radius: 12px;"></div>
@@ -138,7 +118,6 @@
         </div>
       </div>
 
-      <!-- نموذج التسجيل -->
       <div id="viewRegister" style="display: none;">
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">الاسم الكريم</label><input type="text" id="regName" placeholder="اسمك الكريم" style="padding: 14px; font-size: 1rem; border-radius: 12px;"></div>
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني</label><input type="email" id="regEmail" placeholder="name@example.com" style="padding: 14px; font-size: 1rem; border-radius: 12px;"></div>
@@ -149,7 +128,6 @@
         </div>
       </div>
 
-      <!-- نموذج الاستعادة -->
       <div id="viewReset" style="display: none;">
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني المسجل</label><input type="email" id="resetEmail" placeholder="name@example.com" style="padding: 14px; font-size: 1rem; border-radius: 12px;"></div>
         <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; font-size: 1.05rem; font-weight: 700; border-radius: 14px;" onclick="window.handleResetPassword()">إرسال رابط الاستعادة 📩</button>
@@ -160,7 +138,54 @@
     </div>
   </div>
 
-  <!-- باقي النوافذ -->
+  <!-- نوافذ الإدارة، الحسابات والاشتراكات -->
+  <div id="verificationNoticeModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px; text-align: center;">
+      <button class="modal-close" onclick="window.closeModal('verificationNoticeModal')">&times;</button>
+      <div style="font-size: 3rem; margin-bottom: 10px;">📧</div>
+      <h3 style="margin-bottom: 14px;">تفعيل البريد الإلكتروني</h3>
+      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">تم إرسال رابط التفعيل. يرجى تفعيل حسابك لتتمكني من الدخول إلى المنصة.</p>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button>
+      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="window.closeModal('verificationNoticeModal'); window.switchAuthView('login'); document.getElementById('authModal').style.display='flex';">العودة لتسجيل الدخول</button>
+    </div>
+  </div>
+
+  <div id="pricingModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 450px;">
+      <button class="modal-close" onclick="window.closeModal('pricingModal')">&times;</button>
+      <h3 style="margin-bottom: 14px;">إدارة الاشتراك 💎</h3>
+      <div id="pricingViewUnsubscribed">
+         <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">حسابك الحالي على الباقة الأساسية. أدخل كود التفعيل للترقية.</p>
+         <div class="form-group">
+           <input type="text" id="userActivationCodeInput" placeholder="أدخل كود التفعيل هنا..." style="padding: 12px; border-radius: 8px;">
+         </div>
+         <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.activateUserSubscriptionWithCode('userActivationCodeInput')">تفعيل الاشتراك</button>
+         <div id="oneTimeTrialBox" style="margin-top: 20px; padding: 15px; border: 1px dashed var(--accent-color); border-radius: 12px; text-align: center;">
+           <h4 style="color: var(--accent-color); margin-bottom: 8px;">تجربة مجانية لمدة يومين</h4>
+           <button class="btn btn-subtle" onclick="window.activateOneTimeFreeTrial()">تفعيل التجربة الآن</button>
+         </div>
+      </div>
+      <div id="pricingViewSubscribed" style="display: none;">
+         <div id="subActiveDetails" style="font-size: 0.95rem; margin-bottom: 10px; line-height: 1.6;"></div>
+         <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;"><span id="daysRemainingText"></span></div>
+         <div class="progress-bar-bg" style="height: 10px; margin-bottom: 20px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 0%;"></div></div>
+         <h4 style="margin-bottom: 10px; font-size: 0.9rem;">تجديد الاشتراك</h4>
+         <div class="form-group" style="display: flex; gap: 8px;">
+           <input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 8px; border-radius: 8px;">
+           <button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button>
+         </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="adminModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px;">
+      <button class="modal-close" onclick="window.closeModal('adminModal')">&times;</button>
+      <h3 style="margin-bottom: 14px;">لوحة التحكم ⚙️</h3>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px;">إصدار وتوليد أكواد التفعيل.</p>
+    </div>
+  </div>
+
   <div id="profileModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 400px;">
       <button class="modal-close" onclick="window.closeModal('profileModal')">&times;</button>
