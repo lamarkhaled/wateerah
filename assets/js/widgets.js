@@ -15,14 +15,18 @@ window.compressImage = function(file, callback) {
   reader.readAsDataURL(file);
 };
 
-// ================= إدارة الأعمال 💼 =================
+// ================= إدارة الأعمال الشاملة 💼 =================
 window.renderBusinessWidget = function() {
   const summaryCard = document.getElementById('businessSummaryCard');
   if(!summaryCard) return;
-  if(!window.appState.business) window.appState.business = { design: [], honey: [] };
   
-  const designCount = window.appState.business.design.filter(d => !d.done).length;
-  const honeyCount = window.appState.business.honey.filter(h => !h.done).length;
+  // ترحيل البيانات القديمة (إن وجدت) لكي لا تفقدها
+  if(!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
+  if(window.appState.business.design) { window.appState.business.projects = window.appState.business.design; delete window.appState.business.design; }
+  if(window.appState.business.honey) { window.appState.business.campaigns = window.appState.business.honey; delete window.appState.business.honey; }
+  
+  const projectsCount = window.appState.business.projects.filter(p => !p.done).length;
+  const campaignsCount = window.appState.business.campaigns.filter(c => !c.done).length;
 
   summaryCard.innerHTML = `
     <div onclick="window.openBusinessDetails()" style="background: linear-gradient(135deg, var(--bg-glass-strong) 0%, var(--bg-subtle) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 20px; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-ios);">
@@ -31,8 +35,8 @@ window.renderBusinessWidget = function() {
          <span style="font-size:1.1rem; color:var(--text-secondary);">❯</span>
        </div>
        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
-         <span>🎨 ${designCount} مشاريع نشطة</span>
-         <span>🍯 ${honeyCount} مهام تسويق</span>
+         <span>🚀 ${projectsCount} مشاريع نشطة</span>
+         <span>📢 ${campaignsCount} مهام وحملات</span>
        </div>
     </div>
   `;
@@ -54,73 +58,73 @@ window.closeBusinessDetails = function() {
 };
 
 window.renderBusinessDetailsView = function() {
-  if(!window.appState.business) window.appState.business = { design: [], honey: [] };
+  if(!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
   
-  // مشاريع الجرافيك
-  const designList = document.getElementById('designProjectsList');
-  if(designList) {
-     designList.innerHTML = window.appState.business.design.map((p, i) => {
-       const dateHtml = p.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 موعد التسليم: ${p.date}</div>` : '';
+  // 1. المشاريع والعملاء
+  const projectsList = document.getElementById('businessProjectsList');
+  if(projectsList) {
+     projectsList.innerHTML = window.appState.business.projects.map((p, i) => {
+       const dateHtml = p.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 تاريخ التسليم: ${p.date}</div>` : '';
        return `<li class="list-item ${p.done ? 'completed' : ''}" style="padding: 14px 16px; border: 1px dashed var(--border-color); margin-bottom: 10px; background: var(--bg-glass-strong);">
          <div class="item-left" style="align-items: flex-start;">
-           <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleDesign(${i})">${p.done ? '✓' : ''}</div>
+           <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleBusinessProject(${i})">${p.done ? '✓' : ''}</div>
            <div style="display: flex; flex-direction: column; width: 100%;">
                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                   <input type="text" class="item-text-input" value="${p.name}" onchange="window.appState.business.design[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
-                   <span style="font-size:0.9rem; font-weight:800; color: ${p.done ? 'var(--text-secondary)' : 'var(--accent-color)'}; flex-shrink: 0; margin-right: 10px;">${p.price} ر.س</span>
+                   <input type="text" class="item-text-input" value="${p.name}" onchange="window.appState.business.projects[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
+                   <span style="font-size:0.9rem; font-weight:800; color: ${p.done ? 'var(--text-secondary)' : 'var(--accent-color)'}; flex-shrink: 0; margin-right: 10px;">${p.price > 0 ? p.price + ' ر.س' : ''}</span>
                </div>
                ${dateHtml}
            </div>
          </div>
-         <button class="delete-btn" style="margin-left: -8px; font-size: 1.3rem;" onclick="window.deleteDesign(${i})">&times;</button>
+         <button class="delete-btn" style="margin-left: -8px; font-size: 1.3rem;" onclick="window.deleteBusinessProject(${i})">&times;</button>
        </li>`;
      }).join('');
-     if(window.appState.business.design.length === 0) designList.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 15px;">لا توجد مشاريع تصميم حالياً. ابدأ بإضافة عميل جديد!</li>';
+     if(window.appState.business.projects.length === 0) projectsList.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 15px;">لا توجد مشاريع حالياً. ابدأ بإضافة مشروع جديد!</li>';
   }
 
-  // مهام تسويق العسل
-  const honeyList = document.getElementById('honeyTasksList');
-  if(honeyList) {
-     honeyList.innerHTML = window.appState.business.honey.map((h, i) => {
-       const dateHtml = h.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 موعد النشر: ${h.date}</div>` : '';
+  // 2. التسويق والمهام المهنية
+  const campaignsList = document.getElementById('businessCampaignsList');
+  if(campaignsList) {
+     campaignsList.innerHTML = window.appState.business.campaigns.map((h, i) => {
+       const dateHtml = h.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 تاريخ النشر/الإنجاز: ${h.date}</div>` : '';
        return `<li class="list-item ${h.done ? 'completed' : ''}" style="padding: 14px 16px; border: 1px dashed var(--border-color); margin-bottom: 10px; background: var(--bg-glass-strong);">
          <div class="item-left" style="align-items: flex-start;">
-           <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleHoney(${i})">${h.done ? '✓' : ''}</div>
+           <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleBusinessCampaign(${i})">${h.done ? '✓' : ''}</div>
            <div style="display: flex; flex-direction: column; width: 100%;">
-               <input type="text" class="item-text-input" value="${h.name}" onchange="window.appState.business.honey[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
+               <input type="text" class="item-text-input" value="${h.name}" onchange="window.appState.business.campaigns[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
                ${dateHtml}
            </div>
          </div>
-         <button class="delete-btn" style="margin-left: -8px; font-size: 1.3rem;" onclick="window.deleteHoney(${i})">&times;</button>
+         <button class="delete-btn" style="margin-left: -8px; font-size: 1.3rem;" onclick="window.deleteBusinessCampaign(${i})">&times;</button>
        </li>`;
      }).join('');
-     if(window.appState.business.honey.length === 0) honeyList.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 15px;">لا توجد مهام تسويق حالياً.</li>';
+     if(window.appState.business.campaigns.length === 0) campaignsList.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 15px;">لا توجد مهام تسويق حالياً.</li>';
   }
 };
 
-window.addDesignProject = () => {
-  const n = document.getElementById('newDesignName'); const p = document.getElementById('newDesignPrice'); const d = document.getElementById('newDesignDate');
+window.addBusinessProject = () => {
+  const n = document.getElementById('newProjectName'); const p = document.getElementById('newProjectPrice'); const d = document.getElementById('newProjectDate');
   if(!n.value.trim()) return window.showToast('أدخل تفاصيل المشروع');
-  if(!window.appState.business) window.appState.business = { design: [], honey: [] };
-  window.appState.business.design.unshift({ name: n.value.trim(), price: parseFloat(p.value)||0, date: d.value, done: false });
+  if(!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
+  window.appState.business.projects.unshift({ name: n.value.trim(), price: parseFloat(p.value)||0, date: d.value, done: false });
   n.value = ''; p.value = ''; d.value = '';
-  document.getElementById('addDesignForm').style.display='none'; document.getElementById('addDesignPlusBtn').style.display='flex';
+  document.getElementById('addProjectForm').style.display='none'; document.getElementById('addProjectPlusBtn').style.display='flex';
   window.renderBusinessDetailsView(); window.autoSave();
 };
-window.toggleDesign = (i) => { window.appState.business.design[i].done = !window.appState.business.design[i].done; window.renderBusinessDetailsView(); window.autoSave(); };
-window.deleteDesign = (i) => { window.appState.business.design.splice(i, 1); window.renderBusinessDetailsView(); window.autoSave(); };
+window.toggleBusinessProject = (i) => { window.appState.business.projects[i].done = !window.appState.business.projects[i].done; window.renderBusinessDetailsView(); window.autoSave(); };
+window.deleteBusinessProject = (i) => { window.appState.business.projects.splice(i, 1); window.renderBusinessDetailsView(); window.autoSave(); };
 
-window.addHoneyTask = () => {
-  const n = document.getElementById('newHoneyName'); const d = document.getElementById('newHoneyDate');
+window.addBusinessCampaign = () => {
+  const n = document.getElementById('newCampaignName'); const d = document.getElementById('newCampaignDate');
   if(!n.value.trim()) return window.showToast('أدخل وصف المهمة أو الحملة');
-  if(!window.appState.business) window.appState.business = { design: [], honey: [] };
-  window.appState.business.honey.unshift({ name: n.value.trim(), date: d.value, done: false });
+  if(!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
+  window.appState.business.campaigns.unshift({ name: n.value.trim(), date: d.value, done: false });
   n.value = ''; d.value = '';
-  document.getElementById('addHoneyForm').style.display='none'; document.getElementById('addHoneyPlusBtn').style.display='flex';
+  document.getElementById('addCampaignForm').style.display='none'; document.getElementById('addCampaignPlusBtn').style.display='flex';
   window.renderBusinessDetailsView(); window.autoSave();
 };
-window.toggleHoney = (i) => { window.appState.business.honey[i].done = !window.appState.business.honey[i].done; window.renderBusinessDetailsView(); window.autoSave(); };
-window.deleteHoney = (i) => { window.appState.business.honey.splice(i, 1); window.renderBusinessDetailsView(); window.autoSave(); };
+window.toggleBusinessCampaign = (i) => { window.appState.business.campaigns[i].done = !window.appState.business.campaigns[i].done; window.renderBusinessDetailsView(); window.autoSave(); };
+window.deleteBusinessCampaign = (i) => { window.appState.business.campaigns.splice(i, 1); window.renderBusinessDetailsView(); window.autoSave(); };
 
 // ================= تحديث شامل لـ renderLists =================
 window.renderLists = function() {
@@ -201,6 +205,7 @@ window.renderBankDetailsView = function() {
   const titleEl = document.getElementById('activeBankTitle'); const totalEl = document.getElementById('activeBankTotal'); if(titleEl) titleEl.innerText = bank.name; if(totalEl) totalEl.innerText = bankTotal + ' ر.س';
   const accountsList = document.getElementById('activeBankAccountsList'); if(!accountsList) return;
   if (!bank.accounts || bank.accounts.length === 0) { accountsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد حسابات مضافة بهذا البنك.</div>`; return; }
+
   accountsList.innerHTML = bank.accounts.map((acc, aIdx) => {
     const balance = parseFloat(acc.balance) || 0; const target = parseFloat(acc.target) || 0; const pct = target > 0 ? Math.min(100, Math.round((balance / target) * 100)) : 0;
     const progressHtml = target > 0 ? `<div style="margin-bottom: 16px;"><div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;"><span>الهدف: ${target} ر.س</span><span style="color: ${pct === 100 ? 'var(--accent-color)' : 'var(--text-secondary)'};">${pct}%</span></div><div class="progress-bar-bg" style="height: 6px;"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div></div>` : '';
@@ -390,7 +395,6 @@ window.processAutoSubscriptions = function() {
   });
   return updated;
 };
-
 window.openAddSubForm = () => {
   const sel = document.getElementById('newSubAccountSelect');
   if(sel) {
@@ -400,7 +404,6 @@ window.openAddSubForm = () => {
   }
   document.getElementById('addSubForm').style.display='block'; document.getElementById('addSubPlusBtn').style.display='none';
 };
-
 window.renderSubscriptions = function() {
   const container = document.getElementById('subscriptionsContainer'); if (!container) return;
   if(window.processAutoSubscriptions()) { window.autoSave(); window.renderBanksList(); if (window.currentBankIndex !== null) window.renderBankDetailsView(); }
@@ -439,7 +442,6 @@ window.renderSubscriptions = function() {
     container.innerHTML = `<div style="background: linear-gradient(135deg, var(--bg-subtle) 0%, var(--bg-primary) 100%); padding: 16px 20px; border-radius: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);"><div><div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; margin-bottom: 4px;">إجمالي الاشتراكات</div><div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-color);">${totalCost} <span style="font-size: 0.85rem; color: var(--text-secondary);">ر.س / شهرياً</span></div></div><div style="font-size: 2.2rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">💳</div></div>` + subsHtml;
   } else { container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 20px;">لا توجد اشتراكات مضافة.</div>`; }
 };
-
 window.addSubscription = () => { 
   const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); const d = document.getElementById('newSubDay'); const sel = document.getElementById('newSubAccountSelect');
   const name = n.value.trim(); const cost = parseFloat(c.value)||0; const day = parseInt(d.value)||1; const linkedAcc = sel ? sel.value : '';
