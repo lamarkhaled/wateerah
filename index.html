@@ -112,7 +112,6 @@
 
       <div id="pageContainer" style="display: none;">
         
-        <!-- لوحة الأهداف -->
         <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div>
@@ -139,7 +138,6 @@
           <div id="corkboardContainer" class="corkboard-surface"></div>
         </div>
 
-        <!-- المهام المتنقلة -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
@@ -163,7 +161,6 @@
           <div class="kanban-grid"><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'idea')"><div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div><div class="kanban-cards-wrap" id="col-idea"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div></div>
         </div>
 
-        <!-- بوصلة التركيز -->
         <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
@@ -172,7 +169,6 @@
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
 
-        <!-- متتبع العادات -->
         <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">متتبع العادات</span></div>
@@ -196,7 +192,6 @@
           <ul id="habitsList" class="item-list"></ul>
         </div>
 
-        <!-- المالية الشاملة ✦ -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة ✦</span></div></div>
           
@@ -260,39 +255,10 @@
             <div id="wishlistCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;"></div>
           </div>
 
-          <!-- قسم 3: مصاريف الشهر (To-Do List) -->
+          <!-- قسم 3: مصاريف الشهر (بطاقة مختصرة تفتح صفحة مستقلة) -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">مصاريف الشهر (مهام الدفع)</div>
-              <button id="addExpensePlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addExpenseForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            
-            <div id="addExpenseForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">مصروف جديد 🧾</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addExpenseForm').style.display='none'; document.getElementById('addExpensePlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0;">
-                <input type="text" id="newExpenseName" placeholder="المصروف (كهرباء, ماء...)" style="flex:2;">
-                <input type="number" id="newExpenseAmount" placeholder="المبلغ" style="flex:1;">
-                <button class="btn btn-primary" onclick="window.addMonthlyExpense()">تأكيد ➕</button>
-              </div>
-            </div>
-
-            <div style="background: var(--bg-glass-strong); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 14px;">
-              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px;">
-                <span>الاكتمال: <strong id="expenseProgressText" style="color: var(--accent-color);">0%</strong></span>
-                <span>المتبقي: <strong id="expenseRemainingText" style="color: var(--danger-color);">0</strong> ر.س</span>
-              </div>
-              <div class="progress-bar-bg" style="height: 6px; margin-bottom: 12px;">
-                <div id="expenseProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
-              </div>
-              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700;">
-                <span>الإجمالي: <span id="expenseTotalText">0</span> ر.س</span>
-                <span style="color: var(--text-secondary);">دُفع: <span id="expensePaidText">0</span> ر.س</span>
-              </div>
-            </div>
-            <ul id="monthlyExpensesList" class="item-list"></ul>
+            <div style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">مصاريف الشهر (مهام الدفع)</div>
+            <div id="monthlyExpensesSummaryCard"></div>
           </div>
 
           <!-- قسم 4: البنوك والحسابات -->
@@ -379,6 +345,51 @@
           </div>
 
           <div id="activeBankAccountsList"></div>
+        </div>
+
+        <!-- صفحة تفاصيل مصاريف الشهر المستقلة ✦ -->
+        <div id="monthlyExpensesPage" class="widget-card col-12 hidden-el" style="display: none;">
+          <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeMonthlyExpenses()"><span style="font-size:1.2rem; margin-left:4px;">❮</span> المالية</button>
+              <div class="card-title" style="font-size: 1.15rem; font-weight: 700;">مصاريف الشهر</div>
+              <div style="width: 70px;"></div>
+            </div>
+          </div>
+          
+          <div style="background: var(--bg-glass-strong); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 10px;">
+              <span>الاكتمال: <strong id="expenseProgressTextDetail" style="color: var(--accent-color);">0%</strong></span>
+              <span>المتبقي: <strong id="expenseRemainingTextDetail" style="color: var(--danger-color);">0</strong> ر.س</span>
+            </div>
+            <div class="progress-bar-bg" style="height: 8px; margin-bottom: 14px;">
+              <div id="expenseProgressBarDetail" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 700;">
+              <span>الإجمالي: <span id="expenseTotalTextDetail">0</span> ر.س</span>
+              <span style="color: var(--text-secondary);">دُفع: <span id="expensePaidTextDetail">0</span> ر.س</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="font-size: 1.05rem; font-weight: 700;">قائمة المصاريف 🧾</div>
+            <button id="addExpensePlusBtn" class="add-widget-plus" style="width: 32px; height: 32px; font-size: 1.3rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addExpenseForm').style.display='block'; this.style.display='none';">+</button>
+          </div>
+
+          <div id="addExpenseForm" style="display: none; background: var(--bg-subtle); padding: 18px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
+              <strong style="font-size: 0.9rem; color: var(--accent-color);">مصروف جديد ✨</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.3rem;" onclick="document.getElementById('addExpenseForm').style.display='none'; document.getElementById('addExpensePlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
+              <input type="text" id="newExpenseName" placeholder="المصروف (إيجار, كهرباء...)" style="flex:2; min-width:140px;">
+              <input type="number" id="newExpenseAmount" placeholder="المبلغ" style="flex:1; min-width:90px;">
+              <input type="date" id="newExpenseDate" style="flex:1.5; min-width:130px;" title="تاريخ الاستحقاق">
+              <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addMonthlyExpense()">تأكيد ➕</button>
+            </div>
+          </div>
+
+          <ul id="monthlyExpensesList" class="item-list"></ul>
         </div>
 
         <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
