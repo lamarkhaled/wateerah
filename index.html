@@ -188,10 +188,35 @@
           <ul id="habitsList" class="item-list"></ul>
         </div>
 
-        <!-- المالية الشاملة ✦ -->
+        <!-- المالية الشاملة -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة ✦</span></div></div>
           
+          <!-- قسم 1: متتبع الدخل (الجديد) -->
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">متتبع الدخل (الهدف الشهري)</div>
+              <button id="addIncomePlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addIncomeForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            
+            <div id="addIncomeForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مصدر دخل جديد 💸</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addIncomeForm').style.display='none'; document.getElementById('addIncomePlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
+                <input type="text" id="newIncomeName" placeholder="المصدر (راتب, عمل حر...)" style="flex:2; min-width:120px;">
+                <input type="number" id="newIncomeAmount" placeholder="المبلغ" style="flex:1; min-width:90px;">
+                <input type="date" id="newIncomeDate" style="flex:1.5; min-width:130px;" title="تاريخ الاستلام">
+                <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addIncome()">إضافة ➕</button>
+              </div>
+            </div>
+
+            <div id="incomeSummaryCard"></div>
+            <ul id="incomeSourcesList" class="item-list" style="margin-top: 12px;"></ul>
+          </div>
+
+          <!-- قسم 2: التوزيع الديناميكي -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -275,11 +300,9 @@
             <div id="banksContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
           </div>
 
-          <!-- قسم 5: الاشتراكات الشهرية -->
           <div style="margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية والتطبيقات</div>
-              <!-- زر الإضافة الذي يستدعي الدالة لفتح النموذج مع خيارات الحسابات -->
               <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="window.openAddSubForm()">+</button>
             </div>
             
@@ -298,12 +321,11 @@
                 <button class="btn btn-primary" style="flex:1; justify-content: center; font-weight: 700;" onclick="window.addSubscription()">تأكيد ➕</button>
               </div>
             </div>
-
-            <!-- حاوية البطاقات الذكية للاشتراكات -->
             <div id="subscriptionsContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
           </div>
         </div>
 
+        <!-- باقي النوافذ والصفحات (المصاريف المستقلة, البنوك, التدوين) كما هي مخفية وتعمل داخلياً -->
         <div id="monthlyExpensesPage" class="widget-card col-12 hidden-el" style="display: none;">
           <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -312,26 +334,18 @@
               <div style="width: 70px;"></div>
             </div>
           </div>
-          
           <div style="background: var(--bg-glass-strong); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 24px;">
             <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 10px;">
               <span>الاكتمال: <strong id="expenseProgressTextDetail" style="color: var(--accent-color);">0%</strong></span>
               <span>المتبقي: <strong id="expenseRemainingTextDetail" style="color: var(--danger-color);">0</strong> ر.س</span>
             </div>
-            <div class="progress-bar-bg" style="height: 8px; margin-bottom: 14px;">
-              <div id="expenseProgressBarDetail" class="progress-bar-fill" style="width: 0%;"></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 700;">
-              <span>الإجمالي: <span id="expenseTotalTextDetail">0</span> ر.س</span>
-              <span style="color: var(--text-secondary);">دُفع: <span id="expensePaidTextDetail">0</span> ر.س</span>
-            </div>
+            <div class="progress-bar-bg" style="height: 8px; margin-bottom: 14px;"><div id="expenseProgressBarDetail" class="progress-bar-fill" style="width: 0%;"></div></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 700;"><span>الإجمالي: <span id="expenseTotalTextDetail">0</span> ر.س</span><span style="color: var(--text-secondary);">دُفع: <span id="expensePaidTextDetail">0</span> ر.س</span></div>
           </div>
-
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="font-size: 1.05rem; font-weight: 700;">قائمة المصاريف 🧾</div>
             <button id="addExpensePlusBtn" class="add-widget-plus" style="width: 32px; height: 32px; font-size: 1.3rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addExpenseForm').style.display='block'; this.style.display='none';">+</button>
           </div>
-
           <div id="addExpenseForm" style="display: none; background: var(--bg-subtle); padding: 18px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
               <strong style="font-size: 0.9rem; color: var(--accent-color);">مصروف جديد ✨</strong>
@@ -344,7 +358,6 @@
               <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addMonthlyExpense()">تأكيد ➕</button>
             </div>
           </div>
-
           <ul id="monthlyExpensesList" class="item-list"></ul>
         </div>
 
@@ -356,17 +369,14 @@
               <button class="delete-btn" style="color: var(--danger-color); font-size: 0.85rem;" onclick="window.deleteCurrentBank()">حذف البنك 🗑️</button>
             </div>
           </div>
-          
           <div style="background: var(--bg-glass-strong); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 24px; text-align: center;">
             <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">إجمالي الرصيد بالبنك</div>
             <div id="activeBankTotal" style="font-size: 2.2rem; font-weight: 700; color: var(--accent-color);">0 ر.س</div>
           </div>
-
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="font-size: 1.05rem; font-weight: 700;">البطاقات والحسابات 💳</div>
             <button id="addAccPlusBtn" class="add-widget-plus" style="width: 32px; height: 32px; font-size: 1.3rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addAccForm').style.display='block'; this.style.display='none';">+</button>
           </div>
-
           <div id="addAccForm" style="display: none; background: var(--bg-subtle); padding: 18px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 14px;">
               <strong style="font-size: 0.9rem; color: var(--accent-color);">إضافة حساب ذكي جديد ✨</strong>
@@ -382,7 +392,6 @@
               <button class="btn btn-primary" onclick="window.addAccountToCurrentBank()" style="width: 100%; justify-content: center; margin-top: 4px;">تأكيد الإضافة ➕</button>
             </div>
           </div>
-
           <div id="activeBankAccountsList"></div>
         </div>
 
@@ -410,104 +419,16 @@
 
   <div id="addWidgetModal" class="modal-overlay"><div class="modal-box" style="max-width: 480px;"><button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button><h3 style="margin-bottom: 6px;">المكتبة</h3><p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف وثبت التطبيقات في شاشتك الرئيسية.</p><div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div></div></div>
 
-  <!-- نافذة سجل عمليات الحساب المستقلة -->
-  <div id="accountHistoryModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
-      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
-      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
-      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
-    </div>
-  </div>
-
-  <div id="visionDetailModal" class="modal-overlay">
-    <div class="modal-box">
-      <button class="modal-close" onclick="window.closeModal('visionDetailModal')">&times;</button>
-      <img id="vModalImg" src="" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 14px; margin-bottom: 14px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><h3 id="vModalTitle" style="font-size: 1.25rem;"></h3><span id="vModalPercentBadge" class="pro-badge">0% مكتمل</span></div>
-      <div class="progress-bar-bg" style="margin-bottom: 18px;"><div id="vModalProgressBar" class="progress-bar-fill"></div></div>
-      <div class="form-group"><label>التاريخ المستهدف:</label><input type="date" id="vModalDate" onchange="window.saveVisionModalChanges()"></div>
-      <div class="form-group"><label>الخطة الاستراتيجية:</label><textarea id="vModalPlan" rows="3" placeholder="خطتك التفصيلية..." oninput="window.saveVisionModalChanges()"></textarea></div>
-      <div class="form-group"><label>المهام (تُحتسب منها نسبة الاكتمال):</label><ul id="vModalTasksList" class="item-list" style="margin-bottom: 10px;"></ul><div class="add-row" style="margin-top: 6px;"><input type="text" id="vModalNewTaskInput" placeholder="أضف مهمة فرعية..." onkeypress="if(event.key==='Enter') window.addVisionSubTask()"><button class="btn btn-primary" onclick="window.addVisionSubTask()">إضافة</button></div></div>
-      <div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);"><button class="btn btn-danger" onclick="window.deleteCurrentVisionItem()">حذف البطاقة</button><button class="btn btn-primary" onclick="window.closeModal('visionDetailModal')">حفظ</button></div>
-    </div>
-  </div>
-
+  <div id="accountHistoryModal" class="modal-overlay"><div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;"><button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button><h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3><div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div></div></div>
+  <div id="visionDetailModal" class="modal-overlay"><div class="modal-box"><button class="modal-close" onclick="window.closeModal('visionDetailModal')">&times;</button><img id="vModalImg" src="" alt="" style="width: 100%; height: 190px; object-fit: cover; border-radius: 14px; margin-bottom: 14px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><h3 id="vModalTitle" style="font-size: 1.25rem;"></h3><span id="vModalPercentBadge" class="pro-badge">0% مكتمل</span></div><div class="progress-bar-bg" style="margin-bottom: 18px;"><div id="vModalProgressBar" class="progress-bar-fill"></div></div><div class="form-group"><label>التاريخ المستهدف:</label><input type="date" id="vModalDate" onchange="window.saveVisionModalChanges()"></div><div class="form-group"><label>الخطة الاستراتيجية:</label><textarea id="vModalPlan" rows="3" placeholder="خطتك التفصيلية..." oninput="window.saveVisionModalChanges()"></textarea></div><div class="form-group"><label>المهام (تُحتسب منها نسبة الاكتمال):</label><ul id="vModalTasksList" class="item-list" style="margin-bottom: 10px;"></ul><div class="add-row" style="margin-top: 6px;"><input type="text" id="vModalNewTaskInput" placeholder="أضف مهمة فرعية..." onkeypress="if(event.key==='Enter') window.addVisionSubTask()"><button class="btn btn-primary" onclick="window.addVisionSubTask()">إضافة</button></div></div><div style="display: flex; justify-content: space-between; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);"><button class="btn btn-danger" onclick="window.deleteCurrentVisionItem()">حذف البطاقة</button><button class="btn btn-primary" onclick="window.closeModal('visionDetailModal')">حفظ</button></div></div></div>
   <div id="iosGuideModal" class="modal-overlay"><div class="modal-box" style="max-width: 440px; text-align: center;"><button class="modal-close" onclick="window.closeModal('iosGuideModal')">&times;</button><h3 style="margin-bottom: 10px;">إضافة وتيرة كتطبيق</h3><div style="text-align: right; background: var(--bg-subtle); padding: 16px; border-radius: 14px; font-size: 0.85rem; line-height: 1.9; margin-bottom: 18px;">1. افتح الموقع من <strong>Safari</strong>.<br>2. اضغط على زر <strong>المشاركة</strong> بالأسفل.<br>3. اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong>.<br>4. اضغط <strong>إضافة</strong>.</div><button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.closeModal('iosGuideModal')">حسناً</button></div></div>
-
-  <div id="authModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 440px;">
-      <button class="modal-close" onclick="window.closeModal('authModal')">&times;</button>
-      <div id="viewLogin">
-        <h3 style="margin-bottom: 14px;">تسجيل الدخول</h3>
-        <div class="form-group"><label>البريد</label><input type="email" id="loginEmail"></div><div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="window.handleLogin()">متابعة</button>
-        <div style="display: flex; justify-content: space-between; font-size: 0.82rem;"><span style="color: var(--accent-color); cursor: pointer;" onclick="window.openResetModal()">نسيت كلمة المرور؟</span><span style="color: var(--text-secondary); cursor: pointer;" onclick="window.switchToRegister()">إنشاء حساب جديد</span></div>
-      </div>
-      <div id="viewRegister" style="display: none;">
-        <h3 style="margin-bottom: 14px;">إنشاء حساب جديد</h3>
-        <div class="form-group"><label>الاسم</label><input type="text" id="regName"></div><div class="form-group"><label>البريد</label><input type="email" id="regEmail"></div><div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="window.handleRegister()">إنشاء الحساب</button>
-        <div style="text-align:center;"><span style="color: var(--text-secondary); cursor: pointer; font-size: 0.82rem;" onclick="window.switchToLogin()">لديك حساب بالفعل؟ سجل دخول</span></div>
-      </div>
-    </div>
-  </div>
-
+  <div id="authModal" class="modal-overlay"><div class="modal-box" style="max-width: 440px;"><button class="modal-close" onclick="window.closeModal('authModal')">&times;</button><div id="viewLogin"><h3 style="margin-bottom: 14px;">تسجيل الدخول</h3><div class="form-group"><label>البريد</label><input type="email" id="loginEmail"></div><div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="window.handleLogin()">متابعة</button><div style="display: flex; justify-content: space-between; font-size: 0.82rem;"><span style="color: var(--accent-color); cursor: pointer;" onclick="window.openResetModal()">نسيت كلمة المرور؟</span><span style="color: var(--text-secondary); cursor: pointer;" onclick="window.switchToRegister()">إنشاء حساب جديد</span></div></div><div id="viewRegister" style="display: none;"><h3 style="margin-bottom: 14px;">إنشاء حساب جديد</h3><div class="form-group"><label>الاسم</label><input type="text" id="regName"></div><div class="form-group"><label>البريد</label><input type="email" id="regEmail"></div><div class="form-group"><label>كلمة المرور</label><input type="password" id="regPassword"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="window.handleRegister()">إنشاء الحساب</button><div style="text-align:center;"><span style="color: var(--text-secondary); cursor: pointer; font-size: 0.82rem;" onclick="window.switchToLogin()">لديك حساب بالفعل؟ سجل دخول</span></div></div></div></div>
   <div id="verificationNoticeModal" class="modal-overlay"><div class="modal-box" style="text-align: center; max-width: 420px;"><button class="modal-close" onclick="window.closeModal('verificationNoticeModal')">&times;</button><h3 style="margin-bottom: 10px; color: var(--danger-color);">تحقق من بريدك الإلكتروني</h3><p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">يرجى النقر على الرابط المرسل لبريدك لتفعيل الحساب.</p><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button></div></div>
   <div id="resetModal" class="modal-overlay"><div class="modal-box" style="max-width: 420px;"><button class="modal-close" onclick="window.closeModal('resetModal')">&times;</button><h3 style="margin-bottom: 10px;">استعادة كلمة المرور</h3><div class="form-group"><label>البريد</label><input type="email" id="resetEmail"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="window.handleResetPassword()">إرسال رابط الاستعادة</button></div></div>
-
-  <div id="adminModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 620px;">
-      <button class="modal-close" onclick="window.closeModal('adminModal')">&times;</button>
-      <h3 style="margin-bottom: 6px; color: var(--admin-color);">لوحة التحكم الإدارية</h3>
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 10px;">إرسال رسالة في الهيرو</h4>
-        <div class="form-group" style="margin-bottom: 8px;"><select id="adminNotifTarget" onchange="window.toggleTargetEmailBox(this.value)"><option value="ALL">جميع المشتركين</option><option value="SPECIFIC">مستخدم معين (إيميل/UID)</option></select></div>
-        <div class="form-group" id="adminSpecificEmailBox" style="display:none; margin-bottom: 8px;"><input type="text" id="adminTargetUserEmail" placeholder="إيميل أو معرف المستخدم..."></div>
-        <div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الرسالة أو المسابقة..."></textarea></div>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط الصورة (اختياري)"></div>
-        <div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="المدة بالدقائق (0 يعني دائم)"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="window.adminSendCloudMessage()">نشر الرسالة</button>
-      </div>
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">المستخدمين المسجلين</h4><div id="adminUsersList" style="font-size: 0.82rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 12px;">جاري التحميل...</div></div>
-      <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">توليد أكواد التفعيل</h4><div style="display: flex; gap: 8px; margin-bottom: 8px;"><input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;"><input type="number" id="adminCodeCustomDays" value="365" placeholder="الأيام" style="flex:1;"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="window.adminGenerateActivationCode()">توليد الكود</button><div id="adminCodesList" style="font-size: 0.82rem; max-height: 90px; overflow-y: auto; margin-top: 10px;"></div></div>
-    </div>
-  </div>
-
-  <div id="pricingModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 460px;">
-      <button class="modal-close" onclick="window.closeModal('pricingModal')">&times;</button>
-      <div id="pricingViewUnsubscribed">
-        <span class="pro-badge">الاشتراك</span><h3 style="margin: 10px 0 6px;">تفعيل الاشتراك</h3>
-        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 14px;">أتمم الطلب عبر متجر سلة ثم أدخل الكود أدناه:</p>
-        <div id="oneTimeTrialBox" style="background: var(--accent-light); border: 1px solid var(--accent-color); padding: 14px; border-radius: 12px; margin-bottom: 16px; display: none;"><div style="font-size: 0.86rem; font-weight: 700; color: var(--accent-color);">متاح لحسابك: تجربة مجانية ليومين</div><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top:10px;" onclick="window.activateOneTimeFreeTrial()">تفعيل التجربة المجانية</button></div>
-        <a href="https://salla.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 14px;">متجر سلة للشراء</a>
-        <div class="form-group"><div style="display: flex; gap: 8px;"><input type="text" id="userActivationCodeInput" placeholder="أدخل الكود..."><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userActivationCodeInput')">تفعيل</button></div></div>
-      </div>
-      <div id="pricingViewSubscribed" style="display: none; padding: 8px;">
-        <div style="text-align: center; margin-bottom: 24px;"><span class="pro-badge">عضوية نشطة</span><h3 style="margin: 12px 0 6px;">إدارة الاشتراك</h3><p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;" id="subActiveDetails"></p><div><div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;"><span>المدة المتبقية:</span><strong id="daysRemainingText">0 يوم</strong></div><div class="progress-bar-bg"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div></div></div>
-        <div style="background: var(--bg-subtle); padding: 18px; border-radius: 14px; margin-bottom: 20px;"><h4 style="font-size: 0.9rem; margin-bottom: 8px;">تجديد وتمديد الاشتراك</h4><div style="display: flex; gap: 8px; margin-bottom: 10px;"><input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); outline: none;"><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button></div></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="profileModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 400px;">
-      <button class="modal-close" onclick="window.closeModal('profileModal')">&times;</button>
-      <h3 style="margin-bottom: 14px;">إعدادات الحساب</h3>
-      <div class="form-group"><label>الاسم</label><input type="text" id="profileNameInput"></div>
-      <div class="form-group"><label>معرف الحساب (UID)</label><input type="text" id="profileUidDisplay" readonly style="opacity: 0.7;"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.saveProfile()">حفظ التغييرات</button>
-      <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="window.handleLogout()">تسجيل الخروج</button>
-    </div>
-  </div>
-
-  <div id="historyModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
-      <button class="modal-close" onclick="window.closeModal('historyModal')">&times;</button>
-      <h3 id="historyModalTitle" style="margin-bottom: 16px;">السجل</h3>
-      <div id="historyModalContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
-    </div>
-  </div>
+  <div id="adminModal" class="modal-overlay"><div class="modal-box" style="max-width: 620px;"><button class="modal-close" onclick="window.closeModal('adminModal')">&times;</button><h3 style="margin-bottom: 6px; color: var(--admin-color);">لوحة التحكم الإدارية</h3><div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">إرسال رسالة في الهيرو</h4><div class="form-group" style="margin-bottom: 8px;"><select id="adminNotifTarget" onchange="window.toggleTargetEmailBox(this.value)"><option value="ALL">جميع المشتركين</option><option value="SPECIFIC">مستخدم معين (إيميل/UID)</option></select></div><div class="form-group" id="adminSpecificEmailBox" style="display:none; margin-bottom: 8px;"><input type="text" id="adminTargetUserEmail" placeholder="إيميل أو معرف المستخدم..."></div><div class="form-group" style="margin-bottom: 8px;"><textarea id="adminWidgetMsg" rows="2" placeholder="نص الرسالة أو المسابقة..."></textarea></div><div class="form-group" style="margin-bottom: 8px;"><input type="text" id="adminWidgetImgUrl" placeholder="رابط الصورة (اختياري)"></div><div class="form-group" style="margin-bottom: 8px;"><input type="number" id="adminWidgetDuration" placeholder="المدة بالدقائق (0 يعني دائم)"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="window.adminSendCloudMessage()">نشر الرسالة</button></div><div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 14px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">المستخدمين المسجلين</h4><div id="adminUsersList" style="font-size: 0.82rem; max-height: 120px; overflow-y: auto; background: var(--bg-card); padding: 10px; border-radius: 12px;">جاري التحميل...</div></div><div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px;"><h4 style="font-size: 0.9rem; margin-bottom: 10px;">توليد أكواد التفعيل</h4><div style="display: flex; gap: 8px; margin-bottom: 8px;"><input type="text" id="adminNewActivationCode" placeholder="رمز الكود..." style="flex:2;"><input type="number" id="adminCodeCustomDays" value="365" placeholder="الأيام" style="flex:1;"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;" onclick="window.adminGenerateActivationCode()">توليد الكود</button><div id="adminCodesList" style="font-size: 0.82rem; max-height: 90px; overflow-y: auto; margin-top: 10px;"></div></div></div></div>
+  <div id="pricingModal" class="modal-overlay"><div class="modal-box" style="max-width: 460px;"><button class="modal-close" onclick="window.closeModal('pricingModal')">&times;</button><div id="pricingViewUnsubscribed"><span class="pro-badge">الاشتراك</span><h3 style="margin: 10px 0 6px;">تفعيل الاشتراك</h3><p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 14px;">أتمم الطلب عبر متجر سلة ثم أدخل الكود أدناه:</p><div id="oneTimeTrialBox" style="background: var(--accent-light); border: 1px solid var(--accent-color); padding: 14px; border-radius: 12px; margin-bottom: 16px; display: none;"><div style="font-size: 0.86rem; font-weight: 700; color: var(--accent-color);">متاح لحسابك: تجربة مجانية ليومين</div><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top:10px;" onclick="window.activateOneTimeFreeTrial()">تفعيل التجربة المجانية</button></div><a href="https://salla.sa" target="_blank" class="btn btn-subtle" style="width: 100%; justify-content: center; margin-bottom: 14px;">متجر سلة للشراء</a><div class="form-group"><div style="display: flex; gap: 8px;"><input type="text" id="userActivationCodeInput" placeholder="أدخل الكود..."><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userActivationCodeInput')">تفعيل</button></div></div></div><div id="pricingViewSubscribed" style="display: none; padding: 8px;"><div style="text-align: center; margin-bottom: 24px;"><span class="pro-badge">عضوية نشطة</span><h3 style="margin: 12px 0 6px;">إدارة الاشتراك</h3><p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;" id="subActiveDetails"></p><div><div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;"><span>المدة المتبقية:</span><strong id="daysRemainingText">0 يوم</strong></div><div class="progress-bar-bg"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 100%;"></div></div></div></div><div style="background: var(--bg-subtle); padding: 18px; border-radius: 14px; margin-bottom: 20px;"><h4 style="font-size: 0.9rem; margin-bottom: 8px;">تجديد وتمديد الاشتراك</h4><div style="display: flex; gap: 8px; margin-bottom: 10px;"><input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); outline: none;"><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button></div></div></div></div></div>
+  <div id="profileModal" class="modal-overlay"><div class="modal-box" style="max-width: 400px;"><button class="modal-close" onclick="window.closeModal('profileModal')">&times;</button><h3 style="margin-bottom: 14px;">إعدادات الحساب</h3><div class="form-group"><label>الاسم</label><input type="text" id="profileNameInput"></div><div class="form-group"><label>معرف الحساب (UID)</label><input type="text" id="profileUidDisplay" readonly style="opacity: 0.7;"></div><button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.saveProfile()">حفظ التغييرات</button><button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="window.handleLogout()">تسجيل الخروج</button></div></div>
+  <div id="historyModal" class="modal-overlay"><div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;"><button class="modal-close" onclick="window.closeModal('historyModal')">&times;</button><h3 id="historyModalTitle" style="margin-bottom: 16px;">السجل</h3><div id="historyModalContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div></div></div>
 
   <script type="module" src="./assets/js/firebase-config.js"></script>
   <script type="module" src="./assets/js/ui.js"></script>
