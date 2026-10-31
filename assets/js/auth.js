@@ -4,6 +4,7 @@ import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebase
 
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 auth.languageCode = 'ar';
+window.isVerifyingAccount = false; 
 
 window.switchAuthView = function(view) {
   const loginView = document.getElementById('viewLogin');
@@ -24,6 +25,13 @@ window.switchAuthView = function(view) {
     resetView.style.display = 'block';
     if(sub) sub.innerText = 'أدخلي بريدك لإرسال رابط الاستعادة';
   }
+};
+
+window.returnToLogin = function() {
+    window.isVerifyingAccount = false;
+    window.closeModal('verificationNoticeModal');
+    window.switchAuthView('login');
+    document.getElementById('authModal').style.display = 'flex';
 };
 
 function getLocalYYYYMMDD(dateObj = new Date()) {
@@ -94,12 +102,14 @@ window.handleRegister = async () => {
   if(!email || !pass) return window.showToast('يرجى تعبئة كافة الحقول المطلوبة');
 
   try {
+    window.isVerifyingAccount = true;
+    document.getElementById('authModal').style.display = 'none';
+
     await signOut(auth); localStorage.removeItem('wateerah_local_state');
     const cred = await createUserWithEmailAndPassword(auth, email, pass); 
     await sendEmailVerification(cred.user);
     
     window.userProfile = { name: name || 'صديقنا', isPro: false, planType: 'الباقة الأساسية', trialUsed: false, totalSubDays: 0, expiryDate: '' };
-    
     window.appState = {
       hasStarted: true, theme: 'default', 
       activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
@@ -112,13 +122,15 @@ window.handleRegister = async () => {
     
     window.unverifiedUserObject = cred.user;
     await signOut(auth);
-    
-    // إخفاء نافذة التسجيل وإظهار التنبيه بدون عمل تحديث للصفحة
+
     document.getElementById('authModal').style.display = 'none';
     window.openModal('verificationNoticeModal');
-    window.showToast('تم إرسال رابط التفعيل إلى بريدك الإلكتروني.');
 
-  } catch(e) { window.showToast('حدث خطأ في التسجيل، تأكدي من صحة البريد أو أنه غير مستخدم مسبقاً.'); }
+  } catch(e) { 
+    window.isVerifyingAccount = false;
+    document.getElementById('authModal').style.display = 'flex';
+    window.showToast('حدث خطأ في التسجيل، تأكدي من صحة البريد.'); 
+  }
 };
 
 window.handleLogin = async () => {
@@ -129,16 +141,18 @@ window.handleLogin = async () => {
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     if (!cred.user.emailVerified && cred.user.email !== ADMIN_EMAIL) { 
+        window.isVerifyingAccount = true;
         window.unverifiedUserObject = cred.user; 
+        await signOut(auth); 
+
         document.getElementById('authModal').style.display = 'none';
         window.openModal('verificationNoticeModal'); 
-        await signOut(auth); 
         return; 
     }
-    window.showToast('مرحباً بك مجدداً في مساحتك الخاصة!');
-    // تم إلغاء location.reload() لكي تفتح المنصة بسلاسة
+    window.isVerifyingAccount = false;
     document.getElementById('authModal').style.display = 'none';
-    window.renderWorkspaceVisibility(); // تحديث الواجهة مباشرة
+    window.renderWorkspaceVisibility();
+    window.showToast('مرحباً بك مجدداً في مساحتك الخاصة!');
   } catch(e) { window.showToast('عذراً، البريد الإلكتروني أو كلمة المرور غير صحيحة.'); }
 };
 
@@ -153,7 +167,10 @@ window.handleResetPassword = async () => {
 
 window.resendVerificationEmailDirectly = async () => { 
     if(!window.unverifiedUserObject) return window.showToast('الرجاء تسجيل الدخول أولاً.'); 
-    try { await sendEmailVerification(window.unverifiedUserObject); window.showToast('تم إعادة إرسال رابط التفعيل.'); window.closeModal('verificationNoticeModal'); } 
+    try { 
+        await sendEmailVerification(window.unverifiedUserObject); 
+        window.showToast('تم إعادة إرسال الرابط بنجاح! تفحصي بريدك.'); 
+    } 
     catch(e) {} 
 };
 
