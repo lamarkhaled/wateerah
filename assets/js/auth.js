@@ -59,9 +59,24 @@ window.handleRegister = async () => {
   const pass = passInput.value;
 
   try {
+    // 1. تسجيل الخروج الإجباري أولاً لضمان عدم تداخل أي جلسة سابقة
+    await signOut(auth);
+    localStorage.removeItem('wateerah_local_state');
+
+    // 2. إنشاء حساب جديد ونظيف تماماً
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    window.userProfile.name = name || 'لمار';
     
+    window.userProfile = { name: name || 'لمار', planType: 'الباقة المتقدمة', isPro: true, expiryDate: 'دائم', totalSubDays: 365, trialUsed: true };
+    window.appState = {
+      hasStarted: true, 
+      theme: 'default', 
+      activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
+      widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
+      dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
+      visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] }
+    };
+    
+    // حفظ الحساب الجديد في السحابة بمعفاه المستقل (UID)
     await setDoc(doc(db, "users", cred.user.uid), { 
       email: email, 
       profile: window.userProfile, 
@@ -69,6 +84,7 @@ window.handleRegister = async () => {
       createdAt: new Date().toISOString() 
     });
 
+    localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
     window.showToast('تم إنشاء الحساب بنجاح! أهلاً بكِ 🌟');
     window.closeModal('authModal');
     location.reload();
