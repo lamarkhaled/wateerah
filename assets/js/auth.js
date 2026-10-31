@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
@@ -25,13 +25,6 @@ window.switchAuthView = function(view) {
     resetView.style.display = 'block';
     if(sub) sub.innerText = 'أدخلي بريدك لإرسال رابط الاستعادة';
   }
-};
-
-window.returnToLogin = function() {
-    window.isVerifyingAccount = false;
-    window.closeModal('verificationNoticeModal');
-    window.switchAuthView('login');
-    document.getElementById('authModal').style.display = 'flex';
 };
 
 function getLocalYYYYMMDD(dateObj = new Date()) {
@@ -102,12 +95,8 @@ window.handleRegister = async () => {
   if(!email || !pass) return window.showToast('يرجى تعبئة كافة الحقول المطلوبة');
 
   try {
-    window.isVerifyingAccount = true;
-    document.getElementById('authModal').style.display = 'none';
-
     await signOut(auth); localStorage.removeItem('wateerah_local_state');
     const cred = await createUserWithEmailAndPassword(auth, email, pass); 
-    await sendEmailVerification(cred.user);
     
     window.userProfile = { name: name || 'صديقنا', isPro: false, planType: 'الباقة الأساسية', trialUsed: false, totalSubDays: 0, expiryDate: '' };
     window.appState = {
@@ -120,17 +109,11 @@ window.handleRegister = async () => {
 
     await setDoc(doc(db, "users", cred.user.uid), { email, profile: window.userProfile, state: window.appState, status: 'نشط', createdAt: new Date().toISOString() });
     
-    window.unverifiedUserObject = cred.user;
-    await signOut(auth);
-
     document.getElementById('authModal').style.display = 'none';
-    window.openModal('verificationNoticeModal');
+    window.renderWorkspaceVisibility();
+    window.showToast('تم إنشاء الحساب والدخول بنجاح!');
 
-  } catch(e) { 
-    window.isVerifyingAccount = false;
-    document.getElementById('authModal').style.display = 'flex';
-    window.showToast('حدث خطأ في التسجيل، تأكدي من صحة البريد.'); 
-  }
+  } catch(e) { window.showToast('حدث خطأ في التسجيل، تأكدي من صحة البريد.'); }
 };
 
 window.handleLogin = async () => {
@@ -139,17 +122,7 @@ window.handleLogin = async () => {
   if(!email || !pass) return window.showToast('يرجى إدخال البريد وكلمة المرور');
 
   try {
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    if (!cred.user.emailVerified && cred.user.email !== ADMIN_EMAIL) { 
-        window.isVerifyingAccount = true;
-        window.unverifiedUserObject = cred.user; 
-        await signOut(auth); 
-
-        document.getElementById('authModal').style.display = 'none';
-        window.openModal('verificationNoticeModal'); 
-        return; 
-    }
-    window.isVerifyingAccount = false;
+    await signInWithEmailAndPassword(auth, email, pass);
     document.getElementById('authModal').style.display = 'none';
     window.renderWorkspaceVisibility();
     window.showToast('مرحباً بك مجدداً في مساحتك الخاصة!');
@@ -163,15 +136,6 @@ window.handleResetPassword = async () => {
     if(!email) return window.showToast('يرجى إدخال البريد الإلكتروني أولاً.'); 
     try { await sendPasswordResetEmail(auth, email); window.showToast('تم إرسال رابط الاستعادة إلى بريدك بنجاح.'); window.switchAuthView('login'); } 
     catch(e) { window.showToast('البريد غير مسجل لدينا أو حدث خطأ.'); } 
-};
-
-window.resendVerificationEmailDirectly = async () => { 
-    if(!window.unverifiedUserObject) return window.showToast('الرجاء تسجيل الدخول أولاً.'); 
-    try { 
-        await sendEmailVerification(window.unverifiedUserObject); 
-        window.showToast('تم إعادة إرسال الرابط بنجاح! تفحصي بريدك.'); 
-    } 
-    catch(e) {} 
 };
 
 window.activateOneTimeFreeTrial = async () => {
