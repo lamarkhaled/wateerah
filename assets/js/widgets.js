@@ -15,13 +15,13 @@ window.compressImage = function(file, callback) {
   reader.readAsDataURL(file);
 };
 
-// ================= إدارة الأعمال الشاملة 💼 =================
+// ================= إدارة الأعمال الشاملة (عامة ومبتكرة) 💼 =================
 window.renderBusinessWidget = function() {
   const summaryCard = document.getElementById('businessSummaryCard');
   if(!summaryCard) return;
   
-  // ترحيل البيانات القديمة (إن وجدت) لكي لا تفقدها
   if(!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
+  // ترحيل المسميات القديمة بسلاسة
   if(window.appState.business.design) { window.appState.business.projects = window.appState.business.design; delete window.appState.business.design; }
   if(window.appState.business.honey) { window.appState.business.campaigns = window.appState.business.honey; delete window.appState.business.honey; }
   
@@ -31,12 +31,12 @@ window.renderBusinessWidget = function() {
   summaryCard.innerHTML = `
     <div onclick="window.openBusinessDetails()" style="background: linear-gradient(135deg, var(--bg-glass-strong) 0%, var(--bg-subtle) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 20px; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-ios);">
        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-         <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary); display:flex; align-items:center; gap:10px;"><span style="font-size:1.4rem;">💼</span><span>مساحة العمل والمشاريع</span></div>
+         <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary); display:flex; align-items:center; gap:10px;"><span style="font-size:1.4rem;">💼</span><span>إدارة الأعمال والمشاريع</span></div>
          <span style="font-size:1.1rem; color:var(--text-secondary);">❯</span>
        </div>
        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
          <span>🚀 ${projectsCount} مشاريع نشطة</span>
-         <span>📢 ${campaignsCount} مهام وحملات</span>
+         <span>📢 ${campaignsCount} حملات ومهام</span>
        </div>
     </div>
   `;
@@ -64,13 +64,17 @@ window.renderBusinessDetailsView = function() {
   const projectsList = document.getElementById('businessProjectsList');
   if(projectsList) {
      projectsList.innerHTML = window.appState.business.projects.map((p, i) => {
-       const dateHtml = p.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 تاريخ التسليم: ${p.date}</div>` : '';
+       const dateHtml = p.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 موعد التسليم: ${p.date}</div>` : '';
+       const typeBadge = p.type ? `<span style="font-size: 0.7rem; background: var(--bg-primary); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color); margin-left: 8px;">${p.type}</span>` : '';
        return `<li class="list-item ${p.done ? 'completed' : ''}" style="padding: 14px 16px; border: 1px dashed var(--border-color); margin-bottom: 10px; background: var(--bg-glass-strong);">
          <div class="item-left" style="align-items: flex-start;">
            <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleBusinessProject(${i})">${p.done ? '✓' : ''}</div>
            <div style="display: flex; flex-direction: column; width: 100%;">
                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                   <input type="text" class="item-text-input" value="${p.name}" onchange="window.appState.business.projects[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
+                   <div style="display:flex; align-items:center; flex:1;">
+                       <input type="text" class="item-text-input" value="${p.name}" onchange="window.appState.business.projects[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
+                       ${typeBadge}
+                   </div>
                    <span style="font-size:0.9rem; font-weight:800; color: ${p.done ? 'var(--text-secondary)' : 'var(--accent-color)'}; flex-shrink: 0; margin-right: 10px;">${p.price > 0 ? p.price + ' ر.س' : ''}</span>
                </div>
                ${dateHtml}
@@ -79,19 +83,23 @@ window.renderBusinessDetailsView = function() {
          <button class="delete-btn" style="margin-left: -8px; font-size: 1.3rem;" onclick="window.deleteBusinessProject(${i})">&times;</button>
        </li>`;
      }).join('');
-     if(window.appState.business.projects.length === 0) projectsList.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 15px;">لا توجد مشاريع حالياً. ابدأ بإضافة مشروع جديد!</li>';
+     if(window.appState.business.projects.length === 0) projectsList.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 15px;">لا توجد مشاريع حالياً. ابدأ بإضافة مشروع أو عميل!</li>';
   }
 
   // 2. التسويق والمهام المهنية
   const campaignsList = document.getElementById('businessCampaignsList');
   if(campaignsList) {
      campaignsList.innerHTML = window.appState.business.campaigns.map((h, i) => {
-       const dateHtml = h.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 تاريخ النشر/الإنجاز: ${h.date}</div>` : '';
+       const dateHtml = h.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 تاريخ النشر: ${h.date}</div>` : '';
+       const platformBadge = h.platform ? `<span style="font-size: 0.7rem; background: var(--bg-primary); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-color); margin-left: 8px;">${h.platform}</span>` : '';
        return `<li class="list-item ${h.done ? 'completed' : ''}" style="padding: 14px 16px; border: 1px dashed var(--border-color); margin-bottom: 10px; background: var(--bg-glass-strong);">
          <div class="item-left" style="align-items: flex-start;">
            <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleBusinessCampaign(${i})">${h.done ? '✓' : ''}</div>
            <div style="display: flex; flex-direction: column; width: 100%;">
-               <input type="text" class="item-text-input" value="${h.name}" onchange="window.appState.business.campaigns[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
+               <div style="display:flex; align-items:center; width:100%;">
+                   <input type="text" class="item-text-input" value="${h.name}" onchange="window.appState.business.campaigns[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
+                   ${platformBadge}
+               </div>
                ${dateHtml}
            </div>
          </div>
@@ -103,10 +111,10 @@ window.renderBusinessDetailsView = function() {
 };
 
 window.addBusinessProject = () => {
-  const n = document.getElementById('newProjectName'); const p = document.getElementById('newProjectPrice'); const d = document.getElementById('newProjectDate');
-  if(!n.value.trim()) return window.showToast('أدخل تفاصيل المشروع');
+  const n = document.getElementById('newProjectName'); const t = document.getElementById('newProjectType'); const p = document.getElementById('newProjectPrice'); const d = document.getElementById('newProjectDate');
+  if(!n.value.trim()) return window.showToast('أدخل اسم المشروع أو العميل');
   if(!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
-  window.appState.business.projects.unshift({ name: n.value.trim(), price: parseFloat(p.value)||0, date: d.value, done: false });
+  window.appState.business.projects.unshift({ name: n.value.trim(), type: t.value, price: parseFloat(p.value)||0, date: d.value, done: false });
   n.value = ''; p.value = ''; d.value = '';
   document.getElementById('addProjectForm').style.display='none'; document.getElementById('addProjectPlusBtn').style.display='flex';
   window.renderBusinessDetailsView(); window.autoSave();
@@ -115,10 +123,10 @@ window.toggleBusinessProject = (i) => { window.appState.business.projects[i].don
 window.deleteBusinessProject = (i) => { window.appState.business.projects.splice(i, 1); window.renderBusinessDetailsView(); window.autoSave(); };
 
 window.addBusinessCampaign = () => {
-  const n = document.getElementById('newCampaignName'); const d = document.getElementById('newCampaignDate');
-  if(!n.value.trim()) return window.showToast('أدخل وصف المهمة أو الحملة');
+  const n = document.getElementById('newCampaignName'); const pt = document.getElementById('newCampaignPlatform'); const d = document.getElementById('newCampaignDate');
+  if(!n.value.trim()) return window.showToast('أدخل فكرة الحملة أو المحتوى');
   if(!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
-  window.appState.business.campaigns.unshift({ name: n.value.trim(), date: d.value, done: false });
+  window.appState.business.campaigns.unshift({ name: n.value.trim(), platform: pt.value, date: d.value, done: false });
   n.value = ''; d.value = '';
   document.getElementById('addCampaignForm').style.display='none'; document.getElementById('addCampaignPlusBtn').style.display='flex';
   window.renderBusinessDetailsView(); window.autoSave();
@@ -205,7 +213,6 @@ window.renderBankDetailsView = function() {
   const titleEl = document.getElementById('activeBankTitle'); const totalEl = document.getElementById('activeBankTotal'); if(titleEl) titleEl.innerText = bank.name; if(totalEl) totalEl.innerText = bankTotal + ' ر.س';
   const accountsList = document.getElementById('activeBankAccountsList'); if(!accountsList) return;
   if (!bank.accounts || bank.accounts.length === 0) { accountsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد حسابات مضافة بهذا البنك.</div>`; return; }
-
   accountsList.innerHTML = bank.accounts.map((acc, aIdx) => {
     const balance = parseFloat(acc.balance) || 0; const target = parseFloat(acc.target) || 0; const pct = target > 0 ? Math.min(100, Math.round((balance / target) * 100)) : 0;
     const progressHtml = target > 0 ? `<div style="margin-bottom: 16px;"><div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;"><span>الهدف: ${target} ر.س</span><span style="color: ${pct === 100 ? 'var(--accent-color)' : 'var(--text-secondary)'};">${pct}%</span></div><div class="progress-bar-bg" style="height: 6px;"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div></div>` : '';
