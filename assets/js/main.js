@@ -10,7 +10,6 @@ window.isDataLoadedFromCloud = false;
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
-// الباقة المتقدمة مفعلة افتراضياً
 window.userProfile = { name: 'لمار', planType: 'الباقة المتقدمة', isPro: true, expiryDate: '', totalSubDays: 30, trialUsed: false };
 window.appState = {
   hasStarted: false, theme: 'default', activeWidgets: [], widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
@@ -20,7 +19,7 @@ window.appState = {
   monthlyExpenses: [], 
   incomeSources: [],
   incomeTarget: 5000,
-  visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
+  visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] }
 };
 
 let saveTimer; 
@@ -39,8 +38,6 @@ window.saveCurrentWateerah = async (manual) => {
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   const user = auth.currentUser;
   if (!user) { if(manual && window.showToast) window.showToast('تم الحفظ محلياً'); return; }
-
-  if (!window.isDataLoadedFromCloud && !manual) return;
 
   try { 
     await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); 
@@ -65,7 +62,6 @@ window.loadTodayDate = function() {
   
   if(window.renderLists) window.renderLists();
   if(window.renderNotesList) window.renderNotesList();
-  window.saveCurrentWateerah(false);
 };
 
 window.openHistoryModal = function(type) {
@@ -103,7 +99,7 @@ window.openHistoryModal = function(type) {
   });
   
   if (!hasContent) {
-    container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا توجد سجلات سابقة محفوظة بعد.</div>';
+    container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا توجد سجلات سابقة محفوظة بعد.</div>`;
   }
   
   window.openModal('historyModal');
@@ -111,57 +107,53 @@ window.openHistoryModal = function(type) {
 
 window.saveProfile = async () => {
   window.userProfile.name = document.getElementById('profileNameInput')?.value.trim() || 'صديقنا';
-  document.getElementById('headerUserName').innerText = window.userProfile.name; document.getElementById('headerAvatar').innerText = window.userProfile.name[0];
+  document.getElementById('headerUserName').innerText = window.userProfile.name; 
+  document.getElementById('headerAvatar').innerText = window.userProfile.name[0];
   if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
   if(window.closeModal) window.closeModal('profileModal'); 
   window.saveCurrentWateerah(true);
 };
 
+// 1. تحميل البيانات المحلية فوراً بغض النظر عن حالة تسجيل الدخول
 const savedLocal = localStorage.getItem('wateerah_local_state');
-if (savedLocal) { try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {} }
+if (savedLocal) { 
+  try { 
+    window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; 
+  } catch(e) {} 
+}
 
 setTimeout(() => { 
   if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
   if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
   if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
   window.loadTodayDate();
-}, 200);
+}, 100);
 
-// تم إلغاء المزامنة اللحظية (onSnapshot) واستبدالها بالقراءة الهادئة (getDoc) لمنع تجميد الشاشة
+// 2. مراقبة الحساب في الخلفية (اختياري لجلب السحابي إن وجد، دون إجبار المستخدم)
 onAuthStateChanged(auth, async (user) => {
-  setTimeout(async () => {
-      if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
-        const guestBtn = document.getElementById('guestAuthBtn'); if(guestBtn) guestBtn.style.display = 'none';
-        const pill = document.getElementById('userProfilePill'); if(pill) pill.style.display = 'flex';
-        const uidDisp = document.getElementById('profileUidDisplay'); if(uidDisp) uidDisp.value = user.uid;
+  if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
+    const guestBtn = document.getElementById('guestAuthBtn'); if(guestBtn) guestBtn.style.display = 'none';
+    const pill = document.getElementById('userProfilePill'); if(pill) pill.style.display = 'flex';
+    const uidDisp = document.getElementById('profileUidDisplay'); if(uidDisp) uidDisp.value = user.uid;
 
-        if (user.email === ADMIN_EMAIL) { const adminBtn = document.getElementById('adminPanelBtn'); if(adminBtn) adminBtn.style.display = 'inline-flex'; }
+    if (user.email === ADMIN_EMAIL) { const adminBtn = document.getElementById('adminPanelBtn'); if(adminBtn) adminBtn.style.display = 'inline-flex'; }
 
-        try { 
-          const snap = await getDoc(doc(db, "users", user.uid)); 
-          if(snap.exists()) { 
-            const d = snap.data(); 
-            if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
-            if(d.state) window.appState = { ...window.appState, ...d.state }; 
-          } 
-        } catch(e) {}
-        
-        window.isDataLoadedFromCloud = true; 
-
-        if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
-        if(window.updateSubscriptionUI) window.updateSubscriptionUI();
-        
-        document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; 
-        document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; 
-        document.getElementById('profileNameInput').value = window.userProfile.name || '';
-        
-        window.loadTodayDate();
-        if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-      } else { 
-        window.isDataLoadedFromCloud = true;
-        if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
-        if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-        window.loadTodayDate();
-      }
-  }, 200);
+    try { 
+      const snap = await getDoc(doc(db, "users", user.uid)); 
+      if(snap.exists()) { 
+        const d = snap.data(); 
+        if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
+        if(d.state) {
+           // دمج البيانات السحابية مع المحلية بحذر لتجنب ضياع المدخلات
+           window.appState = { ...window.appState, ...d.state };
+           localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
+        }
+      } 
+    } catch(e) {}
+    
+    document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; 
+    document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; 
+    document.getElementById('profileNameInput').value = window.userProfile.name || '';
+    window.loadTodayDate();
+  }
 });
