@@ -1,5 +1,5 @@
 import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
-import { doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 window.unverifiedUserObject = null;
@@ -10,17 +10,24 @@ window.isDataLoadedFromCloud = false;
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
-window.userProfile = { name: 'لمار', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 30, trialUsed: false };
+// الباقة المتقدمة مفعلة افتراضياً
+window.userProfile = { name: 'لمار', planType: 'الباقة المتقدمة', isPro: true, expiryDate: '', totalSubDays: 30, trialUsed: false };
 window.appState = {
   hasStarted: false, theme: 'default', activeWidgets: [], widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
   dailyRecords: {}, 
   notes: [],
   allocations: [],
   monthlyExpenses: [], 
+  incomeSources: [],
+  incomeTarget: 5000,
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
 };
 
-let saveTimer; window.autoSave = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => window.saveCurrentWateerah(false), 700); };
+let saveTimer; 
+window.autoSave = () => { 
+  clearTimeout(saveTimer); 
+  saveTimer = setTimeout(() => window.saveCurrentWateerah(false), 800); 
+};
 
 window.saveCurrentWateerah = async (manual) => {
   if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
@@ -110,19 +117,6 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-function listenToCloudMessages() {
-  onSnapshot(doc(db, "notifications", "activeMessage"), (snap) => {
-    if (!snap.exists()) return;
-    const data = snap.data(); const user = auth.currentUser; const myEmail = user ? user.email : ''; const myUid = user ? user.uid : '';
-    if (!(data.target === 'ALL' || data.target === myEmail || data.target === myUid)) return;
-    const elapsedMin = (Date.now() - data.timestamp) / (1000 * 60);
-    if (data.duration > 0 && elapsedMin >= data.duration) { const a = document.getElementById('activeGlassMessage'); const e = document.getElementById('emptyGlassMessage'); if(a) a.style.display = 'none'; if(e) e.style.display = 'flex'; return; }
-    const a = document.getElementById('activeGlassMessage'); const e = document.getElementById('emptyGlassMessage'); if(a) a.style.display = 'block'; if(e) e.style.display = 'none';
-    const txt = document.getElementById('glassMessageText'); if(txt) txt.innerText = data.message;
-    const imgEl = document.getElementById('glassMessageImg'); if (data.imageUrl && imgEl) { imgEl.src = data.imageUrl; imgEl.style.display = 'block'; } else if(imgEl) { imgEl.style.display = 'none'; }
-  });
-}
-
 const savedLocal = localStorage.getItem('wateerah_local_state');
 if (savedLocal) { try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {} }
 
@@ -130,10 +124,10 @@ setTimeout(() => {
   if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
   if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
   if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-  listenToCloudMessages(); 
   window.loadTodayDate();
 }, 200);
 
+// تم إلغاء المزامنة اللحظية (onSnapshot) واستبدالها بالقراءة الهادئة (getDoc) لمنع تجميد الشاشة
 onAuthStateChanged(auth, async (user) => {
   setTimeout(async () => {
       if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
