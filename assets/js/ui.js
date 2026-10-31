@@ -90,19 +90,22 @@ window.openPage = function(wId) {
   const emptyState = document.getElementById('emptyWorkspaceState'); if (emptyState) emptyState.classList.add('hidden-el');
   const pageContainer = document.getElementById('pageContainer'); if (pageContainer) pageContainer.style.display = 'block';
 
+  // إخفاء جميع البطاقات والتطبيقات أولاً
   document.querySelectorAll('.widget-card').forEach(card => { 
     card.classList.add('hidden-el'); 
     card.style.display = 'none'; 
   });
   
+  // إظهار البطاقة أو الميزة المطلوبة حصرياً
   const target = document.getElementById(wId);
   if(target) { 
     target.classList.remove('hidden-el'); 
     target.style.display = 'block'; 
   }
 
+  // إعادة رسم البيانات الداخلية للتطبيق المفتوح لتجنب ظهور شاشة فارغة
   if (wId === 'widget-finance' && window.renderLists) window.renderLists();
-  if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
+  if (wId === 'widget-business' && window.renderBusinessWidget) window.renderBusinessWidget();
   if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
   if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
   if (wId === 'widget-habits' && window.renderLists) window.renderLists();
@@ -166,21 +169,13 @@ window.removeWidget = (wId) => {
   window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); 
 };
 
-window.openModal = async function(id) {
-  if (id === 'addWidgetModal' && window.renderWidgetLibraryModal) window.renderWidgetLibraryModal();
-  if (id === 'pricingModal' && window.setupPricingModal) window.setupPricingModal();
-  
-  const modal = document.getElementById(id); 
-  if (modal) {
-      modal.classList.add('open');
-      modal.style.display = 'flex';
-  }
+window.openModal = async id => {
+  if (id === 'addWidgetModal') window.renderWidgetLibraryModal();
+  const modal = document.getElementById(id); if (modal) modal.classList.add('open');
 };
 
-window.closeModal = function(id) {
-  const modal = document.getElementById(id); 
-  if (modal) {
-      modal.classList.remove('open');
-      setTimeout(() => modal.style.display = '', 300);
-  }
+window.closeModal = id => {
+  const modal = document.getElementById(id); if (modal) modal.classList.remove('open');
 };
+
+window.openAuthModal = () => { window.openModal('authModal'); };
