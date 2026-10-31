@@ -10,7 +10,6 @@ window.isDataLoadedFromCloud = false;
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
-// تفعيل الباقة المتقدمة وصلاحيات كاملة دائماً
 window.userProfile = { name: 'لمار', planType: 'الباقة المتقدمة', isPro: true, expiryDate: 'دائم', totalSubDays: 365, trialUsed: true };
 window.appState = {
   hasStarted: true, 
@@ -86,7 +85,7 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-// تحميل البيانات المحلية فوراً
+// استرجاع البيانات المحفوظة محلياً فوراً
 const savedLocal = localStorage.getItem('wateerah_local_state');
 if (savedLocal) { 
   try { 
@@ -127,12 +126,11 @@ onAuthStateChanged(auth, async (user) => {
         const d = snap.data(); 
         if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
         if(d.state && Object.keys(d.state).length > 0) {
+           // دمج البيانات السحابية والمحلية بذكاء
            window.appState = { ...window.appState, ...d.state };
            localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
         }
-      } else {
-        await window.saveCurrentWateerah(true);
-      }
+      } 
     } catch(e) {}
     
     const headerName = document.getElementById('headerUserName');
@@ -147,6 +145,7 @@ onAuthStateChanged(auth, async (user) => {
     if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
   } else {
+    // فتح نافذة الدخول إذا لم يكن مسجلاً
     if(authModal) authModal.classList.add('open');
     if(lockBtn) lockBtn.style.display = 'none';
     if(guestBtn) guestBtn.style.display = 'inline-block';
