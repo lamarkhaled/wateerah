@@ -206,8 +206,8 @@ window.renderWishlist = function() {
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 0.8rem; font-weight: 700; color: ${pct === 100 ? 'var(--accent-color)' : 'var(--text-secondary)'};">${pct}%</span>
           <div style="display: flex; gap: 6px;">
-            <button class="btn btn-subtle" style="padding: 4px 12px; font-size: 1rem; font-weight: bold;" onclick="window.updateWishlistAmount(${idx}, -50)">-</button>
-            <button class="btn btn-primary" style="padding: 4px 12px; font-size: 1rem; font-weight: bold;" onclick="window.updateWishlistAmount(${idx}, 50)">+</button>
+            <button class="btn btn-subtle" style="padding: 4px 12px; font-size: 1rem; font-weight: bold;" onclick="window.updateWishlistAmount(${idx}, -1)">-</button>
+            <button class="btn btn-primary" style="padding: 4px 12px; font-size: 1rem; font-weight: bold;" onclick="window.updateWishlistAmount(${idx}, 1)">+</button>
             <button class="btn btn-subtle" style="padding: 4px 10px; font-size: 0.75rem;" onclick="window.promptWishlistAmount(${idx})">تعديل ✏️</button>
           </div>
         </div>
@@ -236,7 +236,6 @@ window.addWishlistItem = () => {
     document.getElementById('newWishLink').value = '';
     if (fileInput) fileInput.value = '';
     
-    // إخفاء النموذج وإعادة زر +
     const form = document.getElementById('addWishForm');
     const plusBtn = document.getElementById('addWishPlusBtn');
     if(form) form.style.display = 'none';
