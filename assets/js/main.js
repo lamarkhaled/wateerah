@@ -12,14 +12,22 @@ window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
 window.userProfile = { name: 'لمار', planType: 'الباقة المتقدمة', isPro: true, expiryDate: '', totalSubDays: 30, trialUsed: false };
 window.appState = {
-  hasStarted: false, theme: 'default', activeWidgets: [], widgetOrder: ['widget-vision', 'widget-kanban', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
+  hasStarted: false, 
+  theme: 'default', 
+  activeWidgets: [], 
+  widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
   dailyRecords: {}, 
   notes: [],
   allocations: [],
   monthlyExpenses: [], 
   incomeSources: [],
   incomeTarget: 5000,
-  visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] }
+  visionBoard: [], 
+  kanbanTasks: [], 
+  banks: [], 
+  wishlist: [], 
+  subscriptions: [], 
+  business: { projects: [], campaigns: [] }
 };
 
 let saveTimer; 
@@ -67,6 +75,7 @@ window.loadTodayDate = function() {
 window.openHistoryModal = function(type) {
   const container = document.getElementById('historyModalContent');
   const title = document.getElementById('historyModalTitle');
+  if(!container || !title) return;
   container.innerHTML = '';
   
   window.saveCurrentWateerah(false);
@@ -99,22 +108,24 @@ window.openHistoryModal = function(type) {
   });
   
   if (!hasContent) {
-    container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا توجد سجلات سابقة محفوظة بعد.</div>`;
+    container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا توجد سجلات سابقة محفوظة بعد.</div>';
   }
   
   window.openModal('historyModal');
 };
 
 window.saveProfile = async () => {
-  window.userProfile.name = document.getElementById('profileNameInput')?.value.trim() || 'صديقنا';
-  document.getElementById('headerUserName').innerText = window.userProfile.name; 
-  document.getElementById('headerAvatar').innerText = window.userProfile.name[0];
-  if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
+  const nameInput = document.getElementById('profileNameInput');
+  window.userProfile.name = nameInput ? nameInput.value.trim() : 'صديقنا';
+  const headerName = document.getElementById('headerUserName');
+  const headerAvatar = document.getElementById('headerAvatar');
+  if(headerName) headerName.innerText = window.userProfile.name; 
+  if(headerAvatar) headerAvatar.innerText = window.userProfile.name[0];
   if(window.closeModal) window.closeModal('profileModal'); 
   window.saveCurrentWateerah(true);
 };
 
-// 1. تحميل البيانات المحلية فوراً بغض النظر عن حالة تسجيل الدخول
+// تحميل البيانات المحلية فوراً
 const savedLocal = localStorage.getItem('wateerah_local_state');
 if (savedLocal) { 
   try { 
@@ -129,7 +140,6 @@ setTimeout(() => {
   window.loadTodayDate();
 }, 100);
 
-// 2. مراقبة الحساب في الخلفية (اختياري لجلب السحابي إن وجد، دون إجبار المستخدم)
 onAuthStateChanged(auth, async (user) => {
   if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
     const guestBtn = document.getElementById('guestAuthBtn'); if(guestBtn) guestBtn.style.display = 'none';
@@ -144,16 +154,18 @@ onAuthStateChanged(auth, async (user) => {
         const d = snap.data(); 
         if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
         if(d.state) {
-           // دمج البيانات السحابية مع المحلية بحذر لتجنب ضياع المدخلات
            window.appState = { ...window.appState, ...d.state };
            localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
         }
       } 
     } catch(e) {}
     
-    document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; 
-    document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; 
-    document.getElementById('profileNameInput').value = window.userProfile.name || '';
+    const headerName = document.getElementById('headerUserName');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const profileNameInput = document.getElementById('profileNameInput');
+    if(headerName) headerName.innerText = window.userProfile.name || user.email; 
+    if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'ل')[0]; 
+    if(profileNameInput) profileNameInput.value = window.userProfile.name || '';
     window.loadTodayDate();
   }
 });
