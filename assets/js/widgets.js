@@ -172,7 +172,6 @@ window.addAllocation = () => { const nameEl = document.getElementById('newAllocN
 window.updateAllocation = (idx, field, val) => { if (field === 'pct') val = parseFloat(val) || 0; window.appState.allocations[idx][field] = val; window.renderAllocations(); window.autoSave(); };
 window.deleteAllocation = (idx) => { window.appState.allocations.splice(idx, 1); window.renderAllocations(); window.autoSave(); };
 
-// ================= نظام قائمة الأمنيات المتطور =================
 window.renderWishlist = function() {
   const container = document.getElementById('wishlistCardsContainer');
   if (!container) return;
@@ -237,6 +236,12 @@ window.addWishlistItem = () => {
     document.getElementById('newWishLink').value = '';
     if (fileInput) fileInput.value = '';
     
+    // إخفاء النموذج وإعادة زر +
+    const form = document.getElementById('addWishForm');
+    const plusBtn = document.getElementById('addWishPlusBtn');
+    if(form) form.style.display = 'none';
+    if(plusBtn) plusBtn.style.display = 'flex';
+    
     window.renderLists(); window.autoSave(); window.showToast('تمت الإضافة لقائمة الأمنيات');
   };
 
@@ -294,9 +299,7 @@ window.addHabit = () => { if (!window.userProfile?.isPro && (window.appState.hab
 window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; window.renderLists(); window.autoSave(); };
 window.calculateDistribution = () => { window.renderAllocations(); };
 
-// ================= دوال التدوين =================
 window.currentActiveNoteId = null;
-
 window.renderNotesList = function() {
   if (!window.appState.notes) window.appState.notes = [];
   const listContainer = document.getElementById('notesListView');
