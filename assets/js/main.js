@@ -43,13 +43,10 @@ window.saveCurrentWateerah = async (manual) => {
     habits: window.appState.habits || []
   };
 
-  // حفظ محلياً على الجهاز
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
-  
   const user = auth.currentUser;
   if (!user) return;
 
-  // مزامنة سحابية مع حسابك لكي يظهر في الأجهزة الأخرى
   try { 
     await setDoc(doc(db, "users", user.uid), { 
       email: user.email, 
@@ -57,7 +54,6 @@ window.saveCurrentWateerah = async (manual) => {
       state: window.appState, 
       updatedAt: new Date().toISOString() 
     }, { merge: true }); 
-    if(manual && window.showToast) window.showToast('تمت المزامنة سحابياً بنجاح ☁️');
   } catch(e) {}
 };
 
@@ -89,7 +85,6 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-// 1. استرجاع البيانات المحفوظة محلياً فوراً
 const savedLocal = localStorage.getItem('wateerah_local_state');
 if (savedLocal) { 
   try { 
@@ -104,12 +99,12 @@ setTimeout(() => {
   window.loadTodayDate();
 }, 100);
 
-// 2. إدارة حالة الاتصال والمزامنة عند تسجيل الدخول
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
   const guestBtn = document.getElementById('guestAuthBtn');
   const profilePill = document.getElementById('userProfilePill');
+  const adminBtn = document.getElementById('adminPanelBtn');
 
   if (user) {
     if(authModal) authModal.classList.remove('open');
@@ -117,13 +112,14 @@ onAuthStateChanged(auth, async (user) => {
     if(guestBtn) guestBtn.style.display = 'none';
     if(profilePill) profilePill.style.display = 'flex';
 
+    if (user.email === ADMIN_EMAIL) { 
+      if(adminBtn) adminBtn.style.display = 'inline-flex'; 
+    } else {
+      if(adminBtn) adminBtn.style.display = 'none';
+    }
+
     const uidDisp = document.getElementById('profileUidDisplay'); 
     if(uidDisp) uidDisp.value = user.uid;
-
-    if (user.email === ADMIN_EMAIL) { 
-      const adminBtn = document.getElementById('adminPanelBtn'); 
-      if(adminBtn) adminBtn.style.display = 'inline-flex'; 
-    }
 
     try { 
       const snap = await getDoc(doc(db, "users", user.uid)); 
@@ -131,12 +127,10 @@ onAuthStateChanged(auth, async (user) => {
         const d = snap.data(); 
         if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
         if(d.state && Object.keys(d.state).length > 0) {
-           // سحب البيانات من السحابة لضمان تطابق الأجهزة (لابتوب وآيباد)
            window.appState = { ...window.appState, ...d.state };
            localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
         }
       } else {
-        // إذا كان الحساب جديداً، يتم رفع البيانات الحالية للسحابة
         await window.saveCurrentWateerah(true);
       }
     } catch(e) {}
@@ -146,7 +140,7 @@ onAuthStateChanged(auth, async (user) => {
     const profileNameInput = document.getElementById('profileNameInput');
     if(headerName) headerName.innerText = window.userProfile.name || user.email; 
     if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'ل')[0]; 
-    if(profileNameInput) profileNameInput.value = window.userProfile.name || '';
+    if(profilePill) profilePill.value = window.userProfile.name || '';
     
     window.loadTodayDate();
     if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
@@ -157,5 +151,6 @@ onAuthStateChanged(auth, async (user) => {
     if(lockBtn) lockBtn.style.display = 'none';
     if(guestBtn) guestBtn.style.display = 'inline-block';
     if(profilePill) profilePill.style.display = 'none';
+    if(adminBtn) adminBtn.style.display = 'none';
   }
 });
