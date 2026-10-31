@@ -90,22 +90,20 @@ window.openPage = function(wId) {
   const emptyState = document.getElementById('emptyWorkspaceState'); if (emptyState) emptyState.classList.add('hidden-el');
   const pageContainer = document.getElementById('pageContainer'); if (pageContainer) pageContainer.style.display = 'block';
 
-  // إخفاء جميع البطاقات والتطبيقات أولاً
   document.querySelectorAll('.widget-card').forEach(card => { 
     card.classList.add('hidden-el'); 
     card.style.display = 'none'; 
   });
   
-  // إظهار البطاقة أو الميزة المطلوبة حصرياً
   const target = document.getElementById(wId);
   if(target) { 
     target.classList.remove('hidden-el'); 
     target.style.display = 'block'; 
   }
 
-  // إعادة رسم البيانات الداخلية للتطبيق المفتوح لتجنب ظهور شاشة فارغة
+  // استدعاء دالة الرسم الخاصة بالصفحة المفتوحة لتجنب ظهور المحتوى فارغاً أو نقاط ثلاث
   if (wId === 'widget-finance' && window.renderLists) window.renderLists();
-  if (wId === 'widget-business' && window.renderBusinessWidget) window.renderBusinessWidget();
+  if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
   if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
   if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
   if (wId === 'widget-habits' && window.renderLists) window.renderLists();
