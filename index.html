@@ -174,17 +174,15 @@
             </div>
           </div>
 
-          <!-- قسم قائمة الأمنيات الجديد (بسيط ومرتب) -->
+          <!-- قسم قائمة الأمنيات (بسيط ومرتب) -->
           <div style="margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات (الادخار للأهداف)</div>
-              <!-- زر الإضافة الذي يفتح النموذج -->
+              <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات والمدخرات</div>
               <button id="addWishPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addWishForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             
             <div id="wishlistCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 16px;"></div>
             
-            <!-- نموذج إضافة أمنية (مخفي افتراضياً) -->
             <div id="addWishForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color);">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                 <strong style="font-size: 0.85rem; color: var(--accent-color);">أمنية جديدة 🎁</strong>
@@ -205,9 +203,50 @@
             </div>
           </div>
 
+          <!-- البنوك والاشتراكات ومصاريف الشهر في شبكة متجاوبة -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-            <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">البنوك والحسابات المالية</div><div id="banksContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px;"></div><div class="add-row"><input type="text" id="newBankName" placeholder="اسم البنك (مثل: الراجحي)..."><button class="btn btn-primary" onclick="window.addBank()">إضافة بنك</button></div></div>
-            <div><div style="font-size: 0.88rem; font-weight: 700; margin-bottom: 10px;">الاشتراكات الشهرية</div><ul id="subscriptionsList" class="item-list"></ul><div class="add-row"><input type="text" id="newSubName" placeholder="الاشتراك..."><input type="number" id="newSubCost" placeholder="المبلغ"><button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button></div></div>
+            
+            <!-- مصاريف الشهر (To-Do List) -->
+            <div>
+              <div style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">مصاريف الشهر (مهام الدفع)</div>
+              
+              <div style="background: var(--bg-glass-strong); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px;">
+                  <span>الاكتمال: <strong id="expenseProgressText" style="color: var(--accent-color);">0%</strong></span>
+                  <span>المتبقي: <strong id="expenseRemainingText" style="color: var(--danger-color);">0</strong> ر.س</span>
+                </div>
+                <div class="progress-bar-bg" style="height: 6px; margin-bottom: 12px;">
+                  <div id="expenseProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700;">
+                  <span>الإجمالي: <span id="expenseTotalText">0</span> ر.س</span>
+                  <span style="color: var(--text-secondary);">دُفع: <span id="expensePaidText">0</span> ر.س</span>
+                </div>
+              </div>
+
+              <ul id="monthlyExpensesList" class="item-list"></ul>
+              
+              <div class="add-row">
+                <input type="text" id="newExpenseName" placeholder="المصروف (كهرباء, ماء...)" style="flex:2;">
+                <input type="number" id="newExpenseAmount" placeholder="المبلغ" style="flex:1;">
+                <button class="btn btn-primary" onclick="window.addMonthlyExpense()">إضافة</button>
+              </div>
+            </div>
+
+            <!-- البنوك والحسابات -->
+            <div>
+              <div style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">البنوك والحسابات المالية</div>
+              <div id="banksContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px;"></div>
+              <div class="add-row"><input type="text" id="newBankName" placeholder="اسم البنك (مثل: الراجحي)..."><button class="btn btn-primary" onclick="window.addBank()">إضافة بنك</button></div>
+            </div>
+
+            <!-- الاشتراكات -->
+            <div>
+              <div style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">الاشتراكات الشهرية</div>
+              <ul id="subscriptionsList" class="item-list"></ul>
+              <div class="add-row"><input type="text" id="newSubName" placeholder="الاشتراك..."><input type="number" id="newSubCost" placeholder="المبلغ"><button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button></div>
+            </div>
+
           </div>
         </div>
 
