@@ -124,29 +124,16 @@ window.addBank = () => {
   document.getElementById('newBankName').value = '';
   window.renderLists(); window.autoSave(); window.showToast('تمت إضافة البنك بنجاح');
 };
-
-window.deleteBank = (bIdx) => {
-  if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) {
-    window.appState.banks.splice(bIdx, 1); window.renderLists(); window.autoSave(); window.showToast('تم حذف البنك');
-  }
-};
+window.deleteBank = (bIdx) => { if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) { window.appState.banks.splice(bIdx, 1); window.renderLists(); window.autoSave(); window.showToast('تم حذف البنك'); } };
 window.updateBankName = (bIdx, val) => { window.appState.banks[bIdx].name = val; window.autoSave(); };
-window.addAccount = (bIdx) => {
-  const nameEl = document.getElementById(`newAccName_${bIdx}`); const balEl = document.getElementById(`newAccBalance_${bIdx}`);
-  const name = nameEl.value.trim(); const balance = parseFloat(balEl.value) || 0;
-  if (!name) return window.showToast('أدخل اسم الحساب');
-  window.appState.banks[bIdx].accounts.push({ name, balance });
-  nameEl.value = ''; balEl.value = ''; window.renderLists(); window.autoSave();
-};
+window.addAccount = (bIdx) => { const nameEl = document.getElementById(`newAccName_${bIdx}`); const balEl = document.getElementById(`newAccBalance_${bIdx}`); const name = nameEl.value.trim(); const balance = parseFloat(balEl.value) || 0; if (!name) return window.showToast('أدخل اسم الحساب'); window.appState.banks[bIdx].accounts.push({ name, balance }); nameEl.value = ''; balEl.value = ''; window.renderLists(); window.autoSave(); };
 window.deleteAccount = (bIdx, aIdx) => { window.appState.banks[bIdx].accounts.splice(aIdx, 1); window.renderLists(); window.autoSave(); };
 window.updateAccountName = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].name = val; window.autoSave(); };
-window.updateAccountBalance = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].balance = parseFloat(val) || 0; window.autoSave(); };
+window.updateAccountBalance = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].balance = parseFloat(val) || 0; window.autoSave(); window.calculateDistribution(); };
 
-// ================= دوال التوزيع المئوي للدخل =================
 window.renderAllocations = function() {
   const container = document.getElementById('allocationsContainer');
   if (!container) return;
-  
   if (!window.appState.allocations || window.appState.allocations.length === 0) {
     window.appState.allocations = [
       {name: 'التزامات ومصاريف', pct: 40}, 
@@ -155,7 +142,6 @@ window.renderAllocations = function() {
       {name: 'صدقات', pct: 10}
     ];
   }
-
   const incomeEl = document.getElementById('totalIncomeInput');
   const income = incomeEl ? (parseFloat(incomeEl.value) || 0) : 5000;
   let totalPct = 0;
@@ -164,19 +150,7 @@ window.renderAllocations = function() {
     const p = parseFloat(al.pct) || 0;
     totalPct += p;
     const amount = (income * (p / 100)).toFixed(2);
-    return `
-      <div class="list-item" style="padding: 10px 14px; background: var(--bg-subtle);">
-        <div class="item-left" style="gap: 12px; flex: 1; flex-wrap: wrap;">
-          <input type="text" class="item-text-input" value="${al.name}" onchange="window.updateAllocation(${idx}, 'name', this.value)" style="font-weight: 700; flex: 1.5; min-width: 100px;" placeholder="اسم البند">
-          <div style="display: flex; align-items: center; gap: 4px; flex: 1;">
-            <input type="number" class="item-text-input" value="${al.pct}" onchange="window.updateAllocation(${idx}, 'pct', this.value)" style="color: var(--accent-color); font-weight: 700; width: 60px; text-align: left; background: var(--bg-primary); padding: 4px; border-radius: 6px; border: 1px solid var(--border-color);"> 
-            <span style="font-size: 0.8rem; font-weight: 700;">%</span>
-          </div>
-          <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-color); flex: 1.5; text-align: left; border-right: 1px solid var(--border-color); padding-right: 12px; min-width: 90px;">${amount} ر.س</span>
-        </div>
-        <button class="delete-btn" onclick="window.deleteAllocation(${idx})">&times;</button>
-      </div>
-    `;
+    return `<div class="list-item" style="padding: 10px 14px; background: var(--bg-subtle);"><div class="item-left" style="gap: 12px; flex: 1; flex-wrap: wrap;"><input type="text" class="item-text-input" value="${al.name}" onchange="window.updateAllocation(${idx}, 'name', this.value)" style="font-weight: 700; flex: 1.5; min-width: 100px;" placeholder="اسم البند"><div style="display: flex; align-items: center; gap: 4px; flex: 1;"><input type="number" class="item-text-input" value="${al.pct}" onchange="window.updateAllocation(${idx}, 'pct', this.value)" style="color: var(--accent-color); font-weight: 700; width: 60px; text-align: left; background: var(--bg-primary); padding: 4px; border-radius: 6px; border: 1px solid var(--border-color);"> <span style="font-size: 0.8rem; font-weight: 700;">%</span></div><span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-color); flex: 1.5; text-align: left; border-right: 1px solid var(--border-color); padding-right: 12px; min-width: 90px;">${amount} ر.س</span></div><button class="delete-btn" onclick="window.deleteAllocation(${idx})">&times;</button></div>`;
   }).join('');
 
   const warning = document.getElementById('allocationWarning');
@@ -185,198 +159,175 @@ window.renderAllocations = function() {
   
   if (warning && currTotal && summary) {
     if (totalPct > 100) {
-      warning.style.display = 'block';
-      currTotal.innerText = totalPct;
-      summary.innerText = `تجاوزت الحد! (المتبقي: ${100 - totalPct}%)`;
-      summary.style.color = 'var(--danger-color)';
+      warning.style.display = 'block'; currTotal.innerText = totalPct;
+      summary.innerText = `تجاوزت الحد! (المتبقي: ${100 - totalPct}%)`; summary.style.color = 'var(--danger-color)';
     } else {
       warning.style.display = 'none';
-      summary.innerText = `إجمالي الموزع: ${totalPct}% | المتبقي: ${100 - totalPct}%`;
-      summary.style.color = 'var(--text-secondary)';
+      summary.innerText = `إجمالي الموزع: ${totalPct}% | المتبقي: ${100 - totalPct}%`; summary.style.color = 'var(--text-secondary)';
     }
   }
 };
 
-window.addAllocation = () => {
-  const nameEl = document.getElementById('newAllocName');
-  const pctEl = document.getElementById('newAllocPct');
-  const name = nameEl.value.trim();
-  const pct = parseFloat(pctEl.value) || 0;
-  
-  if (!name) return window.showToast('أدخل اسم البند للتوزيع');
-  
-  if (!window.appState.allocations) window.appState.allocations = [];
-  window.appState.allocations.push({name, pct});
-  
-  nameEl.value = ''; pctEl.value = '';
-  window.renderAllocations();
-  window.autoSave();
-};
+window.addAllocation = () => { const nameEl = document.getElementById('newAllocName'); const pctEl = document.getElementById('newAllocPct'); const name = nameEl.value.trim(); const pct = parseFloat(pctEl.value) || 0; if (!name) return window.showToast('أدخل اسم البند للتوزيع'); if (!window.appState.allocations) window.appState.allocations = []; window.appState.allocations.push({name, pct}); nameEl.value = ''; pctEl.value = ''; window.renderAllocations(); window.autoSave(); };
+window.updateAllocation = (idx, field, val) => { if (field === 'pct') val = parseFloat(val) || 0; window.appState.allocations[idx][field] = val; window.renderAllocations(); window.autoSave(); };
+window.deleteAllocation = (idx) => { window.appState.allocations.splice(idx, 1); window.renderAllocations(); window.autoSave(); };
 
-window.updateAllocation = (idx, field, val) => {
-  if (field === 'pct') val = parseFloat(val) || 0;
-  window.appState.allocations[idx][field] = val;
-  window.renderAllocations();
-  window.autoSave();
-};
-
-window.deleteAllocation = (idx) => {
-  window.appState.allocations.splice(idx, 1);
-  window.renderAllocations();
-  window.autoSave();
-};
-
-// ================= إعادة تشغيل جميع القوائم =================
-window.renderLists = function() {
-  window.renderVisionBoard(); 
-  window.renderKanbanBoard();
-  window.renderBanksList(); 
-  window.renderAllocations();
-
-  document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
-  document.getElementById('wishlistList').innerHTML = (window.appState.wishlist || []).map((w, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${w.title}" onchange="window.appState.wishlist[${i}].title=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600; color:var(--danger-color);">${w.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.wishlist.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
-  document.getElementById('subscriptionsList').innerHTML = (window.appState.subscriptions || []).map((s, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600;">${s.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
-};
-
-window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
-
-window.addHabit = () => { 
-  if (!window.userProfile?.isPro && (window.appState.habits || []).length >= 3) {
-    window.showToast('النسخة المجانية تتيح 3 عادات كحد أقصى. رقّي باقتك الآن! 🌟');
-    window.openModal('pricingModal');
+// ================= نظام قائمة الأمنيات المتطور =================
+window.renderWishlist = function() {
+  const container = document.getElementById('wishlistCardsContainer');
+  if (!container) return;
+  if (!window.appState.wishlist || window.appState.wishlist.length === 0) {
+    container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 20px;">لا توجد أمنيات مضافة حالياً. ادخر لهدفك القادم!</div>';
     return;
   }
-  const el = document.getElementById('newHabitInput'); 
-  if(!el.value.trim()) return; 
-  window.appState.habits.push({text:el.value.trim(), done:false}); 
-  el.value=''; 
-  window.renderLists(); window.autoSave(); 
-};
 
-window.addWishlistItem = () => { const t = document.getElementById('newWishTitle'); const c = document.getElementById('newWishCost'); if(!t.value.trim())return; window.appState.wishlist.push({title:t.value.trim(), cost:parseFloat(c.value)||0}); t.value=''; c.value=''; window.renderLists(); window.autoSave(); };
-window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; window.renderLists(); window.autoSave(); };
-
-// ================= دوال التدوين (هوية وتيرة) =================
-window.currentActiveNoteId = null;
-
-window.renderNotesList = function() {
-  if (!window.appState.notes) window.appState.notes = [];
-  const listContainer = document.getElementById('notesListView');
-  if (!listContainer) return;
-  
-  if (window.appState.notes.length === 0) {
-    listContainer.innerHTML = '<div style="text-align:center; color:var(--text-secondary); padding:60px 20px; font-size:0.95rem;">لا توجد تدوينات.<br>اضغط على 📝 لإنشاء تدوينة جديدة.</div>';
-    return;
-  }
-  
-  const sortedNotes = [...window.appState.notes].sort((a, b) => b.updatedAt - a.updatedAt);
-  
-  listContainer.innerHTML = sortedNotes.map(note => {
-    const dateObj = new Date(note.updatedAt);
-    const dateStr = dateObj.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' });
-    
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = note.content || 'تدوينة جديدة';
-    let rawText = tempDiv.textContent || tempDiv.innerText || '';
-    const title = rawText.split('\n')[0].substring(0, 30) || 'بدون عنوان';
-    let snippet = rawText.replace(title, '').trim().substring(0, 40);
-    if(snippet.length >= 40) snippet += '...';
-    if(snippet === '') snippet = 'لا يوجد نص إضافي';
+  container.innerHTML = window.appState.wishlist.map((w, idx) => {
+    const cost = parseFloat(w.cost) || 0;
+    const saved = parseFloat(w.savedAmount) || 0;
+    const pct = cost > 0 ? Math.min(100, Math.round((saved / cost) * 100)) : 0;
+    const imgHtml = w.image ? `<img src="${w.image}" style="width: 75px; height: 75px; object-fit: cover; border-radius: 12px; box-shadow: var(--shadow-ios);">` : `<div style="width: 75px; height: 75px; border-radius: 12px; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 1px dashed var(--border-color);">🎁</div>`;
+    const linkHtml = w.link ? `<a href="${w.link}" target="_blank" style="color: var(--accent-color); font-size: 0.72rem; text-decoration: none; display: flex; align-items: center; gap: 4px; background: var(--bg-primary); padding: 4px 8px; border-radius: 6px;">🔗 رابط</a>` : '';
+    const storeHtml = w.store ? `<span style="font-size: 0.72rem; color: var(--text-secondary); background: var(--bg-primary); padding: 4px 8px; border-radius: 6px;">🏪 ${w.store}</span>` : '';
 
     return `
-      <div class="note-list-item" onclick="window.openNote('${note.id}')">
-        <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div>
-        <div style="display: flex; gap: 10px; font-size: 0.85rem; color: var(--text-secondary);">
-          <span style="font-weight: 500;">${dateStr}</span>
-          <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8;">${snippet}</span>
+      <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; position: relative;">
+        <button class="delete-btn" style="position: absolute; top: 12px; left: 12px; z-index: 2;" onclick="window.deleteWishlistItem(${idx})">&times;</button>
+        <div style="display: flex; gap: 14px; margin-bottom: 16px;">
+          ${imgHtml}
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 20px;">${w.title}</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">${storeHtml} ${linkHtml}</div>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">
+          <span>المُجَمَّع: <strong style="color: var(--accent-color);">${saved}</strong> ر.س</span>
+          <span>الهدف: <strong>${cost}</strong> ر.س</span>
+        </div>
+        <div class="progress-bar-bg" style="height: 8px; margin-bottom: 12px;"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: ${pct === 100 ? 'var(--accent-color)' : 'var(--text-secondary)'};">${pct}%</span>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-subtle" style="padding: 4px 12px; font-size: 1rem; font-weight: bold;" onclick="window.updateWishlistAmount(${idx}, -50)">-</button>
+            <button class="btn btn-primary" style="padding: 4px 12px; font-size: 1rem; font-weight: bold;" onclick="window.updateWishlistAmount(${idx}, 50)">+</button>
+            <button class="btn btn-subtle" style="padding: 4px 10px; font-size: 0.75rem;" onclick="window.promptWishlistAmount(${idx})">تعديل ✏️</button>
+          </div>
         </div>
       </div>
     `;
   }).join('');
 };
 
-window.showNotesList = function() {
-  document.getElementById('notesListView').style.display = 'block';
-  document.getElementById('noteEditorView').style.display = 'none';
-  window.currentActiveNoteId = null;
-  window.renderNotesList();
-};
+window.addWishlistItem = () => {
+  const t = document.getElementById('newWishTitle').value.trim();
+  const c = document.getElementById('newWishCost').value;
+  const s = document.getElementById('newWishStore').value.trim();
+  const l = document.getElementById('newWishLink').value.trim();
+  const fileInput = document.getElementById('newWishImgFile');
+  const file = fileInput ? fileInput.files[0] : null;
 
-window.createNewNote = function() {
-  if (!window.appState.notes) window.appState.notes = [];
-  const newNote = { id: 'note_' + Date.now(), content: '', updatedAt: Date.now() };
-  window.appState.notes.unshift(newNote); 
-  window.autoSave();
-  window.openNote(newNote.id);
-};
+  if (!t) return window.showToast('أدخل اسم الغرض');
 
-window.openNote = function(id) {
-  window.currentActiveNoteId = id;
-  const note = window.appState.notes.find(n => n.id === id);
-  if (!note) return;
-  
-  document.getElementById('notesListView').style.display = 'none';
-  document.getElementById('noteEditorView').style.display = 'flex';
-  
-  const dateObj = new Date(note.updatedAt);
-  const timeStr = dateObj.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
-  const dateStr = dateObj.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric', year: 'numeric' });
-  document.getElementById('currentNoteDate').innerText = `${dateStr} في ${timeStr}`;
-  
-  const editor = document.getElementById('noteContentEditable');
-  editor.innerHTML = note.content;
-  
-  setTimeout(() => {
-    editor.focus();
-    if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
-      const range = document.createRange();
-      range.selectNodeContents(editor);
-      range.collapse(false);
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-  }, 50);
-};
-
-window.autoSaveNote = function() {
-  if (!window.currentActiveNoteId) return;
-  const noteIndex = window.appState.notes.findIndex(n => n.id === window.currentActiveNoteId);
-  if (noteIndex > -1) {
-    const editor = document.getElementById('noteContentEditable');
-    window.appState.notes[noteIndex].content = editor.innerHTML;
-    window.appState.notes[noteIndex].updatedAt = Date.now();
-    window.autoSave();
-  }
-};
-
-window.deleteCurrentNote = function() {
-  if (!window.currentActiveNoteId) return;
-  if (confirm('هل أنت متأكد من حذف هذه التدوينة نهائياً؟')) {
-    window.appState.notes = window.appState.notes.filter(n => n.id !== window.currentActiveNoteId);
-    window.autoSave();
-    window.showNotesList();
-  }
-};
-
-window.addNoteImage = function(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  if (file.size > 2.5 * 1024 * 1024) {
-    if(window.showToast) window.showToast('حجم الصورة كبير جداً. يرجى اختيار صورة أقل من 2.5 ميجابايت.');
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const imgBase64 = e.target.result;
-    const imgTag = `<br><img src="${imgBase64}"><br>`;
-    const editor = document.getElementById('noteContentEditable');
-    editor.innerHTML += imgTag;
-    window.autoSaveNote();
-    editor.scrollTop = editor.scrollHeight;
+  const finalizeAdd = (imgData) => {
+    if (!window.appState.wishlist) window.appState.wishlist = [];
+    window.appState.wishlist.push({ title: t, cost: parseFloat(c)||0, store: s, link: l, image: imgData, savedAmount: 0 });
+    
+    document.getElementById('newWishTitle').value = '';
+    document.getElementById('newWishCost').value = '';
+    document.getElementById('newWishStore').value = '';
+    document.getElementById('newWishLink').value = '';
+    if (fileInput) fileInput.value = '';
+    
+    window.renderLists(); window.autoSave(); window.showToast('تمت الإضافة لقائمة الأمنيات');
   };
-  reader.readAsDataURL(file);
-  event.target.value = ''; 
+
+  if (file) {
+    if (file.size > 2.5 * 1024 * 1024) return window.showToast('حجم الصورة كبير جداً');
+    const reader = new FileReader();
+    reader.onload = (e) => finalizeAdd(e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    finalizeAdd('');
+  }
 };
 
+window.deleteWishlistItem = (idx) => { if(confirm('هل أنت متأكد من حذف هذه الأمنية؟')) { window.appState.wishlist.splice(idx, 1); window.renderLists(); window.autoSave(); } };
+
+window.updateWishlistAmount = (idx, amount) => {
+  let current = parseFloat(window.appState.wishlist[idx].savedAmount) || 0;
+  let cost = parseFloat(window.appState.wishlist[idx].cost) || 0;
+  current += amount;
+  if(current < 0) current = 0;
+  if(current > cost) current = cost;
+  window.appState.wishlist[idx].savedAmount = current;
+  window.renderLists(); window.autoSave();
+};
+
+window.promptWishlistAmount = (idx) => {
+  let current = parseFloat(window.appState.wishlist[idx].savedAmount) || 0;
+  let cost = parseFloat(window.appState.wishlist[idx].cost) || 0;
+  let val = prompt('أدخل المبلغ المُجمّع يدوياً بالريال:', current);
+  if (val !== null) {
+    let parsed = parseFloat(val);
+    if (!isNaN(parsed)) {
+       if(parsed < 0) parsed = 0;
+       if(parsed > cost) parsed = cost;
+       window.appState.wishlist[idx].savedAmount = parsed;
+       window.renderLists(); window.autoSave();
+    }
+  }
+};
+
+window.renderLists = function() {
+  window.renderVisionBoard(); 
+  window.renderKanbanBoard();
+  window.renderBanksList(); 
+  window.renderAllocations();
+  window.renderWishlist();
+
+  document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
+  document.getElementById('subscriptionsList').innerHTML = (window.appState.subscriptions || []).map((s, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600;">${s.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
+  window.calculateDistribution();
+};
+
+window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
+window.addHabit = () => { if (!window.userProfile?.isPro && (window.appState.habits || []).length >= 3) { window.showToast('النسخة المجانية تتيح 3 عادات. رقّي باقتك الآن! 🌟'); window.openModal('pricingModal'); return; } const el = document.getElementById('newHabitInput'); if(!el.value.trim()) return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; window.renderLists(); window.autoSave(); };
+window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; window.renderLists(); window.autoSave(); };
+window.calculateDistribution = () => { window.renderAllocations(); };
+
+// ================= دوال التدوين =================
+window.currentActiveNoteId = null;
+
+window.renderNotesList = function() {
+  if (!window.appState.notes) window.appState.notes = [];
+  const listContainer = document.getElementById('notesListView');
+  if (!listContainer) return;
+  if (window.appState.notes.length === 0) { listContainer.innerHTML = '<div style="text-align:center; color:var(--text-secondary); padding:60px 20px; font-size:0.95rem;">لا توجد تدوينات.<br>اضغط على 📝 لإنشاء تدوينة جديدة.</div>'; return; }
+  
+  const sortedNotes = [...window.appState.notes].sort((a, b) => b.updatedAt - a.updatedAt);
+  listContainer.innerHTML = sortedNotes.map(note => {
+    const dateObj = new Date(note.updatedAt);
+    const dateStr = dateObj.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' });
+    const tempDiv = document.createElement('div'); tempDiv.innerHTML = note.content || 'تدوينة جديدة'; let rawText = tempDiv.textContent || tempDiv.innerText || '';
+    const title = rawText.split('\n')[0].substring(0, 30) || 'بدون عنوان';
+    let snippet = rawText.replace(title, '').trim().substring(0, 40); if(snippet.length >= 40) snippet += '...'; if(snippet === '') snippet = 'لا يوجد نص إضافي';
+    return `<div class="note-list-item" onclick="window.openNote('${note.id}')"><div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div><div style="display: flex; gap: 10px; font-size: 0.85rem; color: var(--text-secondary);"><span style="font-weight: 500;">${dateStr}</span><span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.8;">${snippet}</span></div></div>`;
+  }).join('');
+};
+
+window.showNotesList = function() { document.getElementById('notesListView').style.display = 'block'; document.getElementById('noteEditorView').style.display = 'none'; window.currentActiveNoteId = null; window.renderNotesList(); };
+window.createNewNote = function() { if (!window.appState.notes) window.appState.notes = []; const newNote = { id: 'note_' + Date.now(), content: '', updatedAt: Date.now() }; window.appState.notes.unshift(newNote); window.autoSave(); window.openNote(newNote.id); };
+window.openNote = function(id) {
+  window.currentActiveNoteId = id; const note = window.appState.notes.find(n => n.id === id); if (!note) return;
+  document.getElementById('notesListView').style.display = 'none'; document.getElementById('noteEditorView').style.display = 'flex';
+  const dateObj = new Date(note.updatedAt); const timeStr = dateObj.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }); const dateStr = dateObj.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric', year: 'numeric' });
+  document.getElementById('currentNoteDate').innerText = `${dateStr} في ${timeStr}`;
+  const editor = document.getElementById('noteContentEditable'); editor.innerHTML = note.content;
+  setTimeout(() => { editor.focus(); if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") { const range = document.createRange(); range.selectNodeContents(editor); range.collapse(false); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); } }, 50);
+};
+window.autoSaveNote = function() { if (!window.currentActiveNoteId) return; const noteIndex = window.appState.notes.findIndex(n => n.id === window.currentActiveNoteId); if (noteIndex > -1) { const editor = document.getElementById('noteContentEditable'); window.appState.notes[noteIndex].content = editor.innerHTML; window.appState.notes[noteIndex].updatedAt = Date.now(); window.autoSave(); } };
+window.deleteCurrentNote = function() { if (!window.currentActiveNoteId) return; if (confirm('هل أنت متأكد من حذف هذه التدوينة نهائياً؟')) { window.appState.notes = window.appState.notes.filter(n => n.id !== window.currentActiveNoteId); window.autoSave(); window.showNotesList(); } };
+window.addNoteImage = function(event) {
+  const file = event.target.files[0]; if (!file) return; if (file.size > 2.5 * 1024 * 1024) return window.showToast('حجم الصورة كبير جداً.');
+  const reader = new FileReader(); reader.onload = function(e) { const imgTag = `<br><img src="${e.target.result}"><br>`; const editor = document.getElementById('noteContentEditable'); editor.innerHTML += imgTag; window.autoSaveNote(); editor.scrollTop = editor.scrollHeight; }; reader.readAsDataURL(file); event.target.value = ''; 
+};
 setTimeout(() => { if (window.renderNotesList) window.renderNotesList(); }, 800);
