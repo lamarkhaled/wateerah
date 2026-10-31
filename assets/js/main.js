@@ -45,11 +45,10 @@ window.saveCurrentWateerah = async (manual) => {
 
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   const user = auth.currentUser;
-  if (!user) { if(manual && window.showToast) window.showToast('تم الحفظ محلياً'); return; }
+  if (!user) return;
 
   try { 
     await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); 
-    if(manual && window.showToast) window.showToast('تم الحفظ والمزامنة سحابياً'); 
   } catch(e) {}
 };
 
@@ -81,28 +80,27 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-// تحميل البيانات المحلية فوراً
-const savedLocal = localStorage.getItem('wateerah_local_state');
-if (savedLocal) { 
-  try { 
-    window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; 
-  } catch(e) {} 
-}
-
-setTimeout(() => { 
-  if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
-  if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
-  if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
-  window.loadTodayDate();
-}, 100);
-
+// نظام الحماية: مراقبة حالة تسجيل الدخول
 onAuthStateChanged(auth, async (user) => {
-  if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
-    const guestBtn = document.getElementById('guestAuthBtn'); if(guestBtn) guestBtn.style.display = 'none';
-    const pill = document.getElementById('userProfilePill'); if(pill) pill.style.display = 'flex';
-    const uidDisp = document.getElementById('profileUidDisplay'); if(uidDisp) uidDisp.value = user.uid;
+  const authModal = document.getElementById('authModal');
+  const lockBtn = document.getElementById('lockScreenBtn');
+  const guestBtn = document.getElementById('guestAuthBtn');
+  const profilePill = document.getElementById('userProfilePill');
 
-    if (user.email === ADMIN_EMAIL) { const adminBtn = document.getElementById('adminPanelBtn'); if(adminBtn) adminBtn.style.display = 'inline-flex'; }
+  if (user) {
+    // إذا مسجل دخول: إخفاء نافذة الحماية وإظهار التطبيق وزر قفل الشاشة
+    if(authModal) authModal.classList.remove('open');
+    if(lockBtn) lockBtn.style.display = 'inline-block';
+    if(guestBtn) guestBtn.style.display = 'none';
+    if(profilePill) profilePill.style.display = 'flex';
+
+    const uidDisp = document.getElementById('profileUidDisplay'); 
+    if(uidDisp) uidDisp.value = user.uid;
+
+    if (user.email === ADMIN_EMAIL) { 
+      const adminBtn = document.getElementById('adminPanelBtn'); 
+      if(adminBtn) adminBtn.style.display = 'inline-flex'; 
+    }
 
     try { 
       const snap = await getDoc(doc(db, "users", user.uid)); 
@@ -116,12 +114,27 @@ onAuthStateChanged(auth, async (user) => {
       } 
     } catch(e) {}
     
+    const savedLocal = localStorage.getItem('wateerah_local_state');
+    if (savedLocal) { 
+      try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {} 
+    }
+
     const headerName = document.getElementById('headerUserName');
     const headerAvatar = document.getElementById('headerAvatar');
     const profileNameInput = document.getElementById('profileNameInput');
     if(headerName) headerName.innerText = window.userProfile.name || user.email; 
     if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'ل')[0]; 
     if(profileNameInput) profileNameInput.value = window.userProfile.name || '';
+    
     window.loadTodayDate();
+    if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
+    if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
+    if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
+  } else {
+    // إذا لم يكن مسجل دخول: إبقاء نافذة الحماية مغلقة على المحتوى وإظهار زر الدخول
+    if(authModal) authModal.classList.add('open');
+    if(lockBtn) lockBtn.style.display = 'none';
+    if(guestBtn) guestBtn.style.display = 'inline-block';
+    if(profilePill) profilePill.style.display = 'none';
   }
 });
