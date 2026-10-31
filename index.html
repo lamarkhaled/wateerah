@@ -112,25 +112,59 @@
 
       <div id="pageContainer" style="display: none;">
         
+        <!-- لوحة الأهداف -->
         <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
-          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div><span style="font-size: 0.8rem; color: var(--text-secondary);">اضغط على البطاقة لفتح خطتها</span></div>
-          <div id="corkboardContainer" class="corkboard-surface"></div>
-          <div class="add-row" style="margin-top: 16px; align-items: stretch;">
-            <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex:2;">
-            <label style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;" title="إدراج صورة من جهازك">
-              📷 رفع صورة <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;">
-            </label>
-            <input type="date" id="newVisionDate" style="flex:1;">
-            <button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت</button>
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">اضغط على البطاقة لفتح خطتها</span>
+              <button id="addVisionPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addVisionForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
           </div>
+          
+          <div id="addVisionForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 0.85rem; color: var(--accent-color);">هدف جديد 🎯</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addVisionForm').style.display='none'; document.getElementById('addVisionPlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0; align-items: stretch;">
+              <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex:2;">
+              <label style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;" title="إدراج صورة من جهازك">
+                📷 رفع صورة <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;">
+              </label>
+              <input type="date" id="newVisionDate" style="flex:1;">
+              <button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت ➕</button>
+            </div>
+          </div>
+          
+          <div id="corkboardContainer" class="corkboard-surface"></div>
         </div>
 
+        <!-- المهام المتنقلة -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
-          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div></div>
-          <div class="add-row" style="margin-top: 0; margin-bottom: 18px;"><input type="text" id="newKanbanTitle" placeholder="عنوان المهمة..."><select id="newKanbanStatus"><option value="idea">فكرة</option><option value="scheduled">مجدول</option><option value="progress">تنفيذ</option><option value="done">مكتمل</option></select><select id="newKanbanPriority"><option value="urgent">عاجل</option><option value="normal" selected>عادي</option><option value="low">غير مهم</option></select><input type="date" id="newKanbanDate"><button class="btn btn-primary" onclick="window.addKanbanTask()">إضافة</button></div>
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
+            <button id="addKanbanPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addKanbanForm').style.display='block'; this.style.display='none';">+</button>
+          </div>
+          
+          <div id="addKanbanForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة جديدة 📋</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addKanbanForm').style.display='none'; document.getElementById('addKanbanPlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0;">
+              <input type="text" id="newKanbanTitle" placeholder="عنوان المهمة...">
+              <select id="newKanbanStatus"><option value="idea">فكرة</option><option value="scheduled">مجدول</option><option value="progress">تنفيذ</option><option value="done">مكتمل</option></select>
+              <select id="newKanbanPriority"><option value="urgent">عاجل</option><option value="normal" selected>عادي</option><option value="low">غير مهم</option></select>
+              <input type="date" id="newKanbanDate">
+              <button class="btn btn-primary" onclick="window.addKanbanTask()">تأكيد ➕</button>
+            </div>
+          </div>
+          
           <div class="kanban-grid"><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'idea')"><div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div><div class="kanban-cards-wrap" id="col-idea"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div></div>
         </div>
 
+        <!-- بوصلة التركيز (مساحة نصية لا تحتاج زر +) -->
         <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
@@ -139,22 +173,41 @@
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
 
+        <!-- العادات -->
         <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">متتبع العادات</span></div>
-            <button class="btn btn-subtle" onclick="window.openHistoryModal('habits')">السجل 🗓️</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-subtle" onclick="window.openHistoryModal('habits')">السجل 🗓️</button>
+              <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
           </div>
+          
+          <div id="addHabitForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 0.85rem; color: var(--accent-color);">عادة جديدة ✨</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addHabitForm').style.display='none'; document.getElementById('addHabitPlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0;">
+              <input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') window.addHabit()">
+              <button class="btn btn-primary" onclick="window.addHabit()">إضافة ➕</button>
+            </div>
+          </div>
+          
           <ul id="habitsList" class="item-list"></ul>
-          <div class="add-row"><input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') window.addHabit()"><button class="btn btn-primary" onclick="window.addHabit()">إضافة</button></div>
         </div>
 
+        <!-- المالية الشاملة -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
           
           <!-- قسم 1: التوزيع الديناميكي -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
-              <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل</span>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل</span>
+                <button id="addAllocPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addAllocForm').style.display='block'; this.style.display='none';">+</button>
+              </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 0.85rem;">المبلغ الإجمالي:</span>
                 <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderAllocations(); window.autoSave();" style="width: 140px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-weight: bold;">
@@ -162,30 +215,31 @@
               </div>
             </div>
             
+            <div id="addAllocForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">بند توزيع جديد 📊</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addAllocForm').style.display='none'; document.getElementById('addAllocPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newAllocName" placeholder="اسم البند (مثال: ادخار)..." style="flex: 2;">
+                <input type="number" id="newAllocPct" placeholder="النسبة %" style="flex: 1; max-width: 100px;">
+                <button class="btn btn-primary" onclick="window.addAllocation()">إضافة بند ➕</button>
+              </div>
+            </div>
+
             <div id="allocationWarning" style="color: var(--danger-color); font-size: 0.85rem; font-weight: 700; display: none; margin-bottom: 8px; background: var(--danger-light); padding: 8px 12px; border-radius: 8px;">⚠️ تنبيه: مجموع النسب يتجاوز 100% (الحالي: <span id="currentTotalPct"></span>%)</div>
             <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 16px;" id="allocationSummary">المتبقي للتوزيع: 0%</div>
-            
-            <div id="allocationsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
-            
-            <div class="add-row">
-              <input type="text" id="newAllocName" placeholder="اسم البند (مثال: ادخار)..." style="flex: 2;">
-              <input type="number" id="newAllocPct" placeholder="النسبة %" style="flex: 1; max-width: 100px;">
-              <button class="btn btn-primary" onclick="window.addAllocation()">إضافة بند</button>
-            </div>
+            <div id="allocationsContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
           </div>
 
-          <!-- قسم 2: قائمة الأمنيات والمدخرات -->
+          <!-- قسم 2: قائمة الأمنيات -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات (الادخار للأهداف)</div>
-              <!-- زر الإضافة الذي يفتح النموذج -->
               <button id="addWishPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addWishForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             
-            <div id="wishlistCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 16px;"></div>
-            
-            <!-- نموذج إضافة أمنية (مخفي افتراضياً) -->
-            <div id="addWishForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color);">
+            <div id="addWishForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                 <strong style="font-size: 0.85rem; color: var(--accent-color);">أمنية جديدة 🎁</strong>
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addWishForm').style.display='none'; document.getElementById('addWishPlusBtn').style.display='flex';">&times;</button>
@@ -203,56 +257,90 @@
                 <button class="btn btn-primary" style="flex:1;" onclick="window.addWishlistItem()">تأكيد ➕</button>
               </div>
             </div>
+
+            <div id="wishlistCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;"></div>
           </div>
 
-          <!-- قسم 3: مصاريف الشهر (To-Do List) -->
-          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-            <div style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">مصاريف الشهر (مهام الدفع)</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
             
-            <div style="background: var(--bg-glass-strong); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 14px;">
-              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px;">
-                <span>الاكتمال: <strong id="expenseProgressText" style="color: var(--accent-color);">0%</strong></span>
-                <span>المتبقي: <strong id="expenseRemainingText" style="color: var(--danger-color);">0</strong> ر.س</span>
+            <!-- قسم 3: مصاريف الشهر -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-size: 0.95rem; font-weight: 700;">مصاريف الشهر (مهام الدفع)</div>
+                <button id="addExpensePlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addExpenseForm').style.display='block'; this.style.display='none';">+</button>
               </div>
-              <div class="progress-bar-bg" style="height: 6px; margin-bottom: 12px;">
-                <div id="expenseProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+              
+              <div id="addExpenseForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                  <strong style="font-size: 0.85rem; color: var(--accent-color);">مصروف جديد 🧾</strong>
+                  <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addExpenseForm').style.display='none'; document.getElementById('addExpensePlusBtn').style.display='flex';">&times;</button>
+                </div>
+                <div class="add-row" style="margin-top: 0;">
+                  <input type="text" id="newExpenseName" placeholder="المصروف (كهرباء, ماء...)" style="flex:2;">
+                  <input type="number" id="newExpenseAmount" placeholder="المبلغ" style="flex:1;">
+                  <button class="btn btn-primary" onclick="window.addMonthlyExpense()">تأكيد ➕</button>
+                </div>
               </div>
-              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700;">
-                <span>الإجمالي: <span id="expenseTotalText">0</span> ر.س</span>
-                <span style="color: var(--text-secondary);">دُفع: <span id="expensePaidText">0</span> ر.س</span>
+
+              <div style="background: var(--bg-glass-strong); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 8px;">
+                  <span>الاكتمال: <strong id="expenseProgressText" style="color: var(--accent-color);">0%</strong></span>
+                  <span>المتبقي: <strong id="expenseRemainingText" style="color: var(--danger-color);">0</strong> ر.س</span>
+                </div>
+                <div class="progress-bar-bg" style="height: 6px; margin-bottom: 12px;">
+                  <div id="expenseProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700;">
+                  <span>الإجمالي: <span id="expenseTotalText">0</span> ر.س</span>
+                  <span style="color: var(--text-secondary);">دُفع: <span id="expensePaidText">0</span> ر.س</span>
+                </div>
               </div>
+              <ul id="monthlyExpensesList" class="item-list"></ul>
             </div>
 
-            <ul id="monthlyExpensesList" class="item-list"></ul>
-            
-            <div class="add-row">
-              <input type="text" id="newExpenseName" placeholder="المصروف (كهرباء, ماء...)" style="flex:2;">
-              <input type="number" id="newExpenseAmount" placeholder="المبلغ" style="flex:1;">
-              <button class="btn btn-primary" onclick="window.addMonthlyExpense()">إضافة</button>
+            <!-- قسم 4: البنوك والحسابات -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-size: 0.95rem; font-weight: 700;">البنوك والحسابات المالية</div>
+                <button id="addBankPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addBankForm').style.display='block'; this.style.display='none';">+</button>
+              </div>
+
+              <div id="addBankForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                  <strong style="font-size: 0.85rem; color: var(--accent-color);">بنك جديد 🏦</strong>
+                  <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankForm').style.display='none'; document.getElementById('addBankPlusBtn').style.display='flex';">&times;</button>
+                </div>
+                <div class="add-row" style="margin-top: 0;">
+                  <input type="text" id="newBankName" placeholder="اسم البنك (مثل: الراجحي)...">
+                  <button class="btn btn-primary" onclick="window.addBank()">تأكيد ➕</button>
+                </div>
+              </div>
+
+              <div id="banksContainer" style="display: flex; flex-direction: column; gap: 14px;"></div>
+            </div>
+
+            <!-- قسم 5: الاشتراكات -->
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية</div>
+                <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addSubForm').style.display='block'; this.style.display='none';">+</button>
+              </div>
+              
+              <div id="addSubForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                  <strong style="font-size: 0.85rem; color: var(--accent-color);">اشتراك جديد 🔄</strong>
+                  <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addSubForm').style.display='none'; document.getElementById('addSubPlusBtn').style.display='flex';">&times;</button>
+                </div>
+                <div class="add-row" style="margin-top: 0;">
+                  <input type="text" id="newSubName" placeholder="الاشتراك...">
+                  <input type="number" id="newSubCost" placeholder="المبلغ">
+                  <button class="btn btn-primary" onclick="window.addSubscription()">تأكيد ➕</button>
+                </div>
+              </div>
+
+              <ul id="subscriptionsList" class="item-list"></ul>
             </div>
           </div>
-
-          <!-- قسم 4: البنوك والحسابات -->
-          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-            <div style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">البنوك والحسابات المالية</div>
-            <div id="banksContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 14px;"></div>
-            <div class="add-row">
-              <input type="text" id="newBankName" placeholder="اسم البنك (مثل: الراجحي)...">
-              <button class="btn btn-primary" onclick="window.addBank()">إضافة بنك</button>
-            </div>
-          </div>
-
-          <!-- قسم 5: الاشتراكات -->
-          <div style="margin-bottom: 8px;">
-            <div style="font-size: 0.95rem; font-weight: 700; margin-bottom: 12px;">الاشتراكات الشهرية</div>
-            <ul id="subscriptionsList" class="item-list"></ul>
-            <div class="add-row">
-              <input type="text" id="newSubName" placeholder="الاشتراك...">
-              <input type="number" id="newSubCost" placeholder="المبلغ">
-              <button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button>
-            </div>
-          </div>
-
         </div>
 
         <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
