@@ -97,6 +97,10 @@ window.openPage = function(wId) {
   const pageContainer = document.getElementById('pageContainer');
   if (pageContainer) pageContainer.style.display = 'block';
 
+  // التأكد من إخفاء صفحة البنك التفصيلية إذا كانت مفتوحة
+  const bankView = document.getElementById('bankDetailsView');
+  if (bankView) bankView.style.display = 'none';
+
   document.querySelectorAll('.widget-card').forEach(card => {
     card.classList.add('hidden-el');
     card.style.display = 'none';
@@ -118,6 +122,9 @@ window.goHome = function() {
   const pageContainer = document.getElementById('pageContainer');
   if (pageContainer) pageContainer.style.display = 'none';
   
+  const bankView = document.getElementById('bankDetailsView');
+  if (bankView) bankView.style.display = 'none';
+
   document.querySelectorAll('.widget-card').forEach(card => {
     card.classList.add('hidden-el');
     card.style.display = 'none';
