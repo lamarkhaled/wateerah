@@ -2,6 +2,8 @@ import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+const ADMIN_EMAIL = "wateerahapp@gmail.com";
+
 window.switchAuthView = function(view) {
   const loginView = document.getElementById('viewLogin');
   const regView = document.getElementById('viewRegister');
@@ -48,7 +50,7 @@ window.handleRegister = async () => {
   const passInput = document.getElementById('regPassword');
   if(!emailInput || !passInput) return;
 
-  const name = nameInput ? nameInput.value.trim() : 'صديقنا';
+  const name = nameInput ? nameInput.value.trim() : 'لمار';
   const email = emailInput.value.trim();
   const pass = passInput.value;
 
