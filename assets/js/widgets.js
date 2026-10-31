@@ -15,6 +15,129 @@ window.compressImage = function(file, callback) {
   reader.readAsDataURL(file);
 };
 
+// ================= إدارة الأعمال 💼 =================
+window.renderBusinessWidget = function() {
+  const summaryCard = document.getElementById('businessSummaryCard');
+  if(!summaryCard) return;
+  if(!window.appState.business) window.appState.business = { design: [], honey: [] };
+  
+  const designCount = window.appState.business.design.filter(d => !d.done).length;
+  const honeyCount = window.appState.business.honey.filter(h => !h.done).length;
+
+  summaryCard.innerHTML = `
+    <div onclick="window.openBusinessDetails()" style="background: linear-gradient(135deg, var(--bg-glass-strong) 0%, var(--bg-subtle) 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 20px; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-ios);">
+       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+         <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary); display:flex; align-items:center; gap:10px;"><span style="font-size:1.4rem;">💼</span><span>مساحة العمل والمشاريع</span></div>
+         <span style="font-size:1.1rem; color:var(--text-secondary);">❯</span>
+       </div>
+       <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
+         <span>🎨 ${designCount} مشاريع نشطة</span>
+         <span>🍯 ${honeyCount} مهام تسويق</span>
+       </div>
+    </div>
+  `;
+};
+
+window.openBusinessDetails = function() {
+  document.getElementById('widget-business').style.display = 'none';
+  const detailsPage = document.getElementById('businessDetailsPage');
+  if(detailsPage) { detailsPage.classList.remove('hidden-el'); detailsPage.style.display = 'block'; }
+  window.renderBusinessDetailsView();
+};
+
+window.closeBusinessDetails = function() {
+  const detailsPage = document.getElementById('businessDetailsPage');
+  if(detailsPage) { detailsPage.style.display = 'none'; detailsPage.classList.add('hidden-el'); }
+  const businessPage = document.getElementById('widget-business');
+  if(businessPage) { businessPage.classList.remove('hidden-el'); businessPage.style.display = 'block'; }
+  window.renderLists();
+};
+
+window.renderBusinessDetailsView = function() {
+  if(!window.appState.business) window.appState.business = { design: [], honey: [] };
+  
+  // مشاريع الجرافيك
+  const designList = document.getElementById('designProjectsList');
+  if(designList) {
+     designList.innerHTML = window.appState.business.design.map((p, i) => {
+       const dateHtml = p.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 موعد التسليم: ${p.date}</div>` : '';
+       return `<li class="list-item ${p.done ? 'completed' : ''}" style="padding: 14px 16px; border: 1px dashed var(--border-color); margin-bottom: 10px; background: var(--bg-glass-strong);">
+         <div class="item-left" style="align-items: flex-start;">
+           <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleDesign(${i})">${p.done ? '✓' : ''}</div>
+           <div style="display: flex; flex-direction: column; width: 100%;">
+               <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                   <input type="text" class="item-text-input" value="${p.name}" onchange="window.appState.business.design[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
+                   <span style="font-size:0.9rem; font-weight:800; color: ${p.done ? 'var(--text-secondary)' : 'var(--accent-color)'}; flex-shrink: 0; margin-right: 10px;">${p.price} ر.س</span>
+               </div>
+               ${dateHtml}
+           </div>
+         </div>
+         <button class="delete-btn" style="margin-left: -8px; font-size: 1.3rem;" onclick="window.deleteDesign(${i})">&times;</button>
+       </li>`;
+     }).join('');
+     if(window.appState.business.design.length === 0) designList.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 15px;">لا توجد مشاريع تصميم حالياً. ابدأ بإضافة عميل جديد!</li>';
+  }
+
+  // مهام تسويق العسل
+  const honeyList = document.getElementById('honeyTasksList');
+  if(honeyList) {
+     honeyList.innerHTML = window.appState.business.honey.map((h, i) => {
+       const dateHtml = h.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 موعد النشر: ${h.date}</div>` : '';
+       return `<li class="list-item ${h.done ? 'completed' : ''}" style="padding: 14px 16px; border: 1px dashed var(--border-color); margin-bottom: 10px; background: var(--bg-glass-strong);">
+         <div class="item-left" style="align-items: flex-start;">
+           <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleHoney(${i})">${h.done ? '✓' : ''}</div>
+           <div style="display: flex; flex-direction: column; width: 100%;">
+               <input type="text" class="item-text-input" value="${h.name}" onchange="window.appState.business.honey[${i}].name=this.value; window.autoSave();" style="font-weight: 700; font-size: 0.95rem; width: 100%;">
+               ${dateHtml}
+           </div>
+         </div>
+         <button class="delete-btn" style="margin-left: -8px; font-size: 1.3rem;" onclick="window.deleteHoney(${i})">&times;</button>
+       </li>`;
+     }).join('');
+     if(window.appState.business.honey.length === 0) honeyList.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 15px;">لا توجد مهام تسويق حالياً.</li>';
+  }
+};
+
+window.addDesignProject = () => {
+  const n = document.getElementById('newDesignName'); const p = document.getElementById('newDesignPrice'); const d = document.getElementById('newDesignDate');
+  if(!n.value.trim()) return window.showToast('أدخل تفاصيل المشروع');
+  if(!window.appState.business) window.appState.business = { design: [], honey: [] };
+  window.appState.business.design.unshift({ name: n.value.trim(), price: parseFloat(p.value)||0, date: d.value, done: false });
+  n.value = ''; p.value = ''; d.value = '';
+  document.getElementById('addDesignForm').style.display='none'; document.getElementById('addDesignPlusBtn').style.display='flex';
+  window.renderBusinessDetailsView(); window.autoSave();
+};
+window.toggleDesign = (i) => { window.appState.business.design[i].done = !window.appState.business.design[i].done; window.renderBusinessDetailsView(); window.autoSave(); };
+window.deleteDesign = (i) => { window.appState.business.design.splice(i, 1); window.renderBusinessDetailsView(); window.autoSave(); };
+
+window.addHoneyTask = () => {
+  const n = document.getElementById('newHoneyName'); const d = document.getElementById('newHoneyDate');
+  if(!n.value.trim()) return window.showToast('أدخل وصف المهمة أو الحملة');
+  if(!window.appState.business) window.appState.business = { design: [], honey: [] };
+  window.appState.business.honey.unshift({ name: n.value.trim(), date: d.value, done: false });
+  n.value = ''; d.value = '';
+  document.getElementById('addHoneyForm').style.display='none'; document.getElementById('addHoneyPlusBtn').style.display='flex';
+  window.renderBusinessDetailsView(); window.autoSave();
+};
+window.toggleHoney = (i) => { window.appState.business.honey[i].done = !window.appState.business.honey[i].done; window.renderBusinessDetailsView(); window.autoSave(); };
+window.deleteHoney = (i) => { window.appState.business.honey.splice(i, 1); window.renderBusinessDetailsView(); window.autoSave(); };
+
+// ================= تحديث شامل لـ renderLists =================
+window.renderLists = function() {
+  window.renderBusinessWidget(); 
+  window.renderIncomeTracker(); 
+  window.renderVisionBoard(); 
+  window.renderKanbanBoard(); 
+  window.renderBanksList(); 
+  if (window.currentBankIndex !== null) window.renderBankDetailsView();
+  window.renderAllocations(); 
+  window.renderWishlist(); 
+  window.renderMonthlyExpenses(); 
+  window.renderSubscriptions();
+  
+  document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
+};
+
 window.renderVisionBoard = function() {
   const board = document.getElementById('corkboardContainer');
   if (!window.appState.visionBoard || window.appState.visionBoard.length === 0) { if(board) board.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.85); padding: 60px 20px; font-size: 0.92rem;">اللوح الخشبي فارغ حالياً.</div>`; return; }
@@ -71,14 +194,13 @@ window.renderBanksList = function() {
   if(overview) { overview.innerHTML = `مجموع الأرصدة الكلي: <strong style="color: var(--accent-color); font-size: 1.1rem;">${grandTotal}</strong> ر.س`; }
 };
 window.openBankDetails = function(bIdx) { window.currentBankIndex = bIdx; document.getElementById('widget-finance').style.display = 'none'; const detailsPage = document.getElementById('bankDetailsPage'); if(detailsPage) { detailsPage.classList.remove('hidden-el'); detailsPage.style.display = 'block'; } window.renderBankDetailsView(); };
-window.closeBankDetails = function() { window.currentBankIndex = null; const detailsPage = document.getElementById('bankDetailsPage'); if(detailsPage) { detailsPage.style.display = 'none'; detailsPage.classList.add('hidden-el'); } const financePage = document.getElementById('widget-finance'); if(financePage) { financePage.classList.remove('hidden-el'); financePage.style.display = 'block'; } window.renderLists(); };
+window.closeBankDetails = function() { window.currentBankIndex = null; const detailsPage = document.getElementById('bankDetailsPage'); if(detailsPage) { detailsPage.style.display = 'none'; detailsPage.classList.add('hidden-el'); } const financePage = document.getElementById('widget-finance'); if(financePage) { financePage.classList.remove('hidden-el'); financePage.style.display = 'block'; } window.renderBanksList(); window.calculateDistribution(); };
 window.renderBankDetailsView = function() {
   if (window.currentBankIndex === null) return; const bank = window.appState.banks[window.currentBankIndex]; if (!bank) return window.closeBankDetails();
   let bankTotal = 0; (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; });
   const titleEl = document.getElementById('activeBankTitle'); const totalEl = document.getElementById('activeBankTotal'); if(titleEl) titleEl.innerText = bank.name; if(totalEl) totalEl.innerText = bankTotal + ' ر.س';
   const accountsList = document.getElementById('activeBankAccountsList'); if(!accountsList) return;
   if (!bank.accounts || bank.accounts.length === 0) { accountsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد حسابات مضافة بهذا البنك.</div>`; return; }
-
   accountsList.innerHTML = bank.accounts.map((acc, aIdx) => {
     const balance = parseFloat(acc.balance) || 0; const target = parseFloat(acc.target) || 0; const pct = target > 0 ? Math.min(100, Math.round((balance / target) * 100)) : 0;
     const progressHtml = target > 0 ? `<div style="margin-bottom: 16px;"><div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;"><span>الهدف: ${target} ر.س</span><span style="color: ${pct === 100 ? 'var(--accent-color)' : 'var(--text-secondary)'};">${pct}%</span></div><div class="progress-bar-bg" style="height: 6px;"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div></div>` : '';
@@ -114,24 +236,15 @@ window.deleteAccountFromDetails = (aIdx) => { if (window.currentBankIndex === nu
 window.addAccountTransaction = (aIdx, type) => { if (window.currentBankIndex === null) return; const account = window.appState.banks[window.currentBankIndex].accounts[aIdx]; const amountStr = prompt(`أدخل المبلغ الذي تريد ${type === 'add' ? 'إضافته' : 'سحبه'} بالريال:`); if (!amountStr) return; const amount = parseFloat(amountStr); if (isNaN(amount) || amount <= 0) return window.showToast('مبلغ غير صحيح'); const reason = prompt('ما هو السبب / التفاصيل؟ (اختياري)') || 'بدون تفاصيل'; if (!account.history) account.history = []; const dateStr = new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); account.history.unshift({ type: type, amount: amount, reason: reason, date: dateStr }); if (type === 'add') account.balance = (parseFloat(account.balance) || 0) + amount; else account.balance = (parseFloat(account.balance) || 0) - amount; window.renderBankDetailsView(); window.autoSave(); };
 window.openAccountHistory = (aIdx) => { if (window.currentBankIndex === null) return; const account = window.appState.banks[window.currentBankIndex].accounts[aIdx]; const container = document.getElementById('accountHistoryContent'); document.getElementById('accountHistoryTitle').innerText = `سجل: ${account.name}`; if (!account.history || account.history.length === 0) { container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا يوجد سجل حركات لهذا الحساب بعد.</div>'; } else { container.innerHTML = account.history.map(tx => { const isAdd = tx.type === 'add'; const color = isAdd ? 'var(--accent-color)' : 'var(--danger-color)'; const sign = isAdd ? '+' : '-'; return `<div style="background:var(--bg-glass-strong); padding:16px; border-radius:14px; border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:700; margin-bottom:6px; font-size:0.95rem;">${tx.reason}</div><div style="font-size:0.75rem; color:var(--text-secondary);">${tx.date}</div></div><div style="font-weight:800; color:${color}; font-size:1.05rem;" dir="ltr">${sign} ${tx.amount}</div></div>`; }).join(''); } window.openModal('accountHistoryModal'); };
 
-// ================= متتبع الدخل الجديد =================
 window.renderIncomeTracker = function() {
-  const container = document.getElementById('incomeSourcesList');
-  const summaryCard = document.getElementById('incomeSummaryCard');
-  if(!container || !summaryCard) return;
-  if (!window.appState.incomeSources) window.appState.incomeSources = [];
-  if (!window.appState.incomeTarget) window.appState.incomeTarget = 5000;
-  
+  const container = document.getElementById('incomeSourcesList'); const summaryCard = document.getElementById('incomeSummaryCard'); if(!container || !summaryCard) return;
+  if (!window.appState.incomeSources) window.appState.incomeSources = []; if (!window.appState.incomeTarget) window.appState.incomeTarget = 5000;
   let totalIncome = 0;
   const listHtml = window.appState.incomeSources.map((inc, i) => {
-     totalIncome += parseFloat(inc.amount) || 0;
-     const dateStr = inc.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 ${inc.date}</div>` : '';
+     totalIncome += parseFloat(inc.amount) || 0; const dateStr = inc.date ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 6px;">📅 ${inc.date}</div>` : '';
      return `<li class="list-item" style="padding: 12px 16px; background: var(--bg-subtle); border: 1px solid var(--border-color); margin-bottom: 8px;">
         <div class="item-left" style="align-items:flex-start;">
-          <div style="display:flex; flex-direction:column;">
-            <span style="font-weight: 700; font-size: 0.95rem;">${inc.name}</span>
-            ${dateStr}
-          </div>
+          <div style="display:flex; flex-direction:column;"><span style="font-weight: 700; font-size: 0.95rem;">${inc.name}</span>${dateStr}</div>
         </div>
         <div style="display:flex; align-items:center; gap:12px;">
           <span style="font-weight:800; color:var(--accent-color); font-size:1.05rem;">${inc.amount} <span style="font-size:0.75rem;">ر.س</span></span>
@@ -139,12 +252,8 @@ window.renderIncomeTracker = function() {
         </div>
      </li>`;
   }).join('');
-  
   container.innerHTML = window.appState.incomeSources.length ? listHtml : '<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 20px;">لا توجد مصادر دخل مضافة هذا الشهر.</div>';
-  
-  const target = parseFloat(window.appState.incomeTarget) || 1;
-  const pct = Math.min(100, Math.round((totalIncome / target) * 100));
-  
+  const target = parseFloat(window.appState.incomeTarget) || 1; const pct = Math.min(100, Math.round((totalIncome / target) * 100));
   summaryCard.innerHTML = `
     <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow-ios);">
        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -152,39 +261,18 @@ window.renderIncomeTracker = function() {
          <button class="btn btn-subtle" style="font-size:0.75rem; font-weight:700; padding:6px 12px;" onclick="window.setIncomeTarget()">تعديل الهدف ✏️</button>
        </div>
        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; font-weight:600;">
-         <span>المحصل: <strong style="color: var(--accent-color); font-size:1rem;">${totalIncome}</strong> ر.س</span>
-         <span>الهدف: <strong>${target}</strong> ر.س</span>
+         <span>المحصل: <strong style="color: var(--accent-color); font-size:1rem;">${totalIncome}</strong> ر.س</span><span>الهدف: <strong>${target}</strong> ر.س</span>
        </div>
        <div class="progress-bar-bg" style="height: 8px; margin-bottom: 8px;"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div>
        <div style="text-align:left; font-size:0.85rem; font-weight:800; color:${pct >= 100 ? 'var(--accent-color)' : 'var(--text-secondary)'}">${pct}%</div>
     </div>
   `;
-  
-  // تحديث الدخل الإجمالي تلقائياً في قسم التوزيع!
-  const allocInput = document.getElementById('totalIncomeInput');
-  if (allocInput && totalIncome > 0) { allocInput.value = totalIncome; }
+  const allocInput = document.getElementById('totalIncomeInput'); if (allocInput && totalIncome > 0) { allocInput.value = totalIncome; }
 };
-
-window.setIncomeTarget = function() {
-  const current = window.appState.incomeTarget || 5000;
-  const val = prompt('كم هدف الدخل الخاص بك لهذا الشهر (بالريال)؟', current);
-  if(val !== null) { const parsed = parseFloat(val); if(!isNaN(parsed) && parsed > 0) { window.appState.incomeTarget = parsed; window.renderLists(); window.autoSave(); } }
-};
-
-window.addIncome = function() {
-  const nameEl = document.getElementById('newIncomeName'); const amountEl = document.getElementById('newIncomeAmount'); const dateEl = document.getElementById('newIncomeDate');
-  const name = nameEl.value.trim(); const amount = parseFloat(amountEl.value) || 0; const date = dateEl.value;
-  if(!name || amount <= 0) return window.showToast('أدخل المصدر والمبلغ بشكل صحيح');
-  if(!window.appState.incomeSources) window.appState.incomeSources = [];
-  window.appState.incomeSources.push({name, amount, date});
-  nameEl.value = ''; amountEl.value = ''; dateEl.value = '';
-  document.getElementById('addIncomeForm').style.display = 'none'; document.getElementById('addIncomePlusBtn').style.display = 'flex';
-  window.renderLists(); window.autoSave();
-};
-
+window.setIncomeTarget = function() { const current = window.appState.incomeTarget || 5000; const val = prompt('كم هدف الدخل الخاص بك لهذا الشهر (بالريال)؟', current); if(val !== null) { const parsed = parseFloat(val); if(!isNaN(parsed) && parsed > 0) { window.appState.incomeTarget = parsed; window.renderLists(); window.autoSave(); } } };
+window.addIncome = function() { const nameEl = document.getElementById('newIncomeName'); const amountEl = document.getElementById('newIncomeAmount'); const dateEl = document.getElementById('newIncomeDate'); const name = nameEl.value.trim(); const amount = parseFloat(amountEl.value) || 0; const date = dateEl.value; if(!name || amount <= 0) return window.showToast('أدخل المصدر والمبلغ بشكل صحيح'); if(!window.appState.incomeSources) window.appState.incomeSources = []; window.appState.incomeSources.push({name, amount, date}); nameEl.value = ''; amountEl.value = ''; dateEl.value = ''; document.getElementById('addIncomeForm').style.display = 'none'; document.getElementById('addIncomePlusBtn').style.display = 'flex'; window.renderLists(); window.autoSave(); };
 window.deleteIncome = function(idx) { window.appState.incomeSources.splice(idx, 1); window.renderLists(); window.autoSave(); };
 
-// ================= توزيع الدخل =================
 window.renderAllocations = function() {
   const container = document.getElementById('allocationsContainer'); if (!container) return;
   if (!window.appState.allocations || window.appState.allocations.length === 0) { window.appState.allocations = [ {name: 'التزامات ومصاريف', pct: 40}, {name: 'ادخار وطوارئ', pct: 30}, {name: 'استثمار', pct: 20}, {name: 'صدقات', pct: 10} ]; }
@@ -236,7 +324,7 @@ window.addWishlistItem = () => {
   const t = document.getElementById('newWishTitle').value.trim(); const c = document.getElementById('newWishCost').value; const s = document.getElementById('newWishStore').value.trim(); const l = document.getElementById('newWishLink').value.trim(); const fileInput = document.getElementById('newWishImgFile'); const file = fileInput ? fileInput.files[0] : null;
   if (!t) return window.showToast('أدخل اسم الغرض');
   const finalizeAdd = (imgData) => { window.appState.wishlist.push({ title: t, cost: parseFloat(c)||0, store: s, link: l, image: imgData, savedAmount: 0 }); document.getElementById('newWishTitle').value = ''; document.getElementById('newWishCost').value = ''; document.getElementById('newWishStore').value = ''; document.getElementById('newWishLink').value = ''; if (fileInput) fileInput.value = ''; if(document.getElementById('addWishForm')) document.getElementById('addWishForm').style.display = 'none'; if(document.getElementById('addWishPlusBtn')) document.getElementById('addWishPlusBtn').style.display = 'flex'; window.renderLists(); window.autoSave(); window.showToast('تمت الإضافة لقائمة الأمنيات'); };
-  if (file) { if (file.size > 2.5 * 1024 * 1024) return window.showToast('حجم الصورة كبير جداً'); window.compressImage(file, finalizeAdd); } else { finalizeAdd(''); }
+  if (file) { window.compressImage(file, finalizeAdd); } else { finalizeAdd(''); }
 };
 window.deleteWishlistItem = (idx) => { if(confirm('هل أنت متأكد من حذف هذه الأمنية؟')) { window.appState.wishlist.splice(idx, 1); window.renderLists(); window.autoSave(); } };
 window.updateWishlistAmount = (idx, amount) => { let current = parseFloat(window.appState.wishlist[idx].savedAmount) || 0; let cost = parseFloat(window.appState.wishlist[idx].cost) || 0; current += amount; if(current < 0) current = 0; if(current > cost) current = cost; window.appState.wishlist[idx].savedAmount = current; window.renderLists(); window.autoSave(); };
@@ -327,8 +415,7 @@ window.renderSubscriptions = function() {
     else if(nameLower.includes('amazon') || nameLower.includes('امازون') || nameLower.includes('prime')) icon = '📦';
     else if(nameLower.includes('stc') || nameLower.includes('mobily') || nameLower.includes('zain') || nameLower.includes('موبايلي') || nameLower.includes('زين') || nameLower.includes('جوال') || nameLower.includes('انترنت')) icon = '📱';
     else if(nameLower.includes('game') || nameLower.includes('لعب') || nameLower.includes('xbox') || nameLower.includes('playstation') || nameLower.includes('بليستيشن')) icon = '🎮';
-    let accName = 'غير مرتبط بحساب';
-    if(s.linkedAcc) { const [bIdx, aIdx] = s.linkedAcc.split('_'); if(window.appState.banks[bIdx] && window.appState.banks[bIdx].accounts[aIdx]) { accName = window.appState.banks[bIdx].accounts[aIdx].name; } }
+    let accName = 'غير مرتبط'; if(s.linkedAcc) { const [bIdx, aIdx] = s.linkedAcc.split('_'); if(window.appState.banks[bIdx] && window.appState.banks[bIdx].accounts[aIdx]) { accName = window.appState.banks[bIdx].accounts[aIdx].name; } }
     const today = new Date(); const currentMonthStr = `${today.getFullYear()}-${today.getMonth() + 1}`; const isPaid = s.lastPaidMonth === currentMonthStr;
     const paidBadge = isPaid ? `<span style="font-size: 0.65rem; background: var(--accent-light); color: var(--accent-color); padding: 2px 6px; border-radius: 4px; margin-right: 6px;">تم الدفع ✅</span>` : `<span style="font-size: 0.65rem; background: var(--warning-light); color: var(--warning-color); padding: 2px 6px; border-radius: 4px; margin-right: 6px;">قادم ⏳</span>`;
     return `
@@ -349,13 +436,7 @@ window.renderSubscriptions = function() {
     `;
   }).join('');
   if (window.appState.subscriptions.length > 0) {
-    const summaryHtml = `
-      <div style="background: linear-gradient(135deg, var(--bg-subtle) 0%, var(--bg-primary) 100%); padding: 16px 20px; border-radius: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);">
-        <div><div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; margin-bottom: 4px;">إجمالي الاشتراكات</div><div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-color);">${totalCost} <span style="font-size: 0.85rem; color: var(--text-secondary);">ر.س / شهرياً</span></div></div>
-        <div style="font-size: 2.2rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">💳</div>
-      </div>
-    `;
-    container.innerHTML = summaryHtml + subsHtml;
+    container.innerHTML = `<div style="background: linear-gradient(135deg, var(--bg-subtle) 0%, var(--bg-primary) 100%); padding: 16px 20px; border-radius: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);"><div><div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; margin-bottom: 4px;">إجمالي الاشتراكات</div><div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-color);">${totalCost} <span style="font-size: 0.85rem; color: var(--text-secondary);">ر.س / شهرياً</span></div></div><div style="font-size: 2.2rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">💳</div></div>` + subsHtml;
   } else { container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 20px;">لا توجد اشتراكات مضافة.</div>`; }
 };
 
@@ -369,17 +450,6 @@ window.addSubscription = () => {
 };
 window.updateSubscription = (idx, field, val) => { if (field === 'cost') val = parseFloat(val) || 0; window.appState.subscriptions[idx][field] = val; window.renderSubscriptions(); window.autoSave(); };
 window.deleteSubscription = (idx) => { if(confirm('هل أنت متأكد من حذف هذا الاشتراك؟')) { window.appState.subscriptions.splice(idx, 1); window.renderSubscriptions(); window.autoSave(); } };
-
-window.renderLists = function() {
-  window.renderIncomeTracker(); // عرض متتبع الدخل أولاً
-  window.renderVisionBoard(); window.renderKanbanBoard(); window.renderBanksList(); 
-  if (window.currentBankIndex !== null) window.renderBankDetailsView();
-  window.renderAllocations(); window.renderWishlist(); window.renderMonthlyExpenses(); window.renderSubscriptions();
-  document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
-};
-window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
-window.addHabit = () => { if (!window.userProfile?.isPro && (window.appState.habits || []).length >= 3) { window.showToast('النسخة المجانية تتيح 3 عادات.'); window.openModal('pricingModal'); return; } const el = document.getElementById('newHabitInput'); if(!el.value.trim()) return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; if(document.getElementById('addHabitForm')) document.getElementById('addHabitForm').style.display = 'none'; if(document.getElementById('addHabitPlusBtn')) document.getElementById('addHabitPlusBtn').style.display = 'flex'; window.renderLists(); window.autoSave(); };
-window.calculateDistribution = () => { window.renderAllocations(); };
 
 window.currentActiveNoteId = null;
 window.renderNotesList = function() {
