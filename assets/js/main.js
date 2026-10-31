@@ -16,7 +16,7 @@ window.appState = {
   dailyRecords: {}, 
   notes: [],
   allocations: [],
-  monthlyExpenses: [],
+  monthlyExpenses: [], 
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: []
 };
 
@@ -35,7 +35,12 @@ window.saveCurrentWateerah = async (manual) => {
 
   if (!window.isDataLoadedFromCloud && !manual) return;
 
-  try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); if(manual && window.showToast) window.showToast('تم الحفظ والمزامنة سحابياً'); } catch(e) {}
+  try { 
+    await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); 
+    if(manual && window.showToast) window.showToast('تم الحفظ والمزامنة سحابياً'); 
+  } catch(e) {
+    console.error("Error saving data:", e);
+  }
 };
 
 window.loadTodayDate = function() {
@@ -129,14 +134,7 @@ setTimeout(() => {
   window.loadTodayDate();
 }, 200);
 
-let userSnapshotUnsubscribe = null;
-
 onAuthStateChanged(auth, async (user) => {
-  if (userSnapshotUnsubscribe) {
-      userSnapshotUnsubscribe();
-      userSnapshotUnsubscribe = null;
-  }
-
   setTimeout(async () => {
       if (user && (user.emailVerified || user.email === ADMIN_EMAIL)) {
         const guestBtn = document.getElementById('guestAuthBtn'); if(guestBtn) guestBtn.style.display = 'none';
@@ -145,28 +143,26 @@ onAuthStateChanged(auth, async (user) => {
 
         if (user.email === ADMIN_EMAIL) { const adminBtn = document.getElementById('adminPanelBtn'); if(adminBtn) adminBtn.style.display = 'inline-flex'; }
 
-        // نظام المزامنة اللحظية الجديد 
-        userSnapshotUnsubscribe = onSnapshot(doc(db, "users", user.uid), (snap) => {
-            if(snap.exists()) {
-                const d = snap.data(); 
-                if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
-                if(d.state) window.appState = { ...window.appState, ...d.state };
-                
-                window.isDataLoadedFromCloud = true;
-
-                if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
-                if(window.updateSubscriptionUI) window.updateSubscriptionUI();
-                
-                document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; 
-                document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; 
-                document.getElementById('profileNameInput').value = window.userProfile.name || '';
-                
-                window.loadTodayDate();
-                if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
-                if(window.renderLists) window.renderLists(); // تحديث الواجهة فوراً
-            }
-        });
+        try { 
+          const snap = await getDoc(doc(db, "users", user.uid)); 
+          if(snap.exists()) { 
+            const d = snap.data(); 
+            if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
+            if(d.state) window.appState = { ...window.appState, ...d.state }; 
+          } 
+        } catch(e) {}
         
+        window.isDataLoadedFromCloud = true; 
+
+        if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
+        if(window.updateSubscriptionUI) window.updateSubscriptionUI();
+        
+        document.getElementById('headerUserName').innerText = window.userProfile.name || user.email; 
+        document.getElementById('headerAvatar').innerText = (window.userProfile.name || 'ل')[0]; 
+        document.getElementById('profileNameInput').value = window.userProfile.name || '';
+        
+        window.loadTodayDate();
+        if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
       } else { 
         window.isDataLoadedFromCloud = true;
         if(window.updateSubscriptionUI) window.updateSubscriptionUI(); 
