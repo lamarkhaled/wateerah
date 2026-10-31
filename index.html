@@ -32,7 +32,6 @@
       <div class="nav-actions">
         <button id="iosInstallBtn" class="btn btn-subtle" onclick="window.openModal('iosGuideModal')">تثبيت التطبيق</button>
         <button id="adminPanelBtn" class="btn btn-admin" style="display: none;" onclick="window.openModal('adminModal')">لوحة التحكم</button>
-        <button id="lockScreenBtn" class="btn btn-danger" style="display: none; padding: 6px 12px; font-size: 0.8rem;" onclick="window.handleLogout()">تسجيل خروج</button>
         <span id="planBadge" class="pro-badge" onclick="window.openModal('pricingModal')">الباقة الأساسية</span>
         <button id="upgradeBtn" class="btn" onclick="window.openModal('pricingModal')">إدارة الاشتراك</button>
         <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="window.openModal('profileModal')">
@@ -73,7 +72,7 @@
           <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
         </div>
         <div class="toolbar-group" id="toolbarToolsContainer">
-          <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة</button>
+          <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة ➕</button>
         </div>
         <div class="toolbar-group" id="homeBtnContainer" style="display: none;">
           <button class="btn btn-primary" style="font-weight: 700; padding: 8px 16px;" onclick="window.goHome()">العودة للرئيسية</button>
@@ -90,6 +89,7 @@
 
       <div id="pageContainer" style="display: none;">
         
+        <!-- الأهداف -->
         <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div>
@@ -104,7 +104,6 @@
             </div>
             <div class="add-row" style="margin-top: 0; align-items: stretch;">
               <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex:2;">
-              <input type="text" id="newVisionImg" placeholder="رابط الصورة..." style="flex:2; display:none;">
               <label style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;" title="إدراج صورة">
                 رفع صورة <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;">
               </label>
@@ -115,6 +114,7 @@
           <div id="corkboardContainer" class="corkboard-surface"></div>
         </div>
 
+        <!-- المهام -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
@@ -141,11 +141,74 @@
           </div>
         </div>
 
+        <!-- الأعمال -->
         <div id="widget-business" class="widget-card col-12 hidden-el" data-widget-id="widget-business">
-          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">استوديو الأعمال والإبداع</span></div></div>
+          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">استوديو الأعمال</span></div></div>
           <div id="businessSummaryCard"></div>
         </div>
 
+        <div id="businessDetailsPage" class="widget-card col-12 hidden-el" style="display: none;">
+          <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeBusinessDetails()">الرئيسية</button>
+              <div class="card-title" style="font-size: 1.15rem; font-weight: 700;">المشاريع والحملات</div>
+              <div style="width: 70px;"></div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">المشاريع والعملاء</div>
+              <button id="addProjectPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addProjectForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addProjectForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مشروع جديد</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addProjectForm').style.display='none'; document.getElementById('addProjectPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
+                <input type="text" id="newProjectName" placeholder="الاسم..." style="flex:2; min-width:130px;">
+                <select id="newProjectType" style="flex:1; min-width:110px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                  <option value="تصميم">تصميم</option>
+                  <option value="برمجة">برمجة</option>
+                  <option value="منتج/متجر">منتج/متجر</option>
+                  <option value="استشارة">استشارة</option>
+                </select>
+                <input type="number" id="newProjectPrice" placeholder="السعر" style="flex:1; min-width:80px;">
+                <input type="date" id="newProjectDate" title="تاريخ التسليم" style="flex:1.2; min-width:110px;">
+                <button class="btn btn-primary" style="flex:1; min-width:80px;" onclick="window.addBusinessProject()">إضافة</button>
+              </div>
+            </div>
+            <ul id="businessProjectsList" class="item-list"></ul>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">الحملات والمحتوى</div>
+              <button id="addCampaignPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addCampaignForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addCampaignForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">حملة جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addCampaignForm').style.display='none'; document.getElementById('addCampaignPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
+                <input type="text" id="newCampaignName" placeholder="الفكرة..." style="flex:2; min-width:140px;">
+                <select id="newCampaignPlatform" style="flex:1; min-width:100px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                  <option value="إنستغرام">إنستغرام</option>
+                  <option value="تيك توك">تيك توك</option>
+                  <option value="متجر">متجر</option>
+                  <option value="إكس">إكس</option>
+                </select>
+                <input type="date" id="newCampaignDate" title="تاريخ النشر" style="flex:1.2; min-width:110px;">
+                <button class="btn btn-primary" style="flex:1; min-width:80px;" onclick="window.addBusinessCampaign()">إضافة</button>
+              </div>
+            </div>
+            <ul id="businessCampaignsList" class="item-list"></ul>
+          </div>
+        </div>
+
+        <!-- التركيز -->
         <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
@@ -154,9 +217,10 @@
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
 
+        <!-- العادات -->
         <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
           <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">متتبع العادات</span></div>
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">العادات</span></div>
             <div style="display: flex; gap: 8px; align-items: center;">
               <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
               <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
@@ -168,19 +232,20 @@
               <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addHabitForm').style.display='none'; document.getElementById('addHabitPlusBtn').style.display='flex';">&times;</button>
             </div>
             <div class="add-row" style="margin-top: 0;">
-              <input type="text" id="newHabitInput" placeholder="عادة جديدة..." onkeypress="if(event.key==='Enter') window.addHabit()">
+              <input type="text" id="newHabitInput" placeholder="أدخل العادة..." onkeypress="if(event.key==='Enter') window.addHabit()">
               <button class="btn btn-primary" onclick="window.addHabit()">إضافة</button>
             </div>
           </div>
           <ul id="habitsList" class="item-list"></ul>
         </div>
 
+        <!-- المالية -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
           
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">متتبع الدخل</div>
+              <div style="font-size: 0.95rem; font-weight: 700;">الدخل</div>
               <button id="addIncomePlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addIncomeForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addIncomeForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
@@ -189,7 +254,7 @@
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addIncomeForm').style.display='none'; document.getElementById('addIncomePlusBtn').style.display='flex';">&times;</button>
               </div>
               <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
-                <input type="text" id="newIncomeName" placeholder="المصدر (راتب...)" style="flex:2; min-width:120px;">
+                <input type="text" id="newIncomeName" placeholder="المصدر..." style="flex:2; min-width:120px;">
                 <input type="number" id="newIncomeAmount" placeholder="المبلغ" style="flex:1; min-width:90px;">
                 <input type="date" id="newIncomeDate" style="flex:1.5; min-width:130px;">
                 <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addIncome()">إضافة</button>
@@ -224,7 +289,7 @@
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addWishForm').style.display='none'; document.getElementById('addWishPlusBtn').style.display='flex';">&times;</button>
               </div>
               <div class="add-row" style="align-items: stretch; margin-top: 0;">
-                <input type="text" id="newWishTitle" placeholder="اسم الغرض..." style="flex:2;">
+                <input type="text" id="newWishTitle" placeholder="الاسم..." style="flex:2;">
                 <input type="number" id="newWishCost" placeholder="السعر" style="flex:1;">
                 <button class="btn btn-primary" style="flex:1;" onclick="window.addWishlistItem()">تأكيد</button>
               </div>
@@ -235,7 +300,8 @@
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <div>
-                <div style="font-size: 0.95rem; font-weight: 700;">البنوك والحسابات المالية</div>
+                <div style="font-size: 0.95rem; font-weight: 700;">البنوك والحسابات</div>
+                <div id="banksTotalOverview" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-top: 4px;">مجموع الأرصدة: 0 ر.س</div>
               </div>
               <button id="addBankPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addBankForm').style.display='block'; this.style.display='none';">+</button>
             </div>
@@ -272,10 +338,11 @@
           </div>
         </div>
 
+        <!-- التدوين -->
         <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
           <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
             <div class="card-title-wrap"><span class="card-title" style="color: var(--accent-color); font-size:1.2rem; font-weight: 700;">التدوين</span></div>
-            <button style="background:none; border:none; color:var(--accent-color); font-size:1.4rem; cursor:pointer;" onclick="window.createNewNote()">جديد</button>
+            <button style="background:none; border:none; color:var(--accent-color); font-size:1rem; font-weight:700; cursor:pointer;" onclick="window.createNewNote()">ملاحظة جديدة</button>
           </div>
           <div id="notesListView" style="flex: 1; overflow-y: auto; background: var(--bg-glass-strong); display: block;"></div>
           <div id="noteEditorView" style="display: none; flex: 1; flex-direction: column; background: var(--bg-glass-strong); padding: 16px;">
@@ -284,14 +351,16 @@
               <button style="background:none; border:none; color:var(--danger-color); font-size:1rem; cursor:pointer;" onclick="window.deleteCurrentNote()">حذف</button>
             </div>
             <div id="currentNoteDate" style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 16px;"></div>
-            <div id="noteContentEditable" class="apple-notes-editor" contenteditable="true" placeholder="تدوينة جديدة..." oninput="window.autoSaveNote()"></div>
+            <div id="noteContentEditable" class="apple-notes-editor" contenteditable="true" placeholder="ملاحظة جديدة..." oninput="window.autoSaveNote()"></div>
           </div>
         </div>
+
       </div>
     </div>
   </main>
 
-  <div id="authModal" style="display: none; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+  <!-- === النوافذ المنبثقة وصفحة الدخول === -->
+  <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
       <p id="authModalSub" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.5;">سجلي دخولك للوصول إلى مساحتك</p>
@@ -328,11 +397,10 @@
 
   <div id="verificationNoticeModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 400px; text-align: center;">
-      <button class="modal-close" onclick="window.closeModal('verificationNoticeModal')">&times;</button>
       <h3 style="margin-bottom: 14px;">تفعيل البريد الإلكتروني</h3>
       <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">يرجى تفعيل حسابك من بريدك الإلكتروني.</p>
       <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button>
-      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="window.closeModal('verificationNoticeModal'); window.switchAuthView('login'); document.getElementById('authModal').style.display='flex';">تسجيل الدخول</button>
+      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="window.returnToLogin()">العودة لتسجيل الدخول</button>
     </div>
   </div>
 
