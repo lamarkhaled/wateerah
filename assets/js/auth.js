@@ -24,5 +24,6 @@ window.handleLogout = async () => {
   try {
     await signOut(auth); 
   } catch(e) {}
+  localStorage.removeItem('wateerah_local_state'); // مسح التخزين المحلي عند القفل الأمني
   location.reload(); 
 };
