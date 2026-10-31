@@ -85,81 +85,88 @@ window.dropKanbanCard = (e, targetStatus) => { e.preventDefault(); if (window.dr
 
 window.expandedBanks = window.expandedBanks || {};
 
-window.toggleBank = function(bIdx) {
-  window.expandedBanks[bIdx] = !window.expandedBanks[bIdx];
-  window.renderBanksList();
-};
-
 window.renderBanksList = function() {
   const container = document.getElementById('banksContainer');
+  const overview = document.getElementById('banksTotalOverview');
   if (!container) return;
   if (!window.appState.banks) window.appState.banks = [];
 
-  let overallTotal = 0;
+  if (window.appState.banks.length === 0) {
+    container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.8rem; padding:10px;">لا توجد بنوك مضافة بعد.</div>`;
+    if(overview) overview.innerHTML = `مجموع الأرصدة: 0 ر.س`;
+    return;
+  }
 
-  const banksHtml = window.appState.banks.map((bank, bIdx) => {
-    const bankTotal = (bank.accounts || []).reduce((sum, acc) => sum + (parseFloat(acc.balance) || 0), 0);
-    overallTotal += bankTotal;
-    const isExpanded = window.expandedBanks[bIdx];
+  let grandTotal = 0;
+
+  container.innerHTML = window.appState.banks.map((bank, bIdx) => {
+    let bankTotal = 0;
+    (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; });
+    grandTotal += bankTotal;
     
+    const isExpanded = window.expandedBanks[bIdx] ? 'block' : 'none';
+    const chevron = window.expandedBanks[bIdx] ? '▲' : '▼';
+
     return `
-      <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 12px; overflow: hidden; transition: all 0.3s ease;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; cursor: pointer; background: ${isExpanded ? 'var(--bg-subtle)' : 'transparent'};" onclick="window.toggleBank(${bIdx})">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 0.9rem; transform: ${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}; transition: transform 0.3s; display: inline-block;">▼</span>
-            <span style="font-weight: 700; font-size: 1.05rem;">${bank.name}</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-weight: 700; color: var(--accent-color);">${bankTotal} ر.س</span>
-            <button class="delete-btn" style="font-size: 1.1rem; padding: 4px;" onclick="event.stopPropagation(); window.deleteBank(${bIdx})">&times;</button>
-          </div>
+      <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 12px;">
+        <div onclick="window.toggleBankAccordion(${bIdx})" style="display: flex; justify-content: space-between; align-items: center; padding: 14px; cursor: pointer; background: var(--bg-subtle);">
+           <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); display:flex; align-items:center; gap:8px;">
+             <span>${bank.name}</span>
+             <span style="font-size:0.75rem; color:var(--text-secondary);">${chevron}</span>
+           </div>
+           <div style="display: flex; align-items: center; gap: 12px;">
+             <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-color);">${bankTotal} ر.س</span>
+             <button class="delete-btn" style="font-size: 1.2rem; padding:4px;" onclick="event.stopPropagation(); window.deleteBank(${bIdx})">&times;</button>
+           </div>
         </div>
         
-        <div style="display: ${isExpanded ? 'block' : 'none'}; padding: 0 16px 16px 16px; border-top: 1px solid var(--border-color);">
-          <div style="margin-top: 12px; margin-bottom: 12px;">
-             <input type="text" value="${bank.name}" onchange="window.updateBankName(${bIdx}, this.value)" style="border: none; background: transparent; color: var(--text-primary); outline: none; font-size: 0.9rem; font-weight: 600; width: 100%; border-bottom: 1px dashed var(--border-color); padding-bottom: 4px;" placeholder="تعديل اسم البنك...">
-          </div>
-          <ul class="item-list" style="margin-bottom: 12px;">
-            ${(bank.accounts || []).map((acc, aIdx) => `
-              <li class="list-item" style="padding: 8px 12px; background: transparent;">
-                <div class="item-left" style="gap: 8px;">
-                  <input type="text" class="item-text-input" value="${acc.name}" onchange="window.updateAccountName(${bIdx},${aIdx}, this.value)" style="font-weight: 500;" placeholder="اسم الحساب">
-                  <input type="number" class="item-text-input" value="${acc.balance}" onchange="window.updateAccountBalance(${bIdx},${aIdx}, this.value)" style="color: var(--accent-color); font-weight: 700; max-width: 80px;" placeholder="الرصيد">
-                  <span style="font-size: 0.75rem; color: var(--text-secondary);">ر.س</span>
-                </div>
-                <button class="delete-btn" onclick="window.deleteAccount(${bIdx},${aIdx})">&times;</button>
-              </li>
-            `).join('')}
-          </ul>
-          
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-             <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">حساب جديد</span>
-             <button id="addAccPlusBtn_${bIdx}" class="add-widget-plus" style="width: 24px; height: 24px; font-size: 1rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addAccForm_${bIdx}').style.display='block'; this.style.display='none';">+</button>
-          </div>
-          <div id="addAccForm_${bIdx}" style="display: none; background: var(--bg-primary); padding: 12px; border-radius: 12px; border: 1px dashed var(--border-color); margin-top: 10px;">
-             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <strong style="font-size: 0.75rem; color: var(--accent-color);">بيانات الحساب 💳</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1rem;" onclick="document.getElementById('addAccForm_${bIdx}').style.display='none'; document.getElementById('addAccPlusBtn_${bIdx}').style.display='flex';">&times;</button>
-             </div>
-             <div class="add-row" style="margin-top: 0;">
-               <input type="text" id="newAccName_${bIdx}" placeholder="اسم الحساب..." style="font-size: 0.8rem; padding: 8px;">
-               <input type="number" id="newAccBalance_${bIdx}" placeholder="الرصيد..." style="font-size: 0.8rem; padding: 8px; width: 80px;">
-               <button class="btn btn-primary" style="font-size: 0.8rem;" onclick="window.addAccount(${bIdx})">إضافة ➕</button>
-             </div>
-          </div>
+        <div style="display: ${isExpanded}; padding: 14px; border-top: 1px solid var(--border-color);">
+           <div style="margin-bottom: 12px; display:flex; gap:8px;">
+             <input type="text" value="${bank.name}" onchange="window.updateBankName(${bIdx}, this.value)" style="font-weight: 600; border: 1px solid var(--border-color); border-radius:6px; background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.85rem; padding:6px 10px; width:100%;" placeholder="تعديل اسم البنك...">
+           </div>
+           
+           <ul class="item-list" style="margin-bottom: 12px;">
+             ${(bank.accounts || []).map((acc, aIdx) => `
+               <li class="list-item" style="padding: 8px 12px; background: transparent; border: 1px dashed var(--border-color);">
+                 <div class="item-left" style="gap: 8px;">
+                   <input type="text" class="item-text-input" value="${acc.name}" onchange="window.updateAccountName(${bIdx},${aIdx}, this.value)" style="font-weight: 500;" placeholder="اسم الحساب">
+                   <input type="number" class="item-text-input" value="${acc.balance}" onchange="window.updateAccountBalance(${bIdx},${aIdx}, this.value)" style="color: var(--accent-color); font-weight: 700; max-width: 80px;" placeholder="الرصيد">
+                   <span style="font-size: 0.75rem; color: var(--text-secondary);">ر.س</span>
+                 </div>
+                 <button class="delete-btn" onclick="window.deleteAccount(${bIdx},${aIdx})">&times;</button>
+               </li>
+             `).join('')}
+           </ul>
+           
+           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">إضافة حساب جديد</span>
+              <button id="addAccPlusBtn_${bIdx}" class="add-widget-plus" style="width: 24px; height: 24px; font-size: 1rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addAccForm_${bIdx}').style.display='block'; this.style.display='none';">+</button>
+           </div>
+           
+           <div id="addAccForm_${bIdx}" style="display: none; background: var(--bg-primary); padding: 12px; border-radius: 12px; border: 1px dashed var(--border-color); margin-top: 10px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                 <strong style="font-size: 0.75rem; color: var(--accent-color);">حساب جديد 💳</strong>
+                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1rem;" onclick="document.getElementById('addAccForm_${bIdx}').style.display='none'; document.getElementById('addAccPlusBtn_${bIdx}').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newAccName_${bIdx}" placeholder="اسم الحساب..." style="font-size: 0.8rem; padding: 8px;">
+                <input type="number" id="newAccBalance_${bIdx}" placeholder="الرصيد" style="font-size: 0.8rem; padding: 8px;">
+                <button class="btn btn-primary" style="font-size: 0.8rem;" onclick="window.addAccount(${bIdx})">تأكيد ➕</button>
+              </div>
+           </div>
         </div>
       </div>
     `;
   }).join('');
 
-  const otEl = document.getElementById('banksOverallTotal');
-  if(otEl) otEl.innerText = overallTotal + ' ر.س';
-  
-  if (window.appState.banks.length === 0) {
-    container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.8rem; padding:10px;">لا توجد بنوك مضافة بعد.</div>`;
-  } else {
-    container.innerHTML = banksHtml;
+  if(overview) {
+    overview.innerHTML = `مجموع الأرصدة الكلي: <strong style="color: var(--accent-color); font-size: 1rem;">${grandTotal}</strong> ر.س`;
   }
+};
+
+window.toggleBankAccordion = function(bIdx) {
+  window.expandedBanks[bIdx] = !window.expandedBanks[bIdx];
+  window.renderBanksList();
 };
 
 window.addBank = () => {
@@ -171,6 +178,8 @@ window.addBank = () => {
   
   if(document.getElementById('addBankForm')) document.getElementById('addBankForm').style.display = 'none';
   if(document.getElementById('addBankPlusBtn')) document.getElementById('addBankPlusBtn').style.display = 'flex';
+  
+  window.expandedBanks[window.appState.banks.length - 1] = true;
   
   window.renderLists(); window.autoSave(); window.showToast('تمت إضافة البنك بنجاح');
 };
@@ -399,17 +408,8 @@ window.addMonthlyExpense = () => {
   window.autoSave();
 };
 
-window.toggleMonthlyExpense = (i) => {
-  window.appState.monthlyExpenses[i].paid = !window.appState.monthlyExpenses[i].paid;
-  window.renderMonthlyExpenses();
-  window.autoSave();
-};
-
-window.deleteMonthlyExpense = (i) => {
-  window.appState.monthlyExpenses.splice(i, 1);
-  window.renderMonthlyExpenses();
-  window.autoSave();
-};
+window.toggleMonthlyExpense = (i) => { window.appState.monthlyExpenses[i].paid = !window.appState.monthlyExpenses[i].paid; window.renderMonthlyExpenses(); window.autoSave(); };
+window.deleteMonthlyExpense = (i) => { window.appState.monthlyExpenses.splice(i, 1); window.renderMonthlyExpenses(); window.autoSave(); };
 
 window.renderLists = function() {
   window.renderVisionBoard(); 
@@ -441,7 +441,6 @@ window.addSubscription = () => {
   
   window.renderLists(); window.autoSave(); 
 };
-window.calculateDistribution = () => { window.renderAllocations(); };
 
 window.currentActiveNoteId = null;
 window.renderNotesList = function() {
