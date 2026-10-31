@@ -12,7 +12,7 @@ window.updateDayNightGreeting = function() {
   if (!isMorning) document.body.classList.add('night-mode-glow'); 
   else document.body.classList.remove('night-mode-glow');
   
-  const userName = window.userProfile?.name || 'صديقنا';
+  const userName = window.userProfile?.name || 'لمار';
   const wTxt = document.getElementById('welcomeText'); 
   if(wTxt) wTxt.innerText = `${greetingWord}، أهلاً بك يا ${userName}.`;
 };
@@ -37,11 +37,11 @@ window.renderWorkspaceVisibility = function() {
   const mainW = document.getElementById('mainWorkspace');
   
   if (!window.appState.hasStarted) { 
-    onb.classList.remove('hidden-el'); 
-    mainW.classList.add('hidden-el'); 
+    if(onb) onb.classList.remove('hidden-el'); 
+    if(mainW) mainW.classList.add('hidden-el'); 
   } else { 
-    onb.classList.add('hidden-el'); 
-    mainW.classList.remove('hidden-el'); 
+    if(onb) onb.classList.add('hidden-el'); 
+    if(mainW) mainW.classList.remove('hidden-el'); 
     const pageContainer = document.getElementById('pageContainer');
     if (!pageContainer || pageContainer.style.display !== 'block') {
         window.goHome(); 
@@ -60,19 +60,17 @@ window.renderActiveWidgets = function() {
     { id: 'widget-habits', name: 'العادات', icon: '✨', desc: 'متتبع العادات اليومية' }
   ];
 
-  const active = window.appState.activeWidgets || [];
+  if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
+    window.appState.activeWidgets = ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'];
+  }
+
+  const active = window.appState.activeWidgets;
   const launcher = document.getElementById('appLauncherGrid');
   const emptyState = document.getElementById('emptyWorkspaceState');
 
-  if (active.length === 0) {
-    if(emptyState) emptyState.classList.remove('hidden-el');
-    if(launcher) launcher.style.display = 'none';
-  } else {
-    if(emptyState) emptyState.classList.add('hidden-el');
-    if(launcher) launcher.style.display = 'grid';
-  }
-
+  if(emptyState) emptyState.classList.add('hidden-el');
   if(launcher) {
+    launcher.style.display = 'grid';
     launcher.innerHTML = active.map(wId => {
       const info = AVAILABLE_APPS.find(w => w.id === wId);
       if(!info) return '';
