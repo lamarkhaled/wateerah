@@ -12,7 +12,6 @@ window.addVisionItem = () => {
   const targetDate = document.getElementById('newVisionDate').value;
   const fileInput = document.getElementById('newVisionImgFile');
   const file = fileInput ? fileInput.files[0] : null;
-
   if (!title) return window.showToast('أدخل عنوان الهدف');
 
   const finalizeSave = (imgData) => {
@@ -21,17 +20,17 @@ window.addVisionItem = () => {
     document.getElementById('newVisionTitle').value = '';
     if(fileInput) fileInput.value = '';
     document.getElementById('newVisionDate').value = '';
+    
+    if(document.getElementById('addVisionForm')) document.getElementById('addVisionForm').style.display = 'none';
+    if(document.getElementById('addVisionPlusBtn')) document.getElementById('addVisionPlusBtn').style.display = 'flex';
+    
     window.renderVisionBoard(); window.autoSave(); window.showToast('تم تثبيت الهدف');
   };
 
   if (file) {
     if (file.size > 2.5 * 1024 * 1024) return window.showToast('حجم الصورة كبير جداً (الحد الأقصى 2.5 ميجابايت).');
-    const reader = new FileReader();
-    reader.onload = (e) => finalizeSave(e.target.result);
-    reader.readAsDataURL(file);
-  } else {
-    finalizeSave('');
-  }
+    const reader = new FileReader(); reader.onload = (e) => finalizeSave(e.target.result); reader.readAsDataURL(file);
+  } else { finalizeSave(''); }
 };
 
 window.openVisionDetail = (idx) => {
@@ -70,7 +69,12 @@ window.addKanbanTask = () => {
   const title = document.getElementById('newKanbanTitle').value.trim(); const status = document.getElementById('newKanbanStatus').value; const priority = document.getElementById('newKanbanPriority').value; const date = document.getElementById('newKanbanDate').value;
   if (!title) return window.showToast('أدخل عنوان المهمة');
   if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
-  window.appState.kanbanTasks.push({ title, status, priority, date }); document.getElementById('newKanbanTitle').value = ''; window.renderKanbanBoard(); window.autoSave();
+  window.appState.kanbanTasks.push({ title, status, priority, date }); document.getElementById('newKanbanTitle').value = ''; 
+  
+  if(document.getElementById('addKanbanForm')) document.getElementById('addKanbanForm').style.display = 'none';
+  if(document.getElementById('addKanbanPlusBtn')) document.getElementById('addKanbanPlusBtn').style.display = 'flex';
+  
+  window.renderKanbanBoard(); window.autoSave();
 };
 
 window.changeKanbanStatus = (idx, newStatus) => { window.appState.kanbanTasks[idx].status = newStatus; window.renderKanbanBoard(); window.autoSave(); };
@@ -107,10 +111,20 @@ window.renderBanksList = function() {
           </li>
         `).join('')}
       </ul>
-      <div class="add-row" style="margin-top: 0;">
-        <input type="text" id="newAccName_${bIdx}" placeholder="حساب جديد..." style="font-size: 0.8rem; padding: 8px;">
-        <input type="number" id="newAccBalance_${bIdx}" placeholder="الرصيد" style="font-size: 0.8rem; padding: 8px;">
-        <button class="btn btn-subtle" style="font-size: 0.8rem;" onclick="window.addAccount(${bIdx})">إضافة</button>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+         <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">الحسابات المضافة</span>
+         <button id="addAccPlusBtn_${bIdx}" class="add-widget-plus" style="width: 24px; height: 24px; font-size: 1rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addAccForm_${bIdx}').style.display='block'; this.style.display='none';">+</button>
+      </div>
+      <div id="addAccForm_${bIdx}" style="display: none; background: var(--bg-primary); padding: 12px; border-radius: 12px; border: 1px dashed var(--border-color); margin-top: 10px;">
+         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <strong style="font-size: 0.75rem; color: var(--accent-color);">حساب جديد 💳</strong>
+            <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1rem;" onclick="document.getElementById('addAccForm_${bIdx}').style.display='none'; document.getElementById('addAccPlusBtn_${bIdx}').style.display='flex';">&times;</button>
+         </div>
+         <div class="add-row" style="margin-top: 0;">
+           <input type="text" id="newAccName_${bIdx}" placeholder="حساب جديد..." style="font-size: 0.8rem; padding: 8px;">
+           <input type="number" id="newAccBalance_${bIdx}" placeholder="الرصيد" style="font-size: 0.8rem; padding: 8px;">
+           <button class="btn btn-primary" style="font-size: 0.8rem;" onclick="window.addAccount(${bIdx})">إضافة ➕</button>
+         </div>
       </div>
     </div>
   `).join('');
@@ -122,11 +136,22 @@ window.addBank = () => {
   if (!window.appState.banks) window.appState.banks = [];
   window.appState.banks.push({ name, accounts: [] });
   document.getElementById('newBankName').value = '';
+  
+  if(document.getElementById('addBankForm')) document.getElementById('addBankForm').style.display = 'none';
+  if(document.getElementById('addBankPlusBtn')) document.getElementById('addBankPlusBtn').style.display = 'flex';
+  
   window.renderLists(); window.autoSave(); window.showToast('تمت إضافة البنك بنجاح');
 };
 window.deleteBank = (bIdx) => { if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) { window.appState.banks.splice(bIdx, 1); window.renderLists(); window.autoSave(); window.showToast('تم حذف البنك'); } };
 window.updateBankName = (bIdx, val) => { window.appState.banks[bIdx].name = val; window.autoSave(); };
-window.addAccount = (bIdx) => { const nameEl = document.getElementById(`newAccName_${bIdx}`); const balEl = document.getElementById(`newAccBalance_${bIdx}`); const name = nameEl.value.trim(); const balance = parseFloat(balEl.value) || 0; if (!name) return window.showToast('أدخل اسم الحساب'); window.appState.banks[bIdx].accounts.push({ name, balance }); nameEl.value = ''; balEl.value = ''; window.renderLists(); window.autoSave(); };
+window.addAccount = (bIdx) => { 
+  const nameEl = document.getElementById(`newAccName_${bIdx}`); const balEl = document.getElementById(`newAccBalance_${bIdx}`); const name = nameEl.value.trim(); const balance = parseFloat(balEl.value) || 0; 
+  if (!name) return window.showToast('أدخل اسم الحساب'); 
+  window.appState.banks[bIdx].accounts.push({ name, balance }); nameEl.value = ''; balEl.value = ''; 
+  if(document.getElementById(`addAccForm_${bIdx}`)) document.getElementById(`addAccForm_${bIdx}`).style.display = 'none';
+  if(document.getElementById(`addAccPlusBtn_${bIdx}`)) document.getElementById(`addAccPlusBtn_${bIdx}`).style.display = 'flex';
+  window.renderLists(); window.autoSave(); 
+};
 window.deleteAccount = (bIdx, aIdx) => { window.appState.banks[bIdx].accounts.splice(aIdx, 1); window.renderLists(); window.autoSave(); };
 window.updateAccountName = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].name = val; window.autoSave(); };
 window.updateAccountBalance = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].balance = parseFloat(val) || 0; window.autoSave(); };
@@ -168,7 +193,17 @@ window.renderAllocations = function() {
   }
 };
 
-window.addAllocation = () => { const nameEl = document.getElementById('newAllocName'); const pctEl = document.getElementById('newAllocPct'); const name = nameEl.value.trim(); const pct = parseFloat(pctEl.value) || 0; if (!name) return window.showToast('أدخل اسم البند للتوزيع'); if (!window.appState.allocations) window.appState.allocations = []; window.appState.allocations.push({name, pct}); nameEl.value = ''; pctEl.value = ''; window.renderAllocations(); window.autoSave(); };
+window.addAllocation = () => { 
+  const nameEl = document.getElementById('newAllocName'); const pctEl = document.getElementById('newAllocPct'); const name = nameEl.value.trim(); const pct = parseFloat(pctEl.value) || 0; 
+  if (!name) return window.showToast('أدخل اسم البند للتوزيع'); 
+  if (!window.appState.allocations) window.appState.allocations = []; 
+  window.appState.allocations.push({name, pct}); nameEl.value = ''; pctEl.value = ''; 
+  
+  if(document.getElementById('addAllocForm')) document.getElementById('addAllocForm').style.display = 'none';
+  if(document.getElementById('addAllocPlusBtn')) document.getElementById('addAllocPlusBtn').style.display = 'flex';
+  
+  window.renderAllocations(); window.autoSave(); 
+};
 window.updateAllocation = (idx, field, val) => { if (field === 'pct') val = parseFloat(val) || 0; window.appState.allocations[idx][field] = val; window.renderAllocations(); window.autoSave(); };
 window.deleteAllocation = (idx) => { window.appState.allocations.splice(idx, 1); window.renderAllocations(); window.autoSave(); };
 
@@ -338,6 +373,9 @@ window.addMonthlyExpense = () => {
   window.appState.monthlyExpenses.push({ name, amount, paid: false });
   nEl.value = ''; aEl.value = '';
   
+  if(document.getElementById('addExpenseForm')) document.getElementById('addExpenseForm').style.display = 'none';
+  if(document.getElementById('addExpensePlusBtn')) document.getElementById('addExpensePlusBtn').style.display = 'flex';
+  
   window.renderMonthlyExpenses();
   window.autoSave();
 };
@@ -360,15 +398,30 @@ window.renderLists = function() {
   window.renderBanksList(); 
   window.renderAllocations();
   window.renderWishlist();
-  window.renderMonthlyExpenses();
+  window.renderMonthlyExpenses(); 
 
   document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
   document.getElementById('subscriptionsList').innerHTML = (window.appState.subscriptions || []).map((s, i) => `<li class="list-item"><div class="item-left"><input type="text" class="item-text-input" value="${s.name}" onchange="window.appState.subscriptions[${i}].name=this.value; window.autoSave()"><span style="font-size:0.8rem; font-weight:600;">${s.cost} ر.س</span></div><button class="delete-btn" onclick="window.appState.subscriptions.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
 };
 
 window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
-window.addHabit = () => { if (!window.userProfile?.isPro && (window.appState.habits || []).length >= 3) { window.showToast('النسخة المجانية تتيح 3 عادات. رقّي باقتك الآن! 🌟'); window.openModal('pricingModal'); return; } const el = document.getElementById('newHabitInput'); if(!el.value.trim()) return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; window.renderLists(); window.autoSave(); };
-window.addSubscription = () => { const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; window.renderLists(); window.autoSave(); };
+window.addHabit = () => { 
+  if (!window.userProfile?.isPro && (window.appState.habits || []).length >= 3) { window.showToast('النسخة المجانية تتيح 3 عادات. رقّي باقتك الآن! 🌟'); window.openModal('pricingModal'); return; } 
+  const el = document.getElementById('newHabitInput'); if(!el.value.trim()) return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; 
+  
+  if(document.getElementById('addHabitForm')) document.getElementById('addHabitForm').style.display = 'none';
+  if(document.getElementById('addHabitPlusBtn')) document.getElementById('addHabitPlusBtn').style.display = 'flex';
+  
+  window.renderLists(); window.autoSave(); 
+};
+window.addSubscription = () => { 
+  const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); if(!n.value.trim())return; window.appState.subscriptions.push({name:n.value.trim(), cost:parseFloat(c.value)||0}); n.value=''; c.value=''; 
+  
+  if(document.getElementById('addSubForm')) document.getElementById('addSubForm').style.display = 'none';
+  if(document.getElementById('addSubPlusBtn')) document.getElementById('addSubPlusBtn').style.display = 'flex';
+  
+  window.renderLists(); window.autoSave(); 
+};
 window.calculateDistribution = () => { window.renderAllocations(); };
 
 window.currentActiveNoteId = null;
