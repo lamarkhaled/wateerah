@@ -20,10 +20,8 @@ window.addVisionItem = () => {
     document.getElementById('newVisionTitle').value = '';
     if(fileInput) fileInput.value = '';
     document.getElementById('newVisionDate').value = '';
-    
     if(document.getElementById('addVisionForm')) document.getElementById('addVisionForm').style.display = 'none';
     if(document.getElementById('addVisionPlusBtn')) document.getElementById('addVisionPlusBtn').style.display = 'flex';
-    
     window.renderVisionBoard(); window.autoSave(); window.showToast('تم تثبيت الهدف');
   };
 
@@ -70,20 +68,19 @@ window.addKanbanTask = () => {
   if (!title) return window.showToast('أدخل عنوان المهمة');
   if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
   window.appState.kanbanTasks.push({ title, status, priority, date }); document.getElementById('newKanbanTitle').value = ''; 
-  
   if(document.getElementById('addKanbanForm')) document.getElementById('addKanbanForm').style.display = 'none';
   if(document.getElementById('addKanbanPlusBtn')) document.getElementById('addKanbanPlusBtn').style.display = 'flex';
-  
   window.renderKanbanBoard(); window.autoSave();
 };
-
 window.changeKanbanStatus = (idx, newStatus) => { window.appState.kanbanTasks[idx].status = newStatus; window.renderKanbanBoard(); window.autoSave(); };
 window.deleteKanbanTask = (idx) => { window.appState.kanbanTasks.splice(idx, 1); window.renderKanbanBoard(); window.autoSave(); };
 window.dragKanbanCard = (e, idx) => { e.stopPropagation(); window.draggedKanbanIndex = idx; };
 window.allowKanbanDrop = (e) => { e.preventDefault(); };
 window.dropKanbanCard = (e, targetStatus) => { e.preventDefault(); if (window.draggedKanbanIndex === null) return; window.appState.kanbanTasks[window.draggedKanbanIndex].status = targetStatus; window.draggedKanbanIndex = null; window.renderKanbanBoard(); window.autoSave(); };
 
-window.expandedBanks = window.expandedBanks || {};
+
+// ================= نظام الصفحات المستقلة للبنوك =================
+window.currentBankIndex = null;
 
 window.renderBanksList = function() {
   const container = document.getElementById('banksContainer');
@@ -91,82 +88,96 @@ window.renderBanksList = function() {
   if (!container) return;
   if (!window.appState.banks) window.appState.banks = [];
 
+  let grandTotal = 0;
+
   if (window.appState.banks.length === 0) {
-    container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.8rem; padding:10px;">لا توجد بنوك مضافة بعد.</div>`;
-    if(overview) overview.innerHTML = `مجموع الأرصدة: 0 ر.س`;
+    container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد بنوك مضافة بعد.</div>`;
+    if(overview) overview.innerHTML = `مجموع الأرصدة الكلي: 0 ر.س`;
     return;
   }
-
-  let grandTotal = 0;
 
   container.innerHTML = window.appState.banks.map((bank, bIdx) => {
     let bankTotal = 0;
     (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; });
     grandTotal += bankTotal;
-    
-    const isExpanded = window.expandedBanks[bIdx] ? 'block' : 'none';
-    const chevron = window.expandedBanks[bIdx] ? '▲' : '▼';
 
     return `
-      <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 12px;">
-        <div onclick="window.toggleBankAccordion(${bIdx})" style="display: flex; justify-content: space-between; align-items: center; padding: 14px; cursor: pointer; background: var(--bg-subtle);">
-           <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); display:flex; align-items:center; gap:8px;">
-             <span>${bank.name}</span>
-             <span style="font-size:0.75rem; color:var(--text-secondary);">${chevron}</span>
-           </div>
-           <div style="display: flex; align-items: center; gap: 12px;">
-             <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-color);">${bankTotal} ر.س</span>
-             <button class="delete-btn" style="font-size: 1.2rem; padding:4px;" onclick="event.stopPropagation(); window.deleteBank(${bIdx})">&times;</button>
-           </div>
-        </div>
-        
-        <div style="display: ${isExpanded}; padding: 14px; border-top: 1px solid var(--border-color);">
-           <div style="margin-bottom: 12px; display:flex; gap:8px;">
-             <input type="text" value="${bank.name}" onchange="window.updateBankName(${bIdx}, this.value)" style="font-weight: 600; border: 1px solid var(--border-color); border-radius:6px; background: var(--bg-primary); color: var(--text-primary); outline: none; font-size: 0.85rem; padding:6px 10px; width:100%;" placeholder="تعديل اسم البنك...">
-           </div>
-           
-           <ul class="item-list" style="margin-bottom: 12px;">
-             ${(bank.accounts || []).map((acc, aIdx) => `
-               <li class="list-item" style="padding: 8px 12px; background: transparent; border: 1px dashed var(--border-color);">
-                 <div class="item-left" style="gap: 8px;">
-                   <input type="text" class="item-text-input" value="${acc.name}" onchange="window.updateAccountName(${bIdx},${aIdx}, this.value)" style="font-weight: 500;" placeholder="اسم الحساب">
-                   <input type="number" class="item-text-input" value="${acc.balance}" onchange="window.updateAccountBalance(${bIdx},${aIdx}, this.value)" style="color: var(--accent-color); font-weight: 700; max-width: 80px;" placeholder="الرصيد">
-                   <span style="font-size: 0.75rem; color: var(--text-secondary);">ر.س</span>
-                 </div>
-                 <button class="delete-btn" onclick="window.deleteAccount(${bIdx},${aIdx})">&times;</button>
-               </li>
-             `).join('')}
-           </ul>
-           
-           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-              <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary);">إضافة حساب جديد</span>
-              <button id="addAccPlusBtn_${bIdx}" class="add-widget-plus" style="width: 24px; height: 24px; font-size: 1rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addAccForm_${bIdx}').style.display='block'; this.style.display='none';">+</button>
-           </div>
-           
-           <div id="addAccForm_${bIdx}" style="display: none; background: var(--bg-primary); padding: 12px; border-radius: 12px; border: 1px dashed var(--border-color); margin-top: 10px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                 <strong style="font-size: 0.75rem; color: var(--accent-color);">حساب جديد 💳</strong>
-                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1rem;" onclick="document.getElementById('addAccForm_${bIdx}').style.display='none'; document.getElementById('addAccPlusBtn_${bIdx}').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0;">
-                <input type="text" id="newAccName_${bIdx}" placeholder="اسم الحساب..." style="font-size: 0.8rem; padding: 8px;">
-                <input type="number" id="newAccBalance_${bIdx}" placeholder="الرصيد" style="font-size: 0.8rem; padding: 8px;">
-                <button class="btn btn-primary" style="font-size: 0.8rem;" onclick="window.addAccount(${bIdx})">تأكيد ➕</button>
-              </div>
-           </div>
-        </div>
+      <div onclick="window.openBankDetails(${bIdx})" style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-ios);">
+         <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary); display:flex; align-items:center; gap:10px;">
+           <span style="font-size:1.4rem;">🏦</span>
+           <span>${bank.name}</span>
+         </div>
+         <div style="display: flex; align-items: center; gap: 14px;">
+           <span style="font-size: 1rem; font-weight: 700; color: var(--accent-color);">${bankTotal} ر.س</span>
+           <span style="font-size:1.1rem; color:var(--text-secondary);">❯</span>
+         </div>
       </div>
     `;
   }).join('');
 
   if(overview) {
-    overview.innerHTML = `مجموع الأرصدة الكلي: <strong style="color: var(--accent-color); font-size: 1rem;">${grandTotal}</strong> ر.س`;
+    overview.innerHTML = `مجموع الأرصدة الكلي: <strong style="color: var(--accent-color); font-size: 1.1rem;">${grandTotal}</strong> ر.س`;
   }
 };
 
-window.toggleBankAccordion = function(bIdx) {
-  window.expandedBanks[bIdx] = !window.expandedBanks[bIdx];
+window.openBankDetails = function(bIdx) {
+  window.currentBankIndex = bIdx;
+  document.getElementById('widget-finance').style.display = 'none';
+  const detailsPage = document.getElementById('bankDetailsPage');
+  if(detailsPage) {
+    detailsPage.classList.remove('hidden-el');
+    detailsPage.style.display = 'block';
+  }
+  window.renderBankDetailsView();
+};
+
+window.closeBankDetails = function() {
+  window.currentBankIndex = null;
+  const detailsPage = document.getElementById('bankDetailsPage');
+  if(detailsPage) {
+    detailsPage.style.display = 'none';
+    detailsPage.classList.add('hidden-el');
+  }
+  const financePage = document.getElementById('widget-finance');
+  if(financePage) {
+    financePage.classList.remove('hidden-el');
+    financePage.style.display = 'block';
+  }
   window.renderBanksList();
+  window.calculateDistribution();
+};
+
+window.renderBankDetailsView = function() {
+  if (window.currentBankIndex === null) return;
+  const bank = window.appState.banks[window.currentBankIndex];
+  if (!bank) return window.closeBankDetails();
+
+  let bankTotal = 0;
+  (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; });
+  
+  const titleEl = document.getElementById('activeBankTitle');
+  const totalEl = document.getElementById('activeBankTotal');
+  if(titleEl) titleEl.innerText = bank.name;
+  if(totalEl) totalEl.innerText = bankTotal + ' ر.س';
+
+  const accountsList = document.getElementById('activeBankAccountsList');
+  if(!accountsList) return;
+
+  if (!bank.accounts || bank.accounts.length === 0) {
+    accountsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد حسابات فرعية بهذا البنك.</div>`;
+    return;
+  }
+
+  accountsList.innerHTML = bank.accounts.map((acc, aIdx) => `
+    <li class="list-item" style="padding: 12px 16px; background: var(--bg-subtle); border: 1px solid var(--border-color); margin-bottom: 8px;">
+      <div class="item-left" style="gap: 12px; align-items:center;">
+        <input type="text" class="item-text-input" value="${acc.name}" onchange="window.updateAccountNameFromDetails(${aIdx}, this.value)" style="font-weight: 600; font-size: 0.95rem; width:120px;" placeholder="اسم الحساب">
+        <input type="number" class="item-text-input" value="${acc.balance}" onchange="window.updateAccountBalanceFromDetails(${aIdx}, this.value)" style="color: var(--accent-color); font-weight: 700; max-width: 90px;" placeholder="الرصيد">
+        <span style="font-size: 0.8rem; color: var(--text-secondary);">ر.س</span>
+      </div>
+      <button class="delete-btn" style="font-size:1.2rem;" onclick="window.deleteAccountFromDetails(${aIdx})">&times;</button>
+    </li>
+  `).join('');
 };
 
 window.addBank = () => {
@@ -175,28 +186,57 @@ window.addBank = () => {
   if (!window.appState.banks) window.appState.banks = [];
   window.appState.banks.push({ name, accounts: [] });
   document.getElementById('newBankName').value = '';
-  
   if(document.getElementById('addBankForm')) document.getElementById('addBankForm').style.display = 'none';
   if(document.getElementById('addBankPlusBtn')) document.getElementById('addBankPlusBtn').style.display = 'flex';
-  
-  window.expandedBanks[window.appState.banks.length - 1] = true;
-  
   window.renderLists(); window.autoSave(); window.showToast('تمت إضافة البنك بنجاح');
 };
-window.deleteBank = (bIdx) => { if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) { window.appState.banks.splice(bIdx, 1); window.renderLists(); window.autoSave(); window.showToast('تم حذف البنك'); } };
-window.updateBankName = (bIdx, val) => { window.appState.banks[bIdx].name = val; window.autoSave(); };
-window.addAccount = (bIdx) => { 
-  const nameEl = document.getElementById(`newAccName_${bIdx}`); const balEl = document.getElementById(`newAccBalance_${bIdx}`); const name = nameEl.value.trim(); const balance = parseFloat(balEl.value) || 0; 
-  if (!name) return window.showToast('أدخل اسم الحساب'); 
-  window.appState.banks[bIdx].accounts.push({ name, balance }); nameEl.value = ''; balEl.value = ''; 
-  if(document.getElementById(`addAccForm_${bIdx}`)) document.getElementById(`addAccForm_${bIdx}`).style.display = 'none';
-  if(document.getElementById(`addAccPlusBtn_${bIdx}`)) document.getElementById(`addAccPlusBtn_${bIdx}`).style.display = 'flex';
-  window.renderLists(); window.autoSave(); 
-};
-window.deleteAccount = (bIdx, aIdx) => { window.appState.banks[bIdx].accounts.splice(aIdx, 1); window.renderLists(); window.autoSave(); };
-window.updateAccountName = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].name = val; window.autoSave(); };
-window.updateAccountBalance = (bIdx, aIdx, val) => { window.appState.banks[bIdx].accounts[aIdx].balance = parseFloat(val) || 0; window.autoSave(); window.renderBanksList(); };
 
+window.deleteCurrentBank = () => {
+  if (window.currentBankIndex === null) return;
+  if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) { 
+    window.appState.banks.splice(window.currentBankIndex, 1); 
+    window.autoSave(); 
+    window.showToast('تم حذف البنك');
+    window.closeBankDetails();
+  }
+};
+
+window.addAccountToCurrentBank = () => { 
+  if (window.currentBankIndex === null) return;
+  const nameEl = document.getElementById('newAccName'); 
+  const balEl = document.getElementById('newAccBalance'); 
+  const name = nameEl.value.trim(); 
+  const balance = parseFloat(balEl.value) || 0; 
+  if (!name) return window.showToast('أدخل اسم الحساب'); 
+  
+  if (!window.appState.banks[window.currentBankIndex].accounts) window.appState.banks[window.currentBankIndex].accounts = [];
+  window.appState.banks[window.currentBankIndex].accounts.push({ name, balance }); 
+  
+  nameEl.value = ''; balEl.value = ''; 
+  if(document.getElementById('addAccForm')) document.getElementById('addAccForm').style.display = 'none';
+  if(document.getElementById('addAccPlusBtn')) document.getElementById('addAccPlusBtn').style.display = 'flex';
+  
+  window.renderBankDetailsView(); window.autoSave(); 
+};
+
+window.deleteAccountFromDetails = (aIdx) => { 
+  if (window.currentBankIndex === null) return;
+  window.appState.banks[window.currentBankIndex].accounts.splice(aIdx, 1); 
+  window.renderBankDetailsView(); window.autoSave(); 
+};
+window.updateAccountNameFromDetails = (aIdx, val) => { 
+  if (window.currentBankIndex === null) return;
+  window.appState.banks[window.currentBankIndex].accounts[aIdx].name = val; 
+  window.autoSave(); 
+};
+window.updateAccountBalanceFromDetails = (aIdx, val) => { 
+  if (window.currentBankIndex === null) return;
+  window.appState.banks[window.currentBankIndex].accounts[aIdx].balance = parseFloat(val) || 0; 
+  window.renderBankDetailsView(); window.autoSave(); 
+};
+
+
+// ================= توزيع الدخل =================
 window.renderAllocations = function() {
   const container = document.getElementById('allocationsContainer');
   if (!container) return;
@@ -415,6 +455,7 @@ window.renderLists = function() {
   window.renderVisionBoard(); 
   window.renderKanbanBoard();
   window.renderBanksList(); 
+  if (window.currentBankIndex !== null) window.renderBankDetailsView();
   window.renderAllocations();
   window.renderWishlist();
   window.renderMonthlyExpenses(); 
