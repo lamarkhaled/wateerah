@@ -80,7 +80,7 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-// تحميل البيانات المحلية فوراً
+// تحميل البيانات المحلية فوراً لضمان سرعة العرض
 const savedLocal = localStorage.getItem('wateerah_local_state');
 if (savedLocal) { 
   try { 
@@ -95,6 +95,7 @@ setTimeout(() => {
   window.loadTodayDate();
 }, 100);
 
+// نظام الحماية المستقر (لا يتدخل إلا عند تسجيل الخروج المتعمد)
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
@@ -139,7 +140,7 @@ onAuthStateChanged(auth, async (user) => {
     if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
   } else {
-    // فتح نافذة الدخول فقط عندما لا توجد جلسة نشطة
+    // تفعيل نافذة القفل فقط إذا لم يكن هناك مستخدم مسجل
     if(authModal) authModal.classList.add('open');
     if(lockBtn) lockBtn.style.display = 'none';
     if(guestBtn) guestBtn.style.display = 'inline-block';
