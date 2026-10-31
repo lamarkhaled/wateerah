@@ -16,18 +16,8 @@ window.appState = {
   theme: 'default', 
   activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
   widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
-  dailyRecords: {}, 
-  notes: [],
-  allocations: [],
-  monthlyExpenses: [], 
-  incomeSources: [],
-  incomeTarget: 5000,
-  visionBoard: [], 
-  kanbanTasks: [], 
-  banks: [], 
-  wishlist: [], 
-  subscriptions: [], 
-  business: { projects: [], campaigns: [] }
+  dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
+  visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] }
 };
 
 let saveTimer; 
@@ -38,38 +28,25 @@ window.autoSave = () => {
 
 window.saveCurrentWateerah = async (manual) => {
   if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
-  window.appState.dailyRecords[window.currentDateStr] = {
-    focusGoal: document.getElementById('focusGoalInput')?.value || '',
-    habits: window.appState.habits || []
-  };
-
+  window.appState.dailyRecords[window.currentDateStr] = { focusGoal: document.getElementById('focusGoalInput')?.value || '', habits: window.appState.habits || [] };
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
+  
   const user = auth.currentUser;
   if (!user) return;
-
   try { 
-    await setDoc(doc(db, "users", user.uid), { 
-      email: user.email, 
-      profile: window.userProfile, 
-      state: window.appState, 
-      updatedAt: new Date().toISOString() 
-    }, { merge: true }); 
+    await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); 
   } catch(e) {}
 };
 
 window.loadTodayDate = function() {
   window.currentDateObj = new Date();
   window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
-  
   const liveDate = document.getElementById('liveDateText');
   if (liveDate) liveDate.innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
-
   const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', habits: [] };
   window.appState.habits = daily.habits || [];
-  
   const focusInput = document.getElementById('focusGoalInput');
   if(focusInput) focusInput.value = daily.focusGoal || '';
-  
   if(window.renderLists) window.renderLists();
   if(window.renderNotesList) window.renderNotesList();
 };
@@ -85,24 +62,29 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
+const savedLocal = localStorage.getItem('wateerah_local_state');
+if (savedLocal) { try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {} }
+
+setTimeout(() => { 
+  if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
+  if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
+  if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
+  window.loadTodayDate();
+}, 100);
+
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
-  const guestBtn = document.getElementById('guestAuthBtn');
   const profilePill = document.getElementById('userProfilePill');
   const adminBtn = document.getElementById('adminPanelBtn');
 
   if (user) {
-    if(authModal) authModal.classList.remove('open');
+    if(authModal) authModal.style.display = 'none'; // إخفاء صفحة الدخول بالكامل
     if(lockBtn) lockBtn.style.display = 'inline-block';
-    if(guestBtn) guestBtn.style.display = 'none';
     if(profilePill) profilePill.style.display = 'flex';
 
-    if (user.email === ADMIN_EMAIL) { 
-      if(adminBtn) adminBtn.style.display = 'inline-flex'; 
-    } else {
-      if(adminBtn) adminBtn.style.display = 'none';
-    }
+    if (user.email === ADMIN_EMAIL) { if(adminBtn) adminBtn.style.display = 'inline-flex'; } 
+    else { if(adminBtn) adminBtn.style.display = 'none'; }
 
     const uidDisp = document.getElementById('profileUidDisplay'); 
     if(uidDisp) uidDisp.value = user.uid;
@@ -131,9 +113,9 @@ onAuthStateChanged(auth, async (user) => {
     if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
   } else {
-    if(authModal) authModal.classList.add('open');
+    // إظهار صفحة الدخول بكامل الشاشة ومنع رؤية التطبيق
+    if(authModal) authModal.style.display = 'flex';
     if(lockBtn) lockBtn.style.display = 'none';
-    if(guestBtn) guestBtn.style.display = 'inline-block';
     if(profilePill) profilePill.style.display = 'none';
     if(adminBtn) adminBtn.style.display = 'none';
   }
