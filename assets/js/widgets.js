@@ -34,63 +34,212 @@ window.dragKanbanCard = (e, idx) => { e.stopPropagation(); window.draggedKanbanI
 window.allowKanbanDrop = (e) => { e.preventDefault(); };
 window.dropKanbanCard = (e, targetStatus) => { e.preventDefault(); if (window.draggedKanbanIndex === null) return; window.appState.kanbanTasks[window.draggedKanbanIndex].status = targetStatus; window.draggedKanbanIndex = null; window.renderKanbanBoard(); window.autoSave(); };
 
+
+// ================= تصميم البنوك الحديث (Apple Wallet Style) =================
 window.currentBankIndex = null;
+
 window.renderBanksList = function() {
-  const container = document.getElementById('banksContainer'); const overview = document.getElementById('banksTotalOverview'); if (!container) return; if (!window.appState.banks) window.appState.banks = []; let grandTotal = 0;
-  if (window.appState.banks.length === 0) { container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد بنوك مضافة بعد.</div>`; if(overview) overview.innerHTML = `مجموع الأرصدة الكلي: 0 ر.س`; return; }
+  const container = document.getElementById('banksContainer');
+  const overview = document.getElementById('banksTotalOverview');
+  if (!container) return;
+  if (!window.appState.banks) window.appState.banks = [];
+
+  let grandTotal = 0;
+
+  if (window.appState.banks.length === 0) {
+    container.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد بنوك مضافة بعد.</div>`;
+    if(overview) overview.innerHTML = `مجموع الأرصدة الكلي: 0 ر.س`;
+    return;
+  }
+
   container.innerHTML = window.appState.banks.map((bank, bIdx) => {
-    let bankTotal = 0; (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; }); grandTotal += bankTotal;
+    let bankTotal = 0;
+    (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; });
+    grandTotal += bankTotal;
+
     return `
-      <div onclick="window.openBankDetails(${bIdx})" style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-ios);">
-         <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-primary); display:flex; align-items:center; gap:10px;"><span style="font-size:1.4rem;">🏦</span><span>${bank.name}</span></div>
-         <div style="display: flex; align-items: center; gap: 14px;"><span style="font-size: 1rem; font-weight: 700; color: var(--accent-color);">${bankTotal} ر.س</span><span style="font-size:1.1rem; color:var(--text-secondary);">❯</span></div>
+      <div onclick="window.openBankDetails(${bIdx})" style="background: linear-gradient(135deg, var(--bg-glass-strong) 0%, var(--bg-subtle) 100%); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.03); position: relative; overflow: hidden;">
+         <!-- دائرة تجميلية في الخلفية -->
+         <div style="position: absolute; left: -20px; top: -20px; width: 100px; height: 100px; background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%); opacity: 0.05;"></div>
+         
+         <div style="display:flex; align-items:center; gap:16px; z-index: 1;">
+           <div style="width: 50px; height: 50px; background: var(--bg-primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: var(--shadow-ios); border: 1px solid var(--border-color);">🏦</div>
+           <div>
+             <div style="font-weight: 800; font-size: 1.15rem; color: var(--text-primary); margin-bottom: 4px;">${bank.name}</div>
+             <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">${bank.accounts?.length || 0} حسابات ذكية</div>
+           </div>
+         </div>
+         <div style="display: flex; flex-direction: column; align-items: flex-end; z-index: 1; text-align: left;">
+           <span style="font-size: 1.3rem; font-weight: 800; color: var(--accent-color); letter-spacing: -0.5px;">${bankTotal}</span>
+           <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">ر.س</span>
+         </div>
       </div>
     `;
   }).join('');
-  if(overview) { overview.innerHTML = `مجموع الأرصدة الكلي: <strong style="color: var(--accent-color); font-size: 1.1rem;">${grandTotal}</strong> ر.س`; }
+
+  if(overview) {
+    overview.innerHTML = `مجموع الأرصدة الكلي: <strong style="color: var(--accent-color); font-size: 1.1rem;">${grandTotal}</strong> ر.س`;
+  }
 };
 
-window.openBankDetails = function(bIdx) { window.currentBankIndex = bIdx; document.getElementById('widget-finance').style.display = 'none'; const detailsPage = document.getElementById('bankDetailsPage'); if(detailsPage) { detailsPage.classList.remove('hidden-el'); detailsPage.style.display = 'block'; } window.renderBankDetailsView(); };
-window.closeBankDetails = function() { window.currentBankIndex = null; const detailsPage = document.getElementById('bankDetailsPage'); if(detailsPage) { detailsPage.style.display = 'none'; detailsPage.classList.add('hidden-el'); } const financePage = document.getElementById('widget-finance'); if(financePage) { financePage.classList.remove('hidden-el'); financePage.style.display = 'block'; } window.renderBanksList(); window.calculateDistribution(); };
+window.openBankDetails = function(bIdx) {
+  window.currentBankIndex = bIdx;
+  document.getElementById('widget-finance').style.display = 'none';
+  const detailsPage = document.getElementById('bankDetailsPage');
+  if(detailsPage) { detailsPage.classList.remove('hidden-el'); detailsPage.style.display = 'block'; }
+  window.renderBankDetailsView();
+};
+
+window.closeBankDetails = function() {
+  window.currentBankIndex = null;
+  const detailsPage = document.getElementById('bankDetailsPage');
+  if(detailsPage) { detailsPage.style.display = 'none'; detailsPage.classList.add('hidden-el'); }
+  const financePage = document.getElementById('widget-finance');
+  if(financePage) { financePage.classList.remove('hidden-el'); financePage.style.display = 'block'; }
+  window.renderBanksList(); window.calculateDistribution();
+};
 
 window.renderBankDetailsView = function() {
-  if (window.currentBankIndex === null) return; const bank = window.appState.banks[window.currentBankIndex]; if (!bank) return window.closeBankDetails();
-  let bankTotal = 0; (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; });
-  const titleEl = document.getElementById('activeBankTitle'); const totalEl = document.getElementById('activeBankTotal'); if(titleEl) titleEl.innerText = bank.name; if(totalEl) totalEl.innerText = bankTotal + ' ر.س';
-  const accountsList = document.getElementById('activeBankAccountsList'); if(!accountsList) return;
-  if (!bank.accounts || bank.accounts.length === 0) { accountsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد حسابات مضافة بهذا البنك.</div>`; return; }
+  if (window.currentBankIndex === null) return;
+  const bank = window.appState.banks[window.currentBankIndex];
+  if (!bank) return window.closeBankDetails();
+
+  let bankTotal = 0;
+  (bank.accounts || []).forEach(acc => { bankTotal += parseFloat(acc.balance) || 0; });
+  
+  const titleEl = document.getElementById('activeBankTitle');
+  const totalEl = document.getElementById('activeBankTotal');
+  if(titleEl) titleEl.innerText = bank.name;
+  if(totalEl) totalEl.innerText = bankTotal + ' ر.س';
+
+  const accountsList = document.getElementById('activeBankAccountsList');
+  if(!accountsList) return;
+
+  if (!bank.accounts || bank.accounts.length === 0) {
+    accountsList.innerHTML = `<div style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:20px;">لا توجد حسابات مضافة بهذا البنك.</div>`;
+    return;
+  }
+
   accountsList.innerHTML = bank.accounts.map((acc, aIdx) => {
-    const balance = parseFloat(acc.balance) || 0; const target = parseFloat(acc.target) || 0; const pct = target > 0 ? Math.min(100, Math.round((balance / target) * 100)) : 0;
-    const progressHtml = target > 0 ? `<div class="progress-bar-bg" style="height: 6px; margin-top: 10px;"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div><div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; text-align: left;">الهدف: ${target} ر.س (${pct}%)</div>` : '';
+    const balance = parseFloat(acc.balance) || 0;
+    const target = parseFloat(acc.target) || 0;
+    const pct = target > 0 ? Math.min(100, Math.round((balance / target) * 100)) : 0;
+    
+    const progressHtml = target > 0 
+      ? `<div style="margin-bottom: 16px;"><div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;"><span>الهدف: ${target} ر.س</span><span style="color: ${pct === 100 ? 'var(--accent-color)' : 'var(--text-secondary)'};">${pct}%</span></div><div class="progress-bar-bg" style="height: 6px;"><div class="progress-bar-fill" style="width: ${pct}%;"></div></div></div>` 
+      : '';
+
     return `
-      <div style="background: var(--bg-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; margin-bottom: 14px; position: relative;">
-        <button class="delete-btn" style="position: absolute; top: 14px; left: 14px; font-size: 1.2rem;" onclick="window.deleteAccountFromDetails(${aIdx})">&times;</button>
-        <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; padding-left: 28px;">
-          <input type="text" value="${acc.name}" onchange="window.updateAccountDetail(${aIdx}, 'name', this.value)" style="font-weight: 700; font-size: 1.05rem; border: none; background: transparent; color: var(--text-primary); outline: none;" placeholder="اسم الحساب">
-          <input type="text" value="${acc.purpose || ''}" onchange="window.updateAccountDetail(${aIdx}, 'purpose', this.value)" style="font-size: 0.82rem; color: var(--text-secondary); border: none; background: transparent; outline: none; margin-top: -2px;" placeholder="الغرض من الحساب (اختياري)...">
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <div style="font-size: 1.4rem; font-weight: 700; color: var(--accent-color);">${balance} <span style="font-size: 0.8rem; color: var(--text-secondary);">ر.س</span></div>
-          <div style="display: flex; gap: 6px;">
-            <button class="btn btn-subtle" style="padding: 4px 12px; font-size: 1.1rem; font-weight: bold; color: var(--danger-color);" onclick="window.addAccountTransaction(${aIdx}, 'sub')">-</button>
-            <button class="btn btn-primary" style="padding: 4px 12px; font-size: 1.1rem; font-weight: bold;" onclick="window.addAccountTransaction(${aIdx}, 'add')">+</button>
-            <button class="btn btn-subtle" style="padding: 4px 10px; font-size: 0.75rem;" onclick="window.openAccountHistory(${aIdx})">السجل 🗓️</button>
+      <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); position: relative; overflow: hidden; transition: transform 0.2s;">
+        <!-- شريط لوني جانبي -->
+        <div style="position: absolute; right: 0; top: 0; height: 100%; width: 4px; background: var(--accent-color); opacity: 0.8;"></div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+          <div style="flex: 1; margin-right: 12px;">
+            <input type="text" value="${acc.name}" onchange="window.updateAccountDetail(${aIdx}, 'name', this.value)" style="font-weight: 800; font-size: 1.15rem; border: none; background: transparent; color: var(--text-primary); outline: none; width: 100%; padding: 0;" placeholder="اسم الحساب">
+            <input type="text" value="${acc.purpose || ''}" onchange="window.updateAccountDetail(${aIdx}, 'purpose', this.value)" style="font-size: 0.85rem; color: var(--text-secondary); border: none; background: transparent; outline: none; margin-top: 2px; width: 100%; padding: 0;" placeholder="الغرض من الحساب (اختياري)...">
           </div>
+          <button style="background: var(--danger-light); color: var(--danger-color); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; border: none; cursor: pointer; flex-shrink: 0;" onclick="window.deleteAccountFromDetails(${aIdx})" title="حذف الحساب">&times;</button>
         </div>
+
+        <div style="margin-bottom: 16px; margin-right: 12px;">
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">الرصيد الحالي</span>
+          <div style="font-size: 2rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; line-height: 1;">${balance} <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-secondary);">ر.س</span></div>
+        </div>
+
         ${progressHtml}
+
+        <div style="display: flex; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 8px;">
+          <button class="btn btn-primary" style="flex: 1; justify-content: center; padding: 10px; font-weight: 700;" onclick="window.addAccountTransaction(${aIdx}, 'add')">إيداع ➕</button>
+          <button class="btn btn-subtle" style="flex: 1; justify-content: center; padding: 10px; font-weight: 700; color: var(--danger-color);" onclick="window.addAccountTransaction(${aIdx}, 'sub')">سحب ➖</button>
+          <button class="btn btn-subtle" style="width: 44px; justify-content: center; padding: 0; font-size: 1.1rem; flex-shrink: 0;" onclick="window.openAccountHistory(${aIdx})" title="سجل العمليات">🗓️</button>
+        </div>
       </div>
     `;
   }).join('');
 };
 
-window.addBank = () => { const name = document.getElementById('newBankName').value.trim(); if (!name) return window.showToast('أدخل اسم البنك'); if (!window.appState.banks) window.appState.banks = []; window.appState.banks.push({ name, accounts: [] }); document.getElementById('newBankName').value = ''; if(document.getElementById('addBankForm')) document.getElementById('addBankForm').style.display = 'none'; if(document.getElementById('addBankPlusBtn')) document.getElementById('addBankPlusBtn').style.display = 'flex'; window.renderLists(); window.autoSave(); window.showToast('تمت إضافة البنك بنجاح'); };
-window.deleteCurrentBank = () => { if (window.currentBankIndex === null) return; if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) { window.appState.banks.splice(window.currentBankIndex, 1); window.autoSave(); window.showToast('تم حذف البنك'); window.closeBankDetails(); } };
-window.addAccountToCurrentBank = () => { if (window.currentBankIndex === null) return; const nameEl = document.getElementById('newAccName'); const purposeEl = document.getElementById('newAccPurpose'); const targetEl = document.getElementById('newAccTarget'); const balEl = document.getElementById('newAccBalance'); const name = nameEl.value.trim(); const purpose = purposeEl.value.trim(); const target = parseFloat(targetEl.value) || 0; const balance = parseFloat(balEl.value) || 0; if (!name) return window.showToast('أدخل اسم الحساب'); if (!window.appState.banks[window.currentBankIndex].accounts) window.appState.banks[window.currentBankIndex].accounts = []; window.appState.banks[window.currentBankIndex].accounts.push({ name, purpose, target, balance, history: [] }); nameEl.value = ''; purposeEl.value = ''; targetEl.value = ''; balEl.value = ''; if(document.getElementById('addAccForm')) document.getElementById('addAccForm').style.display = 'none'; if(document.getElementById('addAccPlusBtn')) document.getElementById('addAccPlusBtn').style.display = 'flex'; window.renderBankDetailsView(); window.autoSave(); };
-window.updateAccountDetail = (aIdx, field, val) => { if (window.currentBankIndex === null) return; window.appState.banks[window.currentBankIndex].accounts[aIdx][field] = val; window.autoSave(); };
-window.deleteAccountFromDetails = (aIdx) => { if (window.currentBankIndex === null) return; if(confirm('متأكد من حذف الحساب؟')) { window.appState.banks[window.currentBankIndex].accounts.splice(aIdx, 1); window.renderBankDetailsView(); window.autoSave(); } };
-window.addAccountTransaction = (aIdx, type) => { if (window.currentBankIndex === null) return; const account = window.appState.banks[window.currentBankIndex].accounts[aIdx]; const amountStr = prompt(`أدخل المبلغ الذي تريد ${type === 'add' ? 'إضافته' : 'سحبه'} بالريال:`); if (!amountStr) return; const amount = parseFloat(amountStr); if (isNaN(amount) || amount <= 0) return window.showToast('مبلغ غير صحيح'); const reason = prompt('ما هو السبب / التفاصيل؟') || 'بدون تفاصيل'; if (!account.history) account.history = []; const dateStr = new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); account.history.unshift({ type: type, amount: amount, reason: reason, date: dateStr }); if (type === 'add') account.balance = (parseFloat(account.balance) || 0) + amount; else account.balance = (parseFloat(account.balance) || 0) - amount; window.renderBankDetailsView(); window.autoSave(); };
-window.openAccountHistory = (aIdx) => { if (window.currentBankIndex === null) return; const account = window.appState.banks[window.currentBankIndex].accounts[aIdx]; const container = document.getElementById('accountHistoryContent'); document.getElementById('accountHistoryTitle').innerText = `سجل: ${account.name}`; if (!account.history || account.history.length === 0) { container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا يوجد سجل حركات لهذا الحساب بعد.</div>'; } else { container.innerHTML = account.history.map(tx => { const isAdd = tx.type === 'add'; const color = isAdd ? 'var(--accent-color)' : 'var(--danger-color)'; const sign = isAdd ? '+' : '-'; return `<div style="background:var(--bg-glass-strong); padding:14px; border-radius:12px; border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;"><div><div style="font-weight:700; margin-bottom:4px;">${tx.reason}</div><div style="font-size:0.75rem; color:var(--text-secondary);">${tx.date}</div></div><div style="font-weight:700; color:${color};" dir="ltr">${sign} ${tx.amount}</div></div>`; }).join(''); } window.openModal('accountHistoryModal'); };
+window.addBank = () => {
+  const name = document.getElementById('newBankName').value.trim();
+  if (!name) return window.showToast('أدخل اسم البنك');
+  if (!window.appState.banks) window.appState.banks = [];
+  window.appState.banks.push({ name, accounts: [] });
+  document.getElementById('newBankName').value = '';
+  if(document.getElementById('addBankForm')) document.getElementById('addBankForm').style.display = 'none';
+  if(document.getElementById('addBankPlusBtn')) document.getElementById('addBankPlusBtn').style.display = 'flex';
+  window.renderLists(); window.autoSave(); window.showToast('تمت إضافة البنك بنجاح');
+};
 
+window.deleteCurrentBank = () => {
+  if (window.currentBankIndex === null) return;
+  if(confirm('هل أنت متأكد من حذف هذا البنك بكافة الحسابات التي بداخله؟')) { 
+    window.appState.banks.splice(window.currentBankIndex, 1); 
+    window.autoSave(); window.showToast('تم حذف البنك'); window.closeBankDetails();
+  }
+};
+
+window.addAccountToCurrentBank = () => { 
+  if (window.currentBankIndex === null) return;
+  const nameEl = document.getElementById('newAccName'); const purposeEl = document.getElementById('newAccPurpose'); const targetEl = document.getElementById('newAccTarget'); const balEl = document.getElementById('newAccBalance'); 
+  const name = nameEl.value.trim(); const purpose = purposeEl.value.trim(); const target = parseFloat(targetEl.value) || 0; const balance = parseFloat(balEl.value) || 0; 
+  if (!name) return window.showToast('أدخل اسم الحساب'); 
+  if (!window.appState.banks[window.currentBankIndex].accounts) window.appState.banks[window.currentBankIndex].accounts = [];
+  window.appState.banks[window.currentBankIndex].accounts.push({ name, purpose, target, balance, history: [] }); 
+  nameEl.value = ''; purposeEl.value = ''; targetEl.value = ''; balEl.value = ''; 
+  if(document.getElementById('addAccForm')) document.getElementById('addAccForm').style.display = 'none';
+  if(document.getElementById('addAccPlusBtn')) document.getElementById('addAccPlusBtn').style.display = 'flex';
+  window.renderBankDetailsView(); window.autoSave(); 
+};
+
+window.updateAccountDetail = (aIdx, field, val) => {
+   if (window.currentBankIndex === null) return;
+   window.appState.banks[window.currentBankIndex].accounts[aIdx][field] = val; window.autoSave();
+};
+
+window.deleteAccountFromDetails = (aIdx) => { 
+  if (window.currentBankIndex === null) return;
+  if(confirm('متأكد من حذف الحساب؟')) { window.appState.banks[window.currentBankIndex].accounts.splice(aIdx, 1); window.renderBankDetailsView(); window.autoSave(); }
+};
+
+window.addAccountTransaction = (aIdx, type) => {
+   if (window.currentBankIndex === null) return;
+   const account = window.appState.banks[window.currentBankIndex].accounts[aIdx];
+   const amountStr = prompt(`أدخل المبلغ الذي تريد ${type === 'add' ? 'إضافته' : 'سحبه'} بالريال:`);
+   if (!amountStr) return;
+   const amount = parseFloat(amountStr);
+   if (isNaN(amount) || amount <= 0) return window.showToast('مبلغ غير صحيح');
+   const reason = prompt('ما هو السبب / التفاصيل؟ (اختياري)') || 'بدون تفاصيل';
+   if (!account.history) account.history = [];
+   const dateStr = new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+   account.history.unshift({ type: type, amount: amount, reason: reason, date: dateStr });
+   if (type === 'add') account.balance = (parseFloat(account.balance) || 0) + amount; else account.balance = (parseFloat(account.balance) || 0) - amount;
+   window.renderBankDetailsView(); window.autoSave();
+};
+
+window.openAccountHistory = (aIdx) => {
+   if (window.currentBankIndex === null) return;
+   const account = window.appState.banks[window.currentBankIndex].accounts[aIdx];
+   const container = document.getElementById('accountHistoryContent');
+   document.getElementById('accountHistoryTitle').innerText = `سجل: ${account.name}`;
+   if (!account.history || account.history.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا يوجد سجل حركات لهذا الحساب بعد.</div>';
+   } else {
+      container.innerHTML = account.history.map(tx => {
+         const isAdd = tx.type === 'add';
+         const color = isAdd ? 'var(--accent-color)' : 'var(--danger-color)';
+         const sign = isAdd ? '+' : '-';
+         return `
+           <div style="background:var(--bg-glass-strong); padding:16px; border-radius:14px; border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+             <div><div style="font-weight:700; margin-bottom:6px; font-size:0.95rem;">${tx.reason}</div><div style="font-size:0.75rem; color:var(--text-secondary);">${tx.date}</div></div>
+             <div style="font-weight:800; color:${color}; font-size:1.05rem;" dir="ltr">${sign} ${tx.amount}</div>
+           </div>
+         `;
+      }).join('');
+   }
+   window.openModal('accountHistoryModal');
+};
+
+// ================= توزيع الدخل =================
 window.renderAllocations = function() {
   const container = document.getElementById('allocationsContainer'); if (!container) return;
   if (!window.appState.allocations || window.appState.allocations.length === 0) { window.appState.allocations = [ {name: 'التزامات ومصاريف', pct: 40}, {name: 'ادخار وطوارئ', pct: 30}, {name: 'استثمار', pct: 20}, {name: 'صدقات', pct: 10} ]; }
@@ -148,20 +297,14 @@ window.deleteWishlistItem = (idx) => { if(confirm('هل أنت متأكد من �
 window.updateWishlistAmount = (idx, amount) => { let current = parseFloat(window.appState.wishlist[idx].savedAmount) || 0; let cost = parseFloat(window.appState.wishlist[idx].cost) || 0; current += amount; if(current < 0) current = 0; if(current > cost) current = cost; window.appState.wishlist[idx].savedAmount = current; window.renderLists(); window.autoSave(); };
 window.promptWishlistAmount = (idx) => { let current = parseFloat(window.appState.wishlist[idx].savedAmount) || 0; let cost = parseFloat(window.appState.wishlist[idx].cost) || 0; let val = prompt('أدخل المبلغ المُجمّع يدوياً بالريال:', current); if (val !== null) { let parsed = parseFloat(val); if (!isNaN(parsed)) { if(parsed < 0) parsed = 0; if(parsed > cost) parsed = cost; window.appState.wishlist[idx].savedAmount = parsed; window.renderLists(); window.autoSave(); } } };
 
-// ================= نظام مصاريف الشهر (الصفحة المستقلة) =================
 window.renderMonthlyExpenses = function() {
-  const listContainer = document.getElementById('monthlyExpensesList');
-  const summaryCardContainer = document.getElementById('monthlyExpensesSummaryCard');
+  const listContainer = document.getElementById('monthlyExpensesList'); const summaryCardContainer = document.getElementById('monthlyExpensesSummaryCard');
   if (!window.appState.monthlyExpenses) window.appState.monthlyExpenses = [];
-  
   let total = 0; let paid = 0;
   
   const listHtml = window.appState.monthlyExpenses.map((exp, i) => {
-    const amount = parseFloat(exp.amount) || 0;
-    total += amount; 
-    if (exp.paid) paid += amount;
+    const amount = parseFloat(exp.amount) || 0; total += amount; if (exp.paid) paid += amount;
     const dateHtml = exp.date ? `<div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">📅 ${exp.date}</div>` : '';
-    
     return `<li class="list-item ${exp.paid ? 'completed' : ''}" style="padding: 12px 16px; border: 1px dashed var(--border-color); margin-bottom: 8px;">
       <div class="item-left" style="align-items: flex-start;">
         <div class="checkbox" style="margin-top: 2px;" onclick="window.toggleMonthlyExpense(${i})">${exp.paid ? '✓' : ''}</div>
@@ -177,14 +320,9 @@ window.renderMonthlyExpenses = function() {
     </li>`;
   }).join('');
 
-  if(listContainer) {
-      if (window.appState.monthlyExpenses.length === 0) { listContainer.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 20px;">لا توجد مصاريف مضافة.</li>'; } 
-      else { listContainer.innerHTML = listHtml; }
-  }
+  if(listContainer) { if (window.appState.monthlyExpenses.length === 0) { listContainer.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 20px;">لا توجد مصاريف مضافة.</li>'; } else { listContainer.innerHTML = listHtml; } }
   
-  const remaining = total - paid;
-  const pct = total > 0 ? Math.min(100, Math.round((paid / total) * 100)) : 0;
-  
+  const remaining = total - paid; const pct = total > 0 ? Math.min(100, Math.round((paid / total) * 100)) : 0;
   const pTextDet = document.getElementById('expenseProgressTextDetail'); const rTextDet = document.getElementById('expenseRemainingTextDetail'); const tTextDet = document.getElementById('expenseTotalTextDetail'); const paidTextDet = document.getElementById('expensePaidTextDetail'); const pBarDet = document.getElementById('expenseProgressBarDetail');
   if(pTextDet) pTextDet.innerText = pct + '%'; if(rTextDet) rTextDet.innerText = remaining; if(tTextDet) tTextDet.innerText = total; if(paidTextDet) paidTextDet.innerText = paid; if(pBarDet) pBarDet.style.width = pct + '%';
 
@@ -201,33 +339,9 @@ window.renderMonthlyExpenses = function() {
       `;
   }
 };
-
-window.openMonthlyExpenses = function() {
-  document.getElementById('widget-finance').style.display = 'none';
-  const detailsPage = document.getElementById('monthlyExpensesPage');
-  if(detailsPage) { detailsPage.classList.remove('hidden-el'); detailsPage.style.display = 'block'; }
-  window.renderMonthlyExpenses();
-};
-
-window.closeMonthlyExpenses = function() {
-  const detailsPage = document.getElementById('monthlyExpensesPage');
-  if(detailsPage) { detailsPage.style.display = 'none'; detailsPage.classList.add('hidden-el'); }
-  const financePage = document.getElementById('widget-finance');
-  if(financePage) { financePage.classList.remove('hidden-el'); financePage.style.display = 'block'; }
-  window.renderLists();
-};
-
-window.addMonthlyExpense = () => {
-  const nEl = document.getElementById('newExpenseName'); const aEl = document.getElementById('newExpenseAmount'); const dEl = document.getElementById('newExpenseDate');
-  const name = nEl.value.trim(); const amount = parseFloat(aEl.value) || 0; const date = dEl.value;
-  if (!name) return window.showToast('أدخل اسم المصروف');
-  if (!window.appState.monthlyExpenses) window.appState.monthlyExpenses = [];
-  window.appState.monthlyExpenses.push({ name, amount, date, paid: false });
-  nEl.value = ''; aEl.value = ''; dEl.value = '';
-  if(document.getElementById('addExpenseForm')) document.getElementById('addExpenseForm').style.display = 'none';
-  if(document.getElementById('addExpensePlusBtn')) document.getElementById('addExpensePlusBtn').style.display = 'flex';
-  window.renderMonthlyExpenses(); window.autoSave();
-};
+window.openMonthlyExpenses = function() { document.getElementById('widget-finance').style.display = 'none'; const detailsPage = document.getElementById('monthlyExpensesPage'); if(detailsPage) { detailsPage.classList.remove('hidden-el'); detailsPage.style.display = 'block'; } window.renderMonthlyExpenses(); };
+window.closeMonthlyExpenses = function() { const detailsPage = document.getElementById('monthlyExpensesPage'); if(detailsPage) { detailsPage.style.display = 'none'; detailsPage.classList.add('hidden-el'); } const financePage = document.getElementById('widget-finance'); if(financePage) { financePage.classList.remove('hidden-el'); financePage.style.display = 'block'; } window.renderLists(); };
+window.addMonthlyExpense = () => { const nEl = document.getElementById('newExpenseName'); const aEl = document.getElementById('newExpenseAmount'); const dEl = document.getElementById('newExpenseDate'); const name = nEl.value.trim(); const amount = parseFloat(aEl.value) || 0; const date = dEl.value; if (!name) return window.showToast('أدخل اسم المصروف'); if (!window.appState.monthlyExpenses) window.appState.monthlyExpenses = []; window.appState.monthlyExpenses.push({ name, amount, date, paid: false }); nEl.value = ''; aEl.value = ''; dEl.value = ''; if(document.getElementById('addExpenseForm')) document.getElementById('addExpenseForm').style.display = 'none'; if(document.getElementById('addExpensePlusBtn')) document.getElementById('addExpensePlusBtn').style.display = 'flex'; window.renderMonthlyExpenses(); window.autoSave(); };
 window.toggleMonthlyExpense = (i) => { window.appState.monthlyExpenses[i].paid = !window.appState.monthlyExpenses[i].paid; window.renderMonthlyExpenses(); window.autoSave(); };
 window.deleteMonthlyExpense = (i) => { window.appState.monthlyExpenses.splice(i, 1); window.renderMonthlyExpenses(); window.autoSave(); };
 
