@@ -10,11 +10,12 @@ window.isDataLoadedFromCloud = false;
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
-window.userProfile = { name: 'لمار', planType: 'الباقة المتقدمة', isPro: true, expiryDate: '', totalSubDays: 30, trialUsed: false };
+// تفعيل الباقة المتقدمة وصلاحيات كاملة دائماً
+window.userProfile = { name: 'لمار', planType: 'الباقة المتقدمة', isPro: true, expiryDate: 'دائم', totalSubDays: 365, trialUsed: true };
 window.appState = {
-  hasStarted: false, 
+  hasStarted: true, 
   theme: 'default', 
-  activeWidgets: [], 
+  activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
   widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
   dailyRecords: {}, 
   notes: [],
@@ -76,7 +77,7 @@ window.loadTodayDate = function() {
 
 window.saveProfile = async () => {
   const nameInput = document.getElementById('profileNameInput');
-  window.userProfile.name = nameInput ? nameInput.value.trim() : 'صديقنا';
+  window.userProfile.name = nameInput ? nameInput.value.trim() : 'لمار';
   const headerName = document.getElementById('headerUserName');
   const headerAvatar = document.getElementById('headerAvatar');
   if(headerName) headerName.innerText = window.userProfile.name; 
@@ -85,7 +86,7 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-// 1. تحميل البيانات المحلية أولاً لضمان عدم ضياع أي شيء
+// تحميل البيانات المحلية فوراً
 const savedLocal = localStorage.getItem('wateerah_local_state');
 if (savedLocal) { 
   try { 
@@ -100,7 +101,6 @@ setTimeout(() => {
   window.loadTodayDate();
 }, 100);
 
-// 2. التحقق من الحساب وسحب البيانات السحابية القديمة (إن وجدت) دون كتابة فوقها بشكل خاطئ
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
@@ -127,12 +127,10 @@ onAuthStateChanged(auth, async (user) => {
         const d = snap.data(); 
         if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
         if(d.state && Object.keys(d.state).length > 0) {
-           // دمج البيانات الذكي: إذا كان في السحابة بيانات، نعتمدها ونحدث المحلي
            window.appState = { ...window.appState, ...d.state };
            localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
         }
       } else {
-        // إذا كان الحساب جديداً تماماً في السحابة، نقوم برفع الحالة المحلية الحالية له فوراً
         await window.saveCurrentWateerah(true);
       }
     } catch(e) {}
