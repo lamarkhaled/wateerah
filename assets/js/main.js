@@ -80,7 +80,21 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
-// نظام الحماية: مراقبة حالة تسجيل الدخول
+// تحميل البيانات المحلية فوراً
+const savedLocal = localStorage.getItem('wateerah_local_state');
+if (savedLocal) { 
+  try { 
+    window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; 
+  } catch(e) {} 
+}
+
+setTimeout(() => { 
+  if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
+  if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
+  if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility(); 
+  window.loadTodayDate();
+}, 100);
+
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
@@ -88,7 +102,6 @@ onAuthStateChanged(auth, async (user) => {
   const profilePill = document.getElementById('userProfilePill');
 
   if (user) {
-    // إذا مسجل دخول: إخفاء نافذة الحماية وإظهار التطبيق وزر قفل الشاشة
     if(authModal) authModal.classList.remove('open');
     if(lockBtn) lockBtn.style.display = 'inline-block';
     if(guestBtn) guestBtn.style.display = 'none';
@@ -114,11 +127,6 @@ onAuthStateChanged(auth, async (user) => {
       } 
     } catch(e) {}
     
-    const savedLocal = localStorage.getItem('wateerah_local_state');
-    if (savedLocal) { 
-      try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {} 
-    }
-
     const headerName = document.getElementById('headerUserName');
     const headerAvatar = document.getElementById('headerAvatar');
     const profileNameInput = document.getElementById('profileNameInput');
@@ -131,7 +139,7 @@ onAuthStateChanged(auth, async (user) => {
     if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
   } else {
-    // إذا لم يكن مسجل دخول: إبقاء نافذة الحماية مغلقة على المحتوى وإظهار زر الدخول
+    // فتح نافذة الدخول فقط عندما لا توجد جلسة نشطة
     if(authModal) authModal.classList.add('open');
     if(lockBtn) lockBtn.style.display = 'none';
     if(guestBtn) guestBtn.style.display = 'inline-block';
