@@ -50,9 +50,7 @@ window.saveCurrentWateerah = async (manual) => {
   try { 
     await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); 
     if(manual && window.showToast) window.showToast('تم الحفظ والمزامنة سحابياً'); 
-  } catch(e) {
-    console.error("Error saving data:", e);
-  }
+  } catch(e) {}
 };
 
 window.loadTodayDate = function() {
@@ -70,48 +68,6 @@ window.loadTodayDate = function() {
   
   if(window.renderLists) window.renderLists();
   if(window.renderNotesList) window.renderNotesList();
-};
-
-window.openHistoryModal = function(type) {
-  const container = document.getElementById('historyModalContent');
-  const title = document.getElementById('historyModalTitle');
-  if(!container || !title) return;
-  container.innerHTML = '';
-  
-  window.saveCurrentWateerah(false);
-  
-  const records = window.appState.dailyRecords || {};
-  const dates = Object.keys(records).sort((a, b) => new Date(b) - new Date(a));
-  
-  let hasContent = false;
-
-  dates.forEach(date => {
-    const data = records[date];
-    let contentHTML = '';
-    
-    const dateObj = new Date(date);
-    const displayDate = dateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
-
-    if (type === 'focus' && data.focusGoal && data.focusGoal.trim() !== '') {
-      title.innerText = 'سجل التركيز';
-      contentHTML = `<div style="background:var(--bg-glass-strong); padding:14px; border-radius:12px; border:1px solid var(--border-color);"><div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:6px;">${displayDate}</div><div style="font-weight:600; color:var(--accent-color);">${data.focusGoal}</div></div>`;
-      hasContent = true;
-    } 
-    else if (type === 'habits' && data.habits && data.habits.length > 0) {
-      title.innerText = 'سجل العادات';
-      const habitsList = data.habits.map(h => `<li style="display:flex; align-items:center; gap:8px; margin-bottom:6px;"><span style="color:${h.done ? 'var(--accent-color)' : 'var(--text-secondary)'}; font-weight:bold;">${h.done ? '✓' : '—'}</span><span style="${h.done ? 'text-decoration:line-through; opacity:0.6;' : ''}">${h.text}</span></li>`).join('');
-      contentHTML = `<div style="background:var(--bg-glass-strong); padding:14px; border-radius:12px; border:1px solid var(--border-color);"><div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:10px;">${displayDate}</div><ul style="list-style:none; padding:0; margin:0; font-size:0.9rem;">${habitsList}</ul></div>`;
-      hasContent = true;
-    }
-    
-    if (contentHTML) container.innerHTML += contentHTML;
-  });
-  
-  if (!hasContent) {
-    container.innerHTML = '<div style="text-align:center; padding:40px 20px; color:var(--text-secondary); font-size:0.9rem;">لا توجد سجلات سابقة محفوظة بعد.</div>';
-  }
-  
-  window.openModal('historyModal');
 };
 
 window.saveProfile = async () => {
