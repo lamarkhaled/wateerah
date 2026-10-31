@@ -3,7 +3,6 @@ window.showToast = function(msg) {
   if(!c) return;
   const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
   c.appendChild(t); 
-  // زيادة وقت بقاء الرسالة إلى 7 ثوانٍ بدلاً من 3 ثوانٍ
   setTimeout(() => t.remove(), 7000); 
 };
 
@@ -15,7 +14,7 @@ window.updateDayNightGreeting = function() {
   if (!isMorning) document.body.classList.add('night-mode-glow'); 
   else document.body.classList.remove('night-mode-glow');
   
-  const userName = window.userProfile?.name || 'لمار';
+  const userName = window.userProfile?.name || 'صديقنا';
   const wTxt = document.getElementById('welcomeText'); 
   if(wTxt) wTxt.innerText = `${greetingWord}، أهلاً بك يا ${userName}.`;
 };
@@ -105,6 +104,7 @@ window.openPage = function(wId) {
 
   try {
       if (wId === 'widget-finance' && window.renderLists) window.renderLists();
+      if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
       if (wId === 'widget-habits' && window.renderLists) window.renderLists();
