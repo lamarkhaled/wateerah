@@ -112,6 +112,8 @@ window.handleRegister = async () => {
     
     window.unverifiedUserObject = cred.user;
     await signOut(auth);
+    
+    // إخفاء نافذة التسجيل وإظهار التنبيه بدون عمل تحديث للصفحة
     document.getElementById('authModal').style.display = 'none';
     window.openModal('verificationNoticeModal');
     window.showToast('تم إرسال رابط التفعيل إلى بريدك الإلكتروني.');
@@ -134,7 +136,9 @@ window.handleLogin = async () => {
         return; 
     }
     window.showToast('مرحباً بك مجدداً في مساحتك الخاصة!');
-    // تم إلغاء location.reload() لكي تفتح المنصة بسلاسة ويبقى التنبيه ظاهراً
+    // تم إلغاء location.reload() لكي تفتح المنصة بسلاسة
+    document.getElementById('authModal').style.display = 'none';
+    window.renderWorkspaceVisibility(); // تحديث الواجهة مباشرة
   } catch(e) { window.showToast('عذراً، البريد الإلكتروني أو كلمة المرور غير صحيحة.'); }
 };
 
