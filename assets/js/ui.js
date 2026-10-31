@@ -50,7 +50,6 @@ window.renderWorkspaceVisibility = function() {
     onb.classList.add('hidden-el'); 
     mainW.classList.remove('hidden-el'); 
     
-    // الإصلاح الجذري: لا تقم بإجبار المستخدم على العودة للرئيسية إذا كان يتصفح أي صفحة حالياً!
     const pageContainer = document.getElementById('pageContainer');
     if (!pageContainer || pageContainer.style.display !== 'block') {
         window.goHome(); 
@@ -62,6 +61,7 @@ window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
     { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
+    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'مشاريع التصميم وتسويق العسل' },
     { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
     { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة' },
     { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم' },
@@ -142,6 +142,7 @@ window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
     { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
+    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'مشاريع التصميم وتسويق العسل' },
     { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
     { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة والصور' },
     { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم لليوم' },
@@ -196,5 +197,4 @@ window.openAuthModal = () => { window.switchToLogin(); window.openModal('authMod
 window.switchToLogin = () => { const vLogin = document.getElementById('viewLogin'); const vReg = document.getElementById('viewRegister'); if(vLogin) vLogin.style.display = 'block'; if(vReg) vReg.style.display = 'none'; };
 window.switchToRegister = () => { const vLogin = document.getElementById('viewLogin'); const vReg = document.getElementById('viewRegister'); if(vLogin) vLogin.style.display = 'none'; if(vReg) vReg.style.display = 'block'; };
 window.openResetModal = () => { window.closeModal('authModal'); window.openModal('resetModal'); };
-
 window.dismissGlassMessage = () => { const aMsg = document.getElementById('activeGlassMessage'); const eMsg = document.getElementById('emptyGlassMessage'); if(aMsg) aMsg.style.display = 'none'; if(eMsg) eMsg.style.display = 'flex'; };
