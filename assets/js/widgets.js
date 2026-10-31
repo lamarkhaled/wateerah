@@ -1,34 +1,3 @@
-// ================= محرك ضغط الصور الذكي =================
-window.compressImage = function(file, callback) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
-      const MAX_SIZE = 800; // أقصى عرض أو ارتفاع للصورة
-
-      if (width > height) {
-        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
-      } else {
-        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-      // تحويل الصورة إلى JPEG مضغوط بنسبة 60%
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-      callback(dataUrl);
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-};
-
-// ================= لوحة الأهداف =================
 window.renderVisionBoard = function() {
   const board = document.getElementById('corkboardContainer');
   if (!window.appState.visionBoard || window.appState.visionBoard.length === 0) { if(board) board.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.85); padding: 60px 20px; font-size: 0.92rem;">اللوح الخشبي فارغ حالياً.</div>`; return; }
@@ -37,29 +6,12 @@ window.renderVisionBoard = function() {
     return `<div class="polaroid-item" onclick="window.openVisionDetail(${idx})"><div class="board-pin"></div><img class="polaroid-img" src="${item.img}" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500'"><div class="polaroid-caption"><span>${item.title}</span><span style="font-size: 0.78rem; font-weight: 700; color: #1F4E3D;">${pct}%</span></div><div class="polaroid-meta"><span>${item.targetDate || 'بدون تاريخ'}</span><span>${tasks.length} مهام</span></div><div class="polaroid-progress-bg"><div class="polaroid-progress-fill" style="width: ${pct}%;"></div></div></div>`;
   }).join('');
 };
-
 window.addVisionItem = () => {
   const title = document.getElementById('newVisionTitle').value.trim(); const targetDate = document.getElementById('newVisionDate').value; const fileInput = document.getElementById('newVisionImgFile'); const file = fileInput ? fileInput.files[0] : null;
   if (!title) return window.showToast('أدخل عنوان الهدف');
-  
-  const finalizeSave = (imgData) => { 
-    if (!window.appState.visionBoard) window.appState.visionBoard = []; 
-    window.appState.visionBoard.push({ title, img: imgData || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500', targetDate: targetDate || '', plan: '', tasks: [] }); 
-    document.getElementById('newVisionTitle').value = ''; 
-    if(fileInput) fileInput.value = ''; 
-    document.getElementById('newVisionDate').value = ''; 
-    if(document.getElementById('addVisionForm')) document.getElementById('addVisionForm').style.display = 'none'; 
-    if(document.getElementById('addVisionPlusBtn')) document.getElementById('addVisionPlusBtn').style.display = 'flex'; 
-    window.renderVisionBoard(); window.autoSave(); window.showToast('تم تثبيت الهدف'); 
-  };
-  
-  if (file) { 
-    window.compressImage(file, finalizeSave); 
-  } else { 
-    finalizeSave(''); 
-  }
+  const finalizeSave = (imgData) => { window.appState.visionBoard.push({ title, img: imgData || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500', targetDate: targetDate || '', plan: '', tasks: [] }); document.getElementById('newVisionTitle').value = ''; if(fileInput) fileInput.value = ''; document.getElementById('newVisionDate').value = ''; if(document.getElementById('addVisionForm')) document.getElementById('addVisionForm').style.display = 'none'; if(document.getElementById('addVisionPlusBtn')) document.getElementById('addVisionPlusBtn').style.display = 'flex'; window.renderVisionBoard(); window.autoSave(); window.showToast('تم تثبيت الهدف'); };
+  if (file) { if (file.size > 2.5 * 1024 * 1024) return window.showToast('حجم الصورة كبير جداً'); const reader = new FileReader(); reader.onload = (e) => finalizeSave(e.target.result); reader.readAsDataURL(file); } else { finalizeSave(''); }
 };
-
 window.openVisionDetail = (idx) => { window.activeVisionIndex = idx; const item = window.appState.visionBoard[idx]; if (!item) return; document.getElementById('vModalImg').src = item.img; document.getElementById('vModalTitle').innerText = item.title; document.getElementById('vModalDate').value = item.targetDate || ''; document.getElementById('vModalPlan').value = item.plan || ''; window.renderVisionModalTasks(); window.openModal('visionDetailModal'); };
 window.renderVisionModalTasks = function() { if (window.activeVisionIndex === null) return; const item = window.appState.visionBoard[window.activeVisionIndex]; if (!item.tasks) item.tasks = []; const doneCount = item.tasks.filter(t => t.done).length; const pct = item.tasks.length > 0 ? Math.round((doneCount / item.tasks.length) * 100) : 0; document.getElementById('vModalPercentBadge').innerText = `${pct}% مكتمل`; document.getElementById('vModalProgressBar').style.width = `${pct}%`; document.getElementById('vModalTasksList').innerHTML = item.tasks.map((t, tIdx) => `<li class="list-item ${t.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleVisionSubTask(${tIdx})">${t.done ? '✓' : ''}</div><span style="font-size: 0.86rem;">${t.text}</span></div><button class="delete-btn" onclick="window.deleteVisionSubTask(${tIdx})">&times;</button></li>`).join(''); };
 window.addVisionSubTask = () => { if (window.activeVisionIndex === null) return; const input = document.getElementById('vModalNewTaskInput'); if (!input.value.trim()) return; window.appState.visionBoard[window.activeVisionIndex].tasks.push({ text: input.value.trim(), done: false }); input.value = ''; window.renderVisionModalTasks(); window.renderVisionBoard(); window.autoSave(); };
@@ -202,7 +154,7 @@ window.addWishlistItem = () => {
   const t = document.getElementById('newWishTitle').value.trim(); const c = document.getElementById('newWishCost').value; const s = document.getElementById('newWishStore').value.trim(); const l = document.getElementById('newWishLink').value.trim(); const fileInput = document.getElementById('newWishImgFile'); const file = fileInput ? fileInput.files[0] : null;
   if (!t) return window.showToast('أدخل اسم الغرض');
   const finalizeAdd = (imgData) => { window.appState.wishlist.push({ title: t, cost: parseFloat(c)||0, store: s, link: l, image: imgData, savedAmount: 0 }); document.getElementById('newWishTitle').value = ''; document.getElementById('newWishCost').value = ''; document.getElementById('newWishStore').value = ''; document.getElementById('newWishLink').value = ''; if (fileInput) fileInput.value = ''; if(document.getElementById('addWishForm')) document.getElementById('addWishForm').style.display = 'none'; if(document.getElementById('addWishPlusBtn')) document.getElementById('addWishPlusBtn').style.display = 'flex'; window.renderLists(); window.autoSave(); window.showToast('تمت الإضافة لقائمة الأمنيات'); };
-  if (file) { window.compressImage(file, finalizeAdd); } else { finalizeAdd(''); }
+  if (file) { if (file.size > 2.5 * 1024 * 1024) return window.showToast('حجم الصورة كبير جداً'); const reader = new FileReader(); reader.onload = (e) => finalizeAdd(e.target.result); reader.readAsDataURL(file); } else { finalizeAdd(''); }
 };
 window.deleteWishlistItem = (idx) => { if(confirm('هل أنت متأكد من حذف هذه الأمنية؟')) { window.appState.wishlist.splice(idx, 1); window.renderLists(); window.autoSave(); } };
 window.updateWishlistAmount = (idx, amount) => { let current = parseFloat(window.appState.wishlist[idx].savedAmount) || 0; let cost = parseFloat(window.appState.wishlist[idx].cost) || 0; current += amount; if(current < 0) current = 0; if(current > cost) current = cost; window.appState.wishlist[idx].savedAmount = current; window.renderLists(); window.autoSave(); };
@@ -212,6 +164,7 @@ window.renderMonthlyExpenses = function() {
   const listContainer = document.getElementById('monthlyExpensesList'); const summaryCardContainer = document.getElementById('monthlyExpensesSummaryCard');
   if (!window.appState.monthlyExpenses) window.appState.monthlyExpenses = [];
   let total = 0; let paid = 0;
+  
   const listHtml = window.appState.monthlyExpenses.map((exp, i) => {
     const amount = parseFloat(exp.amount) || 0; total += amount; if (exp.paid) paid += amount;
     const dateHtml = exp.date ? `<div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">📅 ${exp.date}</div>` : '';
@@ -229,10 +182,13 @@ window.renderMonthlyExpenses = function() {
       <button class="delete-btn" style="margin-left: -8px; font-size: 1.2rem;" onclick="window.deleteMonthlyExpense(${i})">&times;</button>
     </li>`;
   }).join('');
+
   if(listContainer) { if (window.appState.monthlyExpenses.length === 0) { listContainer.innerHTML = '<li style="text-align:center; color:var(--text-secondary); font-size:0.85rem; padding: 20px;">لا توجد مصاريف مضافة.</li>'; } else { listContainer.innerHTML = listHtml; } }
+  
   const remaining = total - paid; const pct = total > 0 ? Math.min(100, Math.round((paid / total) * 100)) : 0;
   const pTextDet = document.getElementById('expenseProgressTextDetail'); const rTextDet = document.getElementById('expenseRemainingTextDetail'); const tTextDet = document.getElementById('expenseTotalTextDetail'); const paidTextDet = document.getElementById('expensePaidTextDetail'); const pBarDet = document.getElementById('expenseProgressBarDetail');
   if(pTextDet) pTextDet.innerText = pct + '%'; if(rTextDet) rTextDet.innerText = remaining; if(tTextDet) tTextDet.innerText = total; if(paidTextDet) paidTextDet.innerText = paid; if(pBarDet) pBarDet.style.width = pct + '%';
+
   if (summaryCardContainer) {
       summaryCardContainer.innerHTML = `
         <div onclick="window.openMonthlyExpenses()" style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 18px 20px; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-ios);">
@@ -252,6 +208,8 @@ window.addMonthlyExpense = () => { const nEl = document.getElementById('newExpen
 window.toggleMonthlyExpense = (i) => { window.appState.monthlyExpenses[i].paid = !window.appState.monthlyExpenses[i].paid; window.renderMonthlyExpenses(); window.autoSave(); };
 window.deleteMonthlyExpense = (i) => { window.appState.monthlyExpenses.splice(i, 1); window.renderMonthlyExpenses(); window.autoSave(); };
 
+
+// ================= نظام الاشتراكات الشهرية الذكي والخصم التلقائي =================
 window.processAutoSubscriptions = function() {
   if(!window.appState.subscriptions || !window.appState.banks) return false;
   const today = new Date();
@@ -270,7 +228,7 @@ window.processAutoSubscriptions = function() {
          acc.history.unshift({
             type: 'sub',
             amount: parseFloat(sub.cost) || 0,
-            reason: `خصم اشتراك: ${sub.name}`,
+            reason: `خصم تلقائي: ${sub.name}`,
             date: today.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
          });
          sub.lastPaidMonth = currentMonthStr;
@@ -284,7 +242,7 @@ window.processAutoSubscriptions = function() {
 window.openAddSubForm = () => {
   const sel = document.getElementById('newSubAccountSelect');
   if(sel) {
-    let options = '<option value="">اختر الحساب للخصم (اختياري)...</option>';
+    let options = '<option value="">اختر الحساب للخصم التلقائي (اختياري)...</option>';
     (window.appState.banks || []).forEach((bank, bIdx) => {
       (bank.accounts || []).forEach((acc, aIdx) => {
         options += `<option value="${bIdx}_${aIdx}">${bank.name} - ${acc.name} (${acc.balance} ر.س)</option>`;
@@ -307,6 +265,7 @@ window.renderSubscriptions = function() {
   }
 
   if (!window.appState.subscriptions) window.appState.subscriptions = [];
+  
   let totalCost = 0;
   
   const subsHtml = window.appState.subscriptions.map((s, idx) => {
@@ -339,13 +298,17 @@ window.renderSubscriptions = function() {
     return `
       <div style="background: var(--bg-glass-strong); border: 1px solid var(--border-color); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; position: relative; box-shadow: var(--shadow-ios); transition: transform 0.2s;">
          <button class="delete-btn" style="position: absolute; top: 10px; left: 10px; font-size: 1.1rem; opacity: 0.6;" onclick="window.deleteSubscription(${idx})">&times;</button>
+         
          <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
            <div style="width: 42px; height: 42px; border-radius: 12px; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid var(--border-color); flex-shrink: 0;">${icon}</div>
            <div style="flex: 1;">
              <input type="text" value="${s.name}" onchange="window.updateSubscription(${idx}, 'name', this.value)" style="font-weight: 700; font-size: 0.95rem; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0; width: 100%; margin-bottom: 2px;" placeholder="اسم الاشتراك">
-             <div style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600; display:flex; align-items:center;">يوم ${s.day || 1} • يخصم من: ${accName} ${paidBadge}</div>
+             <div style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 600; display:flex; align-items:center;">
+                يوم ${s.day || 1} • يخصم من: ${accName} ${paidBadge}
+             </div>
            </div>
          </div>
+         
          <div style="display: flex; align-items: center; gap: 4px; margin-right: 12px; padding-left: 20px;">
            <input type="number" value="${cost}" onchange="window.updateSubscription(${idx}, 'cost', this.value)" style="font-weight: 800; font-size: 1.15rem; color: var(--text-primary); border: none; background: transparent; outline: none; width: 60px; text-align: left; padding: 0;" placeholder="0">
            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">ر.س</span>
@@ -357,7 +320,10 @@ window.renderSubscriptions = function() {
   if (window.appState.subscriptions.length > 0) {
     const summaryHtml = `
       <div style="background: linear-gradient(135deg, var(--bg-subtle) 0%, var(--bg-primary) 100%); padding: 16px 20px; border-radius: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border-color); box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);">
-        <div><div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; margin-bottom: 4px;">إجمالي الاشتراكات</div><div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-color);">${totalCost} <span style="font-size: 0.85rem; color: var(--text-secondary);">ر.س / شهرياً</span></div></div>
+        <div>
+           <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; margin-bottom: 4px;">إجمالي الاشتراكات</div>
+           <div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-color);">${totalCost} <span style="font-size: 0.85rem; color: var(--text-secondary);">ر.س / شهرياً</span></div>
+        </div>
         <div style="font-size: 2.2rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">💳</div>
       </div>
     `;
@@ -368,27 +334,55 @@ window.renderSubscriptions = function() {
 };
 
 window.addSubscription = () => { 
-  const n = document.getElementById('newSubName'); const c = document.getElementById('newSubCost'); const d = document.getElementById('newSubDay'); const sel = document.getElementById('newSubAccountSelect');
-  const name = n.value.trim(); const cost = parseFloat(c.value)||0; const day = parseInt(d.value)||1; const linkedAcc = sel ? sel.value : '';
+  const n = document.getElementById('newSubName'); 
+  const c = document.getElementById('newSubCost'); 
+  const d = document.getElementById('newSubDay'); 
+  const sel = document.getElementById('newSubAccountSelect');
+  
+  const name = n.value.trim(); 
+  const cost = parseFloat(c.value)||0; 
+  const day = parseInt(d.value)||1;
+  const linkedAcc = sel ? sel.value : '';
+
   if(!name) return window.showToast('أدخل اسم الاشتراك'); 
   if(!window.appState.subscriptions) window.appState.subscriptions = []; 
-  window.appState.subscriptions.push({ name: name, cost: cost, day: day, linkedAcc: linkedAcc, lastPaidMonth: '' }); 
+  
+  window.appState.subscriptions.push({
+     name: name, 
+     cost: cost, 
+     day: day, 
+     linkedAcc: linkedAcc, 
+     lastPaidMonth: '' 
+  }); 
+  
   n.value=''; c.value=''; d.value=''; 
+  
   if(document.getElementById('addSubForm')) document.getElementById('addSubForm').style.display = 'none';
   if(document.getElementById('addSubPlusBtn')) document.getElementById('addSubPlusBtn').style.display = 'flex';
+  
   window.renderLists(); window.autoSave(); 
 };
 
-window.updateSubscription = (idx, field, val) => { if (field === 'cost') val = parseFloat(val) || 0; window.appState.subscriptions[idx][field] = val; window.renderSubscriptions(); window.autoSave(); };
-window.deleteSubscription = (idx) => { if(confirm('هل أنت متأكد من حذف هذا الاشتراك؟')) { window.appState.subscriptions.splice(idx, 1); window.renderSubscriptions(); window.autoSave(); } };
+window.updateSubscription = (idx, field, val) => {
+  if (field === 'cost') val = parseFloat(val) || 0;
+  window.appState.subscriptions[idx][field] = val;
+  window.renderSubscriptions(); window.autoSave();
+};
 
+window.deleteSubscription = (idx) => {
+  if(confirm('هل أنت متأكد من حذف هذا الاشتراك؟')) {
+    window.appState.subscriptions.splice(idx, 1);
+    window.renderSubscriptions(); window.autoSave();
+  }
+};
+
+// ================= التهيئة العامة =================
 window.renderLists = function() {
   window.renderVisionBoard(); window.renderKanbanBoard(); window.renderBanksList(); 
   if (window.currentBankIndex !== null) window.renderBankDetailsView();
   window.renderAllocations(); window.renderWishlist(); window.renderMonthlyExpenses(); window.renderSubscriptions();
   document.getElementById('habitsList').innerHTML = (window.appState.habits || []).map((h, i) => `<li class="list-item ${h.done ? 'completed' : ''}"><div class="item-left"><div class="checkbox" onclick="window.toggleHabit(${i})">${h.done ? '✓' : ''}</div><input type="text" class="item-text-input" value="${h.text}" onchange="window.appState.habits[${i}].text=this.value; window.autoSave()"></div><button class="delete-btn" onclick="window.appState.habits.splice(${i},1); window.renderLists(); window.autoSave()">&times;</button></li>`).join('');
 };
-
 window.toggleHabit = (i) => { window.appState.habits[i].done = !window.appState.habits[i].done; window.renderLists(); window.autoSave(); };
 window.addHabit = () => { if (!window.userProfile?.isPro && (window.appState.habits || []).length >= 3) { window.showToast('النسخة المجانية تتيح 3 عادات.'); window.openModal('pricingModal'); return; } const el = document.getElementById('newHabitInput'); if(!el.value.trim()) return; window.appState.habits.push({text:el.value.trim(), done:false}); el.value=''; if(document.getElementById('addHabitForm')) document.getElementById('addHabitForm').style.display = 'none'; if(document.getElementById('addHabitPlusBtn')) document.getElementById('addHabitPlusBtn').style.display = 'flex'; window.renderLists(); window.autoSave(); };
 window.calculateDistribution = () => { window.renderAllocations(); };
@@ -411,5 +405,5 @@ window.createNewNote = function() { if (!window.appState.notes) window.appState.
 window.openNote = function(id) { window.currentActiveNoteId = id; const note = window.appState.notes.find(n => n.id === id); if (!note) return; document.getElementById('notesListView').style.display = 'none'; document.getElementById('noteEditorView').style.display = 'flex'; const dateObj = new Date(note.updatedAt); const timeStr = dateObj.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }); const dateStr = dateObj.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric', year: 'numeric' }); document.getElementById('currentNoteDate').innerText = `${dateStr} في ${timeStr}`; const editor = document.getElementById('noteContentEditable'); editor.innerHTML = note.content; setTimeout(() => { editor.focus(); if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") { const range = document.createRange(); range.selectNodeContents(editor); range.collapse(false); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); } }, 50); };
 window.autoSaveNote = function() { if (!window.currentActiveNoteId) return; const noteIndex = window.appState.notes.findIndex(n => n.id === window.currentActiveNoteId); if (noteIndex > -1) { const editor = document.getElementById('noteContentEditable'); window.appState.notes[noteIndex].content = editor.innerHTML; window.appState.notes[noteIndex].updatedAt = Date.now(); window.autoSave(); } };
 window.deleteCurrentNote = function() { if (!window.currentActiveNoteId) return; if (confirm('هل أنت متأكد من حذف هذه التدوينة نهائياً؟')) { window.appState.notes = window.appState.notes.filter(n => n.id !== window.currentActiveNoteId); window.autoSave(); window.showNotesList(); } };
-window.addNoteImage = function(event) { const file = event.target.files[0]; if (!file) return; window.compressImage(file, (imgBase64) => { const imgTag = `<br><img src="${imgBase64}"><br>`; const editor = document.getElementById('noteContentEditable'); editor.innerHTML += imgTag; window.autoSaveNote(); editor.scrollTop = editor.scrollHeight; }); event.target.value = ''; };
+window.addNoteImage = function(event) { const file = event.target.files[0]; if (!file) return; if (file.size > 2.5 * 1024 * 1024) return window.showToast('حجم الصورة كبير جداً.'); const reader = new FileReader(); reader.onload = function(e) { const imgTag = `<br><img src="${e.target.result}"><br>`; const editor = document.getElementById('noteContentEditable'); editor.innerHTML += imgTag; window.autoSaveNote(); editor.scrollTop = editor.scrollHeight; }; reader.readAsDataURL(file); event.target.value = ''; };
 setTimeout(() => { if (window.renderNotesList) window.renderNotesList(); }, 800);
