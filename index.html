@@ -159,9 +159,9 @@
           <div class="kanban-grid"><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'idea')"><div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div><div class="kanban-cards-wrap" id="col-idea"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div></div>
         </div>
 
-        <!-- تطبيق إدارة الأعمال (نسخة عامة ومرنة) 💼 -->
+        <!-- تطبيق إدارة الأعمال الإبداعي المطور 💼 -->
         <div id="widget-business" class="widget-card col-12 hidden-el" data-widget-id="widget-business">
-          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">إدارة الأعمال 💼</span></div></div>
+          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">استوديو الأعمال والإبداع 💼</span></div></div>
           <div id="businessSummaryCard"></div>
         </div>
 
@@ -169,7 +169,7 @@
           <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeBusinessDetails()"><span style="font-size:1.2rem; margin-left:4px;">❮</span> الرئيسية</button>
-              <div class="card-title" style="font-size: 1.15rem; font-weight: 700;">مساحة العمل والمشاريع</div>
+              <div class="card-title" style="font-size: 1.15rem; font-weight: 700;">إدارة المشاريع والحملات</div>
               <div style="width: 70px;"></div>
             </div>
           </div>
@@ -186,32 +186,44 @@
                 <strong style="font-size: 0.85rem; color: var(--accent-color);">مشروع أو عميل جديد ✨</strong>
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addProjectForm').style.display='none'; document.getElementById('addProjectPlusBtn').style.display='flex';">&times;</button>
               </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
-                <input type="text" id="newProjectName" placeholder="اسم المشروع أو العميل..." style="flex:2; min-width:140px;">
-                <input type="number" id="newProjectPrice" placeholder="السعر (اختياري)" style="flex:1; min-width:90px;">
-                <input type="date" id="newProjectDate" title="تاريخ التسليم المستهدف" style="flex:1; min-width:130px;">
-                <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addBusinessProject()">إضافة ➕</button>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
+                <input type="text" id="newProjectName" placeholder="اسم المشروع / العميل..." style="flex:2; min-width:130px;">
+                <select id="newProjectType" style="flex:1; min-width:110px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-size: 0.85rem;">
+                  <option value="🎨 تصميم">🎨 تصميم</option>
+                  <option value="💻 برمجة">💻 برمجة</option>
+                  <option value="📦 منتج/متجر">📦 منتج/متجر</option>
+                  <option value="💡 استشارة">💡 استشارة</option>
+                </select>
+                <input type="number" id="newProjectPrice" placeholder="السعر" style="flex:1; min-width:80px;">
+                <input type="date" id="newProjectDate" title="تاريخ التسليم" style="flex:1.2; min-width:110px;">
+                <button class="btn btn-primary" style="flex:1; min-width:80px;" onclick="window.addBusinessProject()">إضافة ➕</button>
               </div>
             </div>
             <ul id="businessProjectsList" class="item-list"></ul>
           </div>
 
-          <!-- القسم الثاني: التسويق والمهام -->
+          <!-- القسم الثاني: التسويق والمحتوى -->
           <div style="margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">📢 التسويق والمهام المهنية (Tasks)</div>
+              <div style="font-size: 0.95rem; font-weight: 700;">📢 الحملات التسويقية والمحتوى (Marketing)</div>
               <button id="addCampaignPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addCampaignForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             
             <div id="addCampaignForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة أو حملة جديدة 📱</strong>
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">فكرة محتوى / حملة جديدة 📱</strong>
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addCampaignForm').style.display='none'; document.getElementById('addCampaignPlusBtn').style.display='flex';">&times;</button>
               </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
-                <input type="text" id="newCampaignName" placeholder="عنوان الحملة أو المهمة..." style="flex:2; min-width:140px;">
-                <input type="date" id="newCampaignDate" title="تاريخ الإنجاز / النشر" style="flex:1.5; min-width:130px;">
-                <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addBusinessCampaign()">إضافة ➕</button>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
+                <input type="text" id="newCampaignName" placeholder="فكرة الحملة أو المحتوى..." style="flex:2; min-width:140px;">
+                <select id="newCampaignPlatform" style="flex:1; min-width:100px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-size: 0.85rem;">
+                  <option value="📸 إنستغرام">📸 إنستغرام</option>
+                  <option value="🎵 تيك توك">🎵 تيك توك</option>
+                  <option value="🛍️ متجر إلكتروني">🛍️ متجر إلكتروني</option>
+                  <option value="🐦 إكس / تويتر">🐦 إكس / تويتر</option>
+                </select>
+                <input type="date" id="newCampaignDate" title="تاريخ النشر" style="flex:1.2; min-width:110px;">
+                <button class="btn btn-primary" style="flex:1; min-width:80px;" onclick="window.addBusinessCampaign()">إضافة ➕</button>
               </div>
             </div>
             <ul id="businessCampaignsList" class="item-list"></ul>
