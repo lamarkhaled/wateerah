@@ -1,6 +1,8 @@
-import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
+import { auth, db } from './firebase-config.js';
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const ADMIN_EMAIL = "wateerahapp@gmail.com";
 
 window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
@@ -79,7 +81,7 @@ onAuthStateChanged(auth, async (user) => {
   const adminBtn = document.getElementById('adminPanelBtn');
 
   if (user) {
-    if(authModal) authModal.style.display = 'none'; // إخفاء صفحة الدخول بالكامل
+    if(authModal) authModal.style.display = 'none'; 
     if(lockBtn) lockBtn.style.display = 'inline-block';
     if(profilePill) profilePill.style.display = 'flex';
 
@@ -113,7 +115,6 @@ onAuthStateChanged(auth, async (user) => {
     if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
   } else {
-    // إظهار صفحة الدخول بكامل الشاشة ومنع رؤية التطبيق
     if(authModal) authModal.style.display = 'flex';
     if(lockBtn) lockBtn.style.display = 'none';
     if(profilePill) profilePill.style.display = 'none';
