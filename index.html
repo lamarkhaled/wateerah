@@ -159,7 +159,7 @@
           <div class="kanban-grid"><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'idea')"><div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div><div class="kanban-cards-wrap" id="col-idea"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div><div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div></div>
         </div>
 
-        <!-- تطبيق إدارة الأعمال الإبداعي المطور 💼 -->
+        <!-- تطبيق إدارة الأعمال الإبداعي 💼 -->
         <div id="widget-business" class="widget-card col-12 hidden-el" data-widget-id="widget-business">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">استوديو الأعمال والإبداع 💼</span></div></div>
           <div id="businessSummaryCard"></div>
@@ -174,7 +174,6 @@
             </div>
           </div>
           
-          <!-- القسم الأول: المشاريع والعملاء -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <div style="font-size: 0.95rem; font-weight: 700;">🚀 المشاريع والعملاء (Projects)</div>
@@ -202,7 +201,6 @@
             <ul id="businessProjectsList" class="item-list"></ul>
           </div>
 
-          <!-- القسم الثاني: التسويق والمحتوى -->
           <div style="margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <div style="font-size: 0.95rem; font-weight: 700;">📢 الحملات التسويقية والمحتوى (Marketing)</div>
@@ -229,7 +227,6 @@
             <ul id="businessCampaignsList" class="item-list"></ul>
           </div>
         </div>
-        <!-- نهاية تطبيق الأعمال -->
 
         <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
           <div class="card-header">
@@ -483,6 +480,29 @@
   <div id="addWidgetModal" class="modal-overlay"><div class="modal-box" style="max-width: 480px;"><button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button><h3 style="margin-bottom: 6px;">المكتبة</h3><p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 18px;">أضف وثبت التطبيقات في شاشتك الرئيسية.</p><div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div></div></div>
   <div id="accountHistoryModal" class="modal-overlay"><div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;"><button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button><h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3><div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div></div></div>
   
+  <div id="profileModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px;">
+      <button class="modal-close" onclick="window.closeModal('profileModal')">&times;</button>
+      <h3 style="margin-bottom: 14px;">إعدادات الحساب</h3>
+      <div class="form-group"><label>الاسم</label><input type="text" id="profileNameInput"></div>
+      <div class="form-group"><label>معرف الحساب (UID)</label><input type="text" id="profileUidDisplay" readonly style="opacity: 0.7;"></div>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.saveProfile()">حفظ التغييرات</button>
+      <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="window.handleLogout()">تسجيل الخروج</button>
+    </div>
+  </div>
+
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 440px;">
+      <button class="modal-close" onclick="window.closeModal('authModal')">&times;</button>
+      <div id="viewLogin">
+        <h3 style="margin-bottom: 14px;">تسجيل الدخول</h3>
+        <div class="form-group"><label>البريد</label><input type="email" id="loginEmail"></div>
+        <div class="form-group"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px; padding: 12px;" onclick="window.handleLogin()">متابعة</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="./assets/js/firebase-config.js"></script>
   <script type="module" src="./assets/js/ui.js"></script>
   <script type="module" src="./assets/js/widgets.js"></script>
