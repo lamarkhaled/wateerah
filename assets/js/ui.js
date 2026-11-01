@@ -60,11 +60,11 @@ window.renderActiveWidgets = function() {
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' },
-    { id: 'widget-rhythm', name: 'إيقاع الإنجاز', desc: 'مؤقت عمل عميق وروتين يومي' }
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع روتين الصحة والـ Skin Care' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
-    window.appState.activeWidgets = ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-rhythm'];
+    window.appState.activeWidgets = ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-care'];
   }
 
   const active = window.appState.activeWidgets;
@@ -108,7 +108,7 @@ window.openPage = function(wId) {
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
       if (wId === 'widget-habits' && window.renderLists) window.renderLists();
-      if (wId === 'widget-rhythm' && window.renderRoutines) window.renderRoutines();
+      if (wId === 'widget-care' && window.renderCareRoutines) window.renderCareRoutines();
   } catch(e) {}
 
   const homeBtn = document.getElementById('homeBtnContainer');
@@ -137,7 +137,7 @@ window.renderWidgetLibraryModal = function() {
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' },
-    { id: 'widget-rhythm', name: 'إيقاع الإنجاز', desc: 'مؤقت عمل عميق وروتين يومي' }
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع روتين الصحة والـ Skin Care' }
   ];
   const active = window.appState.activeWidgets || [];
   const libraryList = document.getElementById('widgetLibraryList');
@@ -189,101 +189,59 @@ window.closeModal = function(id) {
   }
 };
 
-// إيقاع الإنجاز (Timer & Routine)
-window.timerInterval = null;
-window.timerTime = 25 * 60;
-window.timerMode = 'work';
-
-window.formatTimer = (seconds) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-};
-
-window.updateTimerDisplay = () => {
-    const d = document.getElementById('timerDisplay');
-    if(d) d.innerText = window.formatTimer(window.timerTime);
-};
-
-window.setTimerMode = (mode) => {
-    window.pauseTimer();
-    window.timerMode = mode;
-    window.timerTime = mode === 'work' ? 25 * 60 : 5 * 60;
-    document.getElementById('mode-work')?.classList.toggle('active', mode === 'work');
-    document.getElementById('mode-break')?.classList.toggle('active', mode === 'break');
-    window.updateTimerDisplay();
-};
-
-window.startTimer = () => {
-    if(window.timerInterval) return;
-    window.timerInterval = setInterval(() => {
-        if(window.timerTime > 0) {
-            window.timerTime--;
-            window.updateTimerDisplay();
-        } else {
-            window.pauseTimer();
-            window.showToast('انتهى الوقت المحدد!');
-        }
-    }, 1000);
-};
-
-window.pauseTimer = () => {
-    clearInterval(window.timerInterval);
-    window.timerInterval = null;
-};
-
-window.resetTimer = () => {
-    window.setTimerMode(window.timerMode);
-};
-
-window.renderRoutines = () => {
+window.renderCareRoutines = () => {
     const state = window.appState.dailyRecords[window.currentDateStr] || {};
-    const mList = state.morningRoutine || [];
-    const eList = state.eveningRoutine || [];
+    const hList = state.healthRoutine || [];
+    const sList = state.skinRoutine || [];
 
     const renderList = (list, type) => list.map((item, idx) => `
         <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px;">
             <div class="item-left">
-                <div class="checkbox" onclick="window.toggleRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
+                <div class="checkbox" onclick="window.toggleCareRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
                 <span style="font-size: 0.85rem;">${item.text}</span>
             </div>
-            <button class="delete-btn" onclick="window.deleteRoutine('${type}', ${idx})">&times;</button>
+            <button class="delete-btn" onclick="window.deleteCareRoutine('${type}', ${idx})">&times;</button>
         </li>
     `).join('');
 
-    document.getElementById('morningRoutineList').innerHTML = renderList(mList, 'morning') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
-    document.getElementById('eveningRoutineList').innerHTML = renderList(eList, 'evening') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
+    const hEl = document.getElementById('healthRoutineList');
+    const sEl = document.getElementById('skinRoutineList');
+    if(hEl) hEl.innerHTML = renderList(hList, 'health') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
+    if(sEl) sEl.innerHTML = renderList(sList, 'skin') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
 };
 
-window.addRoutine = (type) => {
-    const input = document.getElementById(type === 'morning' ? 'newMorningTask' : 'newEveningTask');
+window.addCareRoutine = (type) => {
+    const inputId = type === 'health' ? 'newHealthTask' : 'newSkinTask';
+    const input = document.getElementById(inputId);
+    if(!input) return;
     const val = input.value.trim();
     if(!val) return;
+    
     const state = window.appState.dailyRecords[window.currentDateStr];
-    if(type === 'morning') {
-        if(!state.morningRoutine) state.morningRoutine = [];
-        state.morningRoutine.push({text: val, done: false});
+    if(type === 'health') {
+        if(!state.healthRoutine) state.healthRoutine = [];
+        state.healthRoutine.push({text: val, done: false});
     } else {
-        if(!state.eveningRoutine) state.eveningRoutine = [];
-        state.eveningRoutine.push({text: val, done: false});
+        if(!state.skinRoutine) state.skinRoutine = [];
+        state.skinRoutine.push({text: val, done: false});
     }
     input.value = '';
-    window.renderRoutines();
+    window.renderCareRoutines();
     window.autoSave();
 };
 
-window.toggleRoutine = (type, idx) => {
+window.toggleCareRoutine = (type, idx) => {
     const state = window.appState.dailyRecords[window.currentDateStr];
-    const list = type === 'morning' ? state.morningRoutine : state.eveningRoutine;
+    const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
     list[idx].done = !list[idx].done;
-    window.renderRoutines();
+    window.renderCareRoutines();
     window.autoSave();
 };
 
-window.deleteRoutine = (type, idx) => {
+window.deleteCareRoutine = (type, idx) => {
     const state = window.appState.dailyRecords[window.currentDateStr];
-    const list = type === 'morning' ? state.morningRoutine : state.eveningRoutine;
+    const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
     list.splice(idx, 1);
-    window.renderRoutines();
+    window.renderCareRoutines();
     window.autoSave();
 };
