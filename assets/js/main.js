@@ -14,8 +14,8 @@ window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 window.userProfile = { name: 'مستخدم', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 0, trialUsed: false };
 window.appState = {
   hasStarted: true, theme: 'default', 
-  activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-rhythm'], 
-  widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-rhythm'],
+  activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-care'], 
+  widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-care'],
   dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] }
 };
@@ -32,8 +32,8 @@ window.saveCurrentWateerah = async (manual) => {
   window.appState.dailyRecords[window.currentDateStr] = { 
       focusGoal: document.getElementById('focusGoalInput')?.value || '', 
       habits: window.appState.habits || [],
-      morningRoutine: todayRec.morningRoutine || [],
-      eveningRoutine: todayRec.eveningRoutine || []
+      healthRoutine: todayRec.healthRoutine || [],
+      skinRoutine: todayRec.skinRoutine || []
   };
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   
@@ -48,9 +48,9 @@ window.loadTodayDate = function() {
   const liveDate = document.getElementById('liveDateText');
   if (liveDate) liveDate.innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
   
-  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', habits: [], morningRoutine: [], eveningRoutine: [] };
-  if (!daily.morningRoutine) daily.morningRoutine = [];
-  if (!daily.eveningRoutine) daily.eveningRoutine = [];
+  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', habits: [], healthRoutine: [], skinRoutine: [] };
+  if (!daily.healthRoutine) daily.healthRoutine = [];
+  if (!daily.skinRoutine) daily.skinRoutine = [];
   window.appState.dailyRecords[window.currentDateStr] = daily;
   
   window.appState.habits = daily.habits || [];
@@ -58,7 +58,7 @@ window.loadTodayDate = function() {
   if(focusInput) focusInput.value = daily.focusGoal || '';
   if(window.renderLists) window.renderLists();
   if(window.renderNotesList) window.renderNotesList();
-  if(window.renderRoutines) window.renderRoutines();
+  if(window.renderCareRoutines) window.renderCareRoutines();
 };
 
 window.saveProfile = async () => {
