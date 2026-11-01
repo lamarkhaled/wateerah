@@ -54,17 +54,18 @@ window.renderWorkspaceVisibility = function() {
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء' },
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات' },
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية' },
     { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
-    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' },
-    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع روتين الصحة والـ Skin Care' }
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
-    window.appState.activeWidgets = ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-care'];
+    window.appState.activeWidgets = ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal'];
   }
 
   const active = window.appState.activeWidgets;
@@ -109,6 +110,7 @@ window.openPage = function(wId) {
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
       if (wId === 'widget-habits' && window.renderLists) window.renderLists();
       if (wId === 'widget-care' && window.renderCareRoutines) window.renderCareRoutines();
+      if (wId === 'widget-matrix' && window.renderMatrix) window.renderMatrix();
   } catch(e) {}
 
   const homeBtn = document.getElementById('homeBtnContainer');
@@ -131,13 +133,14 @@ window.goHome = function() {
 window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء' },
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات' },
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية' },
     { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
-    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' },
-    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع روتين الصحة والـ Skin Care' }
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' }
   ];
   const active = window.appState.activeWidgets || [];
   const libraryList = document.getElementById('widgetLibraryList');
@@ -189,13 +192,14 @@ window.closeModal = function(id) {
   }
 };
 
+// -- بروتوكول الصحة والعناية --
 window.renderCareRoutines = () => {
     const state = window.appState.dailyRecords[window.currentDateStr] || {};
     const hList = state.healthRoutine || [];
     const sList = state.skinRoutine || [];
 
     const renderList = (list, type) => list.map((item, idx) => `
-        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px;">
+        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px; background: transparent;">
             <div class="item-left">
                 <div class="checkbox" onclick="window.toggleCareRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
                 <span style="font-size: 0.85rem;">${item.text}</span>
@@ -211,12 +215,10 @@ window.renderCareRoutines = () => {
 };
 
 window.addCareRoutine = (type) => {
-    const inputId = type === 'health' ? 'newHealthTask' : 'newSkinTask';
-    const input = document.getElementById(inputId);
+    const input = document.getElementById(type === 'health' ? 'newHealthTask' : 'newSkinTask');
     if(!input) return;
     const val = input.value.trim();
     if(!val) return;
-    
     const state = window.appState.dailyRecords[window.currentDateStr];
     if(type === 'health') {
         if(!state.healthRoutine) state.healthRoutine = [];
@@ -243,5 +245,57 @@ window.deleteCareRoutine = (type, idx) => {
     const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
     list.splice(idx, 1);
     window.renderCareRoutines();
+    window.autoSave();
+};
+
+// -- مصفوفة الأولويات --
+window.renderMatrix = () => {
+    if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
+    const doEl = document.getElementById('matrix-do');
+    const scheduleEl = document.getElementById('matrix-schedule');
+    const delegateEl = document.getElementById('matrix-delegate');
+    const dropEl = document.getElementById('matrix-drop');
+
+    if(!doEl) return;
+    doEl.innerHTML = ''; scheduleEl.innerHTML = ''; delegateEl.innerHTML = ''; dropEl.innerHTML = '';
+    
+    let counts = { do: 0, schedule: 0, delegate: 0, drop: 0 };
+
+    window.appState.matrixTasks.forEach((task, idx) => {
+        counts[task.type]++;
+        const html = `
+            <li class="list-item" style="padding: 6px; margin-bottom: 6px; background: transparent; border: 1px dashed var(--border-color);">
+                <div class="item-left" style="font-size: 0.85rem;">${task.text}</div>
+                <button class="delete-btn" onclick="window.deleteMatrixTask(${idx})">&times;</button>
+            </li>
+        `;
+        if (task.type === 'do') doEl.innerHTML += html;
+        if (task.type === 'schedule') scheduleEl.innerHTML += html;
+        if (task.type === 'delegate') delegateEl.innerHTML += html;
+        if (task.type === 'drop') dropEl.innerHTML += html;
+    });
+
+    ['do', 'schedule', 'delegate', 'drop'].forEach(key => {
+        const cEl = document.getElementById(`count-${key}`);
+        if(cEl) cEl.innerText = counts[key];
+    });
+};
+
+window.addMatrixTask = () => {
+    const textEl = document.getElementById('newMatrixTitle');
+    const typeEl = document.getElementById('newMatrixType');
+    if(!textEl.value.trim()) return;
+    
+    if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
+    window.appState.matrixTasks.push({ text: textEl.value.trim(), type: typeEl.value });
+    
+    textEl.value = '';
+    window.renderMatrix();
+    window.autoSave();
+};
+
+window.deleteMatrixTask = (idx) => {
+    window.appState.matrixTasks.splice(idx, 1);
+    window.renderMatrix();
     window.autoSave();
 };
