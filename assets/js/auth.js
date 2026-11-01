@@ -4,7 +4,6 @@ import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebase
 
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 auth.languageCode = 'ar';
-window.isVerifyingAccount = false; 
 
 window.switchAuthView = function(view) {
   const loginView = document.getElementById('viewLogin');
@@ -20,7 +19,7 @@ window.switchAuthView = function(view) {
     if(sub) sub.innerText = 'سجلي دخولك للوصول إلى مساحتك الخاصة';
   } else if (view === 'register') {
     regView.style.display = 'block';
-    if(sub) sub.innerText = 'أنشئي حسابك الجديد لتبدئي ترتيب حياتك';
+    if(sub) sub.innerText = 'أنشئي حسابك الجديد لتبدئي الترتيب';
   } else if (view === 'reset') {
     resetView.style.display = 'block';
     if(sub) sub.innerText = 'أدخلي بريدك لإرسال رابط الاستعادة';
@@ -95,6 +94,8 @@ window.handleRegister = async () => {
   if(!email || !pass) return window.showToast('يرجى تعبئة كافة الحقول المطلوبة');
 
   try {
+    document.getElementById('authModal').style.display = 'none';
+
     await signOut(auth); localStorage.removeItem('wateerah_local_state');
     const cred = await createUserWithEmailAndPassword(auth, email, pass); 
     
@@ -109,11 +110,11 @@ window.handleRegister = async () => {
 
     await setDoc(doc(db, "users", cred.user.uid), { email, profile: window.userProfile, state: window.appState, status: 'نشط', createdAt: new Date().toISOString() });
     
-    document.getElementById('authModal').style.display = 'none';
-    window.renderWorkspaceVisibility();
-    window.showToast('تم إنشاء الحساب والدخول بنجاح!');
-
-  } catch(e) { window.showToast('حدث خطأ في التسجيل، تأكدي من صحة البريد.'); }
+    window.showToast('تم التسجيل والدخول بنجاح!');
+  } catch(e) { 
+    document.getElementById('authModal').style.display = 'flex';
+    window.showToast('حدث خطأ في التسجيل، تأكدي من صحة البريد.'); 
+  }
 };
 
 window.handleLogin = async () => {
@@ -124,8 +125,7 @@ window.handleLogin = async () => {
   try {
     await signInWithEmailAndPassword(auth, email, pass);
     document.getElementById('authModal').style.display = 'none';
-    window.renderWorkspaceVisibility();
-    window.showToast('مرحباً بك مجدداً في مساحتك الخاصة!');
+    window.showToast('مرحباً بك مجدداً!');
   } catch(e) { window.showToast('عذراً، البريد الإلكتروني أو كلمة المرور غير صحيحة.'); }
 };
 
@@ -134,8 +134,8 @@ window.handleLogout = async () => { await signOut(auth); localStorage.removeItem
 window.handleResetPassword = async () => { 
     const email = document.getElementById('resetEmail')?.value.trim(); 
     if(!email) return window.showToast('يرجى إدخال البريد الإلكتروني أولاً.'); 
-    try { await sendPasswordResetEmail(auth, email); window.showToast('تم إرسال رابط الاستعادة إلى بريدك بنجاح.'); window.switchAuthView('login'); } 
-    catch(e) { window.showToast('البريد غير مسجل لدينا أو حدث خطأ.'); } 
+    try { await sendPasswordResetEmail(auth, email); window.showToast('تم إرسال الرابط.'); window.switchAuthView('login'); } 
+    catch(e) { window.showToast('البريد غير مسجل.'); } 
 };
 
 window.activateOneTimeFreeTrial = async () => {
@@ -144,7 +144,7 @@ window.activateOneTimeFreeTrial = async () => {
   const expiry = new Date(); expiry.setDate(expiry.getDate() + 2);
   window.userProfile.isPro = true; window.userProfile.trialUsed = true; window.userProfile.totalSubDays = 2; window.userProfile.planType = 'تجربة مجانية'; 
   window.userProfile.expiryDate = `${expiry.getFullYear()}-${String(expiry.getMonth() + 1).padStart(2, '0')}-${String(expiry.getDate()).padStart(2, '0')}`;
-  window.updateSubscriptionUI(); await window.saveCurrentWateerah(true); window.closeModal('pricingModal'); window.showToast('تم تفعيل التجربة المجانية بنجاح!');
+  window.updateSubscriptionUI(); await window.saveCurrentWateerah(true); window.closeModal('pricingModal'); window.showToast('تم التفعيل بنجاح!');
 };
 
 window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeInput') => {
@@ -169,6 +169,6 @@ window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeIn
     
     await deleteDoc(codeRef); await window.saveCurrentWateerah(true); window.updateSubscriptionUI();
     if(document.getElementById('userActivationCodeInput')) document.getElementById('userActivationCodeInput').value = ''; if(document.getElementById('userRenewalCodeInput')) document.getElementById('userRenewalCodeInput').value = '';
-    window.openModal('pricingModal'); window.showToast(`تهانينا! تم تمديد الاشتراك لمدة ${days} يوم.`);
+    window.openModal('pricingModal'); window.showToast(`تم تمديد الاشتراك لـ ${days} يوم.`);
   } catch(e) { window.showToast('حدث خطأ أثناء تفعيل الكود.'); }
 };
