@@ -60,7 +60,7 @@ window.renderActiveWidgets = function() {
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' },
-    { id: 'widget-glowup', name: 'التوهج', desc: 'متتبع العناية والتوازن البصري', icon: '💖' }
+    { id: 'widget-glowup', name: 'توازن اليوم', desc: 'مؤشر تتبع العناية الشخصية والتوازن', icon: '⚖️' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
@@ -138,7 +138,7 @@ window.renderWidgetLibraryModal = function() {
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' },
-    { id: 'widget-glowup', name: 'التوهج', desc: 'متتبع العناية والتوازن البصري', icon: '💖' }
+    { id: 'widget-glowup', name: 'توازن اليوم', desc: 'مؤشر تتبع العناية والتوازن الشخصي', icon: '⚖️' }
   ];
   const active = window.appState.activeWidgets || [];
   const libraryList = document.getElementById('widgetLibraryList');
