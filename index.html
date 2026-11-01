@@ -55,30 +55,57 @@
       <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <!-- لوحة تحكم الأدمن المستقلة -->
-    <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1000px; margin: 0 auto;">
+    <!-- لوحة الإدارة الشاملة -->
+    <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
       <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
-        <h2 style="color: var(--accent-color); margin-bottom: 10px; font-size: 2rem;">لوحة الإدارة المركزية</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 30px;">إدارة المنصة وإصدار اشتراكات المستخدمين.</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div>
+                <h2 style="color: var(--accent-color); margin-bottom: 6px; font-size: 2rem;">لوحة الإدارة المركزية</h2>
+                <p style="color: var(--text-secondary); margin: 0;">إدارة المستخدمين، المبيعات، وإصدار التراخيص.</p>
+            </div>
+            <button class="btn btn-danger" onclick="window.handleLogout()">خروج للإدارة</button>
+        </div>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+          
+          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); grid-column: 1 / -1;">
+            <h3 style="margin-bottom: 15px;">قاعدة بيانات المستخدمين وإدارة الاشتراكات</h3>
+            <ul id="adminUsersList" class="item-list" style="max-height: 400px; overflow-y: auto;"></ul>
+          </div>
+
           <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color);">
-            <h3 style="margin-bottom: 15px;">إصدار أكواد تفعيل جديدة</h3>
+            <h3 style="margin-bottom: 15px;">إصدار تراخيص جديدة</h3>
             <div class="form-group" style="display: flex; gap: 8px;">
-                <input type="text" id="adminCodeInputPage" placeholder="اكتبي الكود أو اتركيه فارغاً للتوليد..." style="flex: 2; padding: 12px; border-radius: 10px;">
-                <select id="adminDaysSelectPage" style="flex: 1; padding: 12px; border-radius: 10px; background: var(--bg-subtle);">
-                    <option value="30">شهر واحد</option>
+                <input type="text" id="adminCodeInputPage" placeholder="الكود (اختياري)..." style="flex: 2; padding: 12px; border-radius: 10px;">
+                <select id="adminDaysSelectPage" style="flex: 1.5; padding: 12px; border-radius: 10px; background: var(--bg-subtle);">
+                    <option value="30">شهر (1)</option>
+                    <option value="60">شهران (2)</option>
                     <option value="90">3 أشهر</option>
+                    <option value="120">4 أشهر</option>
+                    <option value="150">5 أشهر</option>
                     <option value="180">6 أشهر</option>
-                    <option value="365">سنة كاملة</option>
+                    <option value="210">7 أشهر</option>
+                    <option value="240">8 أشهر</option>
+                    <option value="270">9 أشهر</option>
+                    <option value="300">10 أشهر</option>
+                    <option value="330">11 شهر</option>
+                    <option value="365">سنة كاملة (12)</option>
+                    <option value="lifetime">مدى الحياة</option>
                 </select>
             </div>
-            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1.05rem;" onclick="window.generateActivationCodePage()">توليد واعتماد الكود</button>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="window.generateActivationCodePage()">توليد واعتماد الكود</button>
           </div>
+
           <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color);">
-            <h3 style="margin-bottom: 15px;">الأكواد النشطة</h3>
-            <ul id="adminCodesListPage" class="item-list" style="max-height: 200px; overflow-y: auto;"></ul>
+            <h3 style="margin-bottom: 15px;">الأكواد النشطة المتاحة للبيع</h3>
+            <ul id="adminCodesListPage" class="item-list" style="max-height: 220px; overflow-y: auto;"></ul>
           </div>
+
+          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); grid-column: 1 / -1;">
+            <h3 style="margin-bottom: 15px;">سجل الأكواد المستخدمة</h3>
+            <ul id="adminUsedCodesListPage" class="item-list" style="max-height: 250px; overflow-y: auto;"></ul>
+          </div>
+
         </div>
       </div>
     </div>
@@ -388,7 +415,7 @@
     </div>
   </main>
 
-  <!-- نوافذ التسجيل المنبثقة -->
+  <!-- نوافذ التسجيل والاشتراكات -->
   <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
@@ -441,7 +468,7 @@
       <div id="pricingViewSubscribed" style="display: none;">
          <div id="subActiveDetails" style="font-size: 0.95rem; margin-bottom: 10px; line-height: 1.6;"></div>
          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;"><span id="daysRemainingText"></span></div>
-         <div class="progress-bar-bg" style="height: 10px; margin-bottom: 20px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 0%;"></div></div>
+         <div class="progress-bar-bg" id="subProgressBarBg" style="height: 10px; margin-bottom: 20px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 0%;"></div></div>
          <h4 style="margin-bottom: 10px; font-size: 0.9rem;">تجديد الاشتراك</h4>
          <div class="form-group" style="display: flex; gap: 8px;">
            <input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 8px; border-radius: 8px;">
