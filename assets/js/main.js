@@ -14,8 +14,7 @@ window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
 window.userProfile = { name: 'صديقنا', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 0, trialUsed: false };
 window.appState = {
-  hasStarted: true, 
-  theme: 'default', 
+  hasStarted: true, theme: 'default', 
   activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
   widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
   dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
@@ -31,11 +30,9 @@ window.autoSave = () => {
 window.saveCurrentWateerah = async (manual) => {
   if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
   window.appState.dailyRecords[window.currentDateStr] = { focusGoal: document.getElementById('focusGoalInput')?.value || '', habits: window.appState.habits || [] };
-  
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   
   const user = auth.currentUser;
-  // منع حفظ بيانات وهمية إذا كان الدخول بحساب الأدمن
   if (!user || user.email === ADMIN_EMAIL) return; 
   try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); } catch(e) {}
 };
@@ -83,27 +80,25 @@ onAuthStateChanged(auth, async (user) => {
     if(authModal) authModal.style.display = 'none'; 
     if(lockBtn) lockBtn.style.display = 'inline-block';
     
-    // ----------------------------------------------------
-    // نظام العزل التام لحساب الإدارة
-    // ----------------------------------------------------
+    // الدخول كأدمن (إدارة النظام)
     if (user.email === ADMIN_EMAIL) {
-        if(mainWorkspace) mainWorkspace.classList.add('hidden-el');
-        if(onboardingScreen) onboardingScreen.classList.add('hidden-el');
-        if(adminWorkspace) adminWorkspace.style.display = 'block'; // فتح لوحة الأدمن
+        if(mainWorkspace) { mainWorkspace.classList.add('hidden-el'); mainWorkspace.style.display = 'none'; }
+        if(onboardingScreen) { onboardingScreen.classList.add('hidden-el'); onboardingScreen.style.display = 'none'; }
+        if(adminWorkspace) { adminWorkspace.classList.remove('hidden-el'); adminWorkspace.style.display = 'block'; }
         
-        // إخفاء أزرار المستخدم العادي
         if(profilePill) profilePill.style.display = 'none';
         if(planBadge) planBadge.style.display = 'none';
         if(upgradeBtn) upgradeBtn.style.display = 'none';
         
-        if(window.loadActiveCodesPage) window.loadActiveCodesPage();
-        return; // التوقف هنا للأدمن
+        // الانتظار قليلاً لضمان تحميل ملف الإدارة ثم جلب الأكواد
+        setTimeout(() => {
+            if(window.loadActiveCodesPage) window.loadActiveCodesPage();
+        }, 500);
+        return; 
     }
 
-    // ----------------------------------------------------
-    // نظام المستخدم العادي
-    // ----------------------------------------------------
-    if(adminWorkspace) adminWorkspace.style.display = 'none';
+    // الدخول كمستخدم عادي (المنصة الأصلية)
+    if(adminWorkspace) { adminWorkspace.classList.add('hidden-el'); adminWorkspace.style.display = 'none'; }
     if(profilePill) profilePill.style.display = 'flex';
     if(planBadge) planBadge.style.display = 'inline-block';
     if(upgradeBtn) upgradeBtn.style.display = 'inline-block';
@@ -120,8 +115,11 @@ onAuthStateChanged(auth, async (user) => {
     if (window.updateSubscriptionUI) window.updateSubscriptionUI();
     const headerName = document.getElementById('headerUserName');
     const headerAvatar = document.getElementById('headerAvatar');
+    const profileNameInput = document.getElementById('profileNameInput');
+    
     if(headerName) headerName.innerText = window.userProfile.name || user.email; 
     if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'ل')[0]; 
+    if(profileNameInput) profileNameInput.value = window.userProfile.name || '';
     
     window.loadTodayDate();
     if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
@@ -129,7 +127,6 @@ onAuthStateChanged(auth, async (user) => {
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
 
   } else {
-    // حالة تسجيل الخروج
     if (!window.isVerifyingAccount && authModal) authModal.style.display = 'flex';
     if(lockBtn) lockBtn.style.display = 'none';
     if(profilePill) profilePill.style.display = 'none';
