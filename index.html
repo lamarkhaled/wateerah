@@ -288,19 +288,21 @@
           <ul id="habitsList" class="item-list"></ul>
         </div>
 
-        <!-- التوهج (Glow Up) -->
+        <!-- توازن اليوم (الإضافة الجديدة) -->
         <div id="widget-glowup" class="widget-card col-12 hidden-el" data-widget-id="widget-glowup">
           <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">رادار التوهج</span></div>
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">توازن اليوم ⚖️</span></div>
             <button class="btn btn-subtle" onclick="window.resetGlowUp()">تصفير اليوم</button>
           </div>
+          
           <div style="display: flex; justify-content: space-between; align-items: flex-end; height: 160px; margin: 24px 0; gap: 12px;">
              <div class="glow-bar-container"><div id="glow-fill-water" class="glow-bar-fill" style="background: linear-gradient(to top, #3b82f6, #60a5fa); color: #3b82f6;"></div><div class="glow-icon">💧</div></div>
              <div class="glow-bar-container"><div id="glow-fill-food" class="glow-bar-fill" style="background: linear-gradient(to top, #22c55e, #4ade80); color: #22c55e;"></div><div class="glow-icon">🥗</div></div>
-             <div class="glow-bar-container"><div id="glow-fill-mind" class="glow-bar-fill" style="background: linear-gradient(to top, #a855f7, #c084fc); color: #a855f7;"></div><div class="glow-icon">🧘‍♀️</div></div>
+             <div class="glow-bar-container"><div id="glow-fill-mind" class="glow-bar-fill" style="background: linear-gradient(to top, #8b5cf6, #a78bfa); color: #8b5cf6;"></div><div class="glow-icon">🧠</div></div>
              <div class="glow-bar-container"><div id="glow-fill-skin" class="glow-bar-fill" style="background: linear-gradient(to top, #f43f5e, #fb7185); color: #f43f5e;"></div><div class="glow-icon">🧴</div></div>
-             <div class="glow-bar-container"><div id="glow-fill-sport" class="glow-bar-fill" style="background: linear-gradient(to top, #f59e0b, #fbbf24); color: #f59e0b;"></div><div class="glow-icon">💪</div></div>
+             <div class="glow-bar-container"><div id="glow-fill-sport" class="glow-bar-fill" style="background: linear-gradient(to top, #f59e0b, #fbbf24); color: #f59e0b;"></div><div class="glow-icon">🏃</div></div>
           </div>
+
           <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
              <button class="btn btn-subtle glow-add-btn" onclick="window.addGlow('water')">+</button>
              <button class="btn btn-subtle glow-add-btn" onclick="window.addGlow('food')">+</button>
@@ -308,6 +310,7 @@
              <button class="btn btn-subtle glow-add-btn" onclick="window.addGlow('skin')">+</button>
              <button class="btn btn-subtle glow-add-btn" onclick="window.addGlow('sport')">+</button>
           </div>
+          
           <style>
             .glow-bar-container { flex: 1; height: 100%; background: var(--bg-primary); border-radius: 24px; display: flex; flex-direction: column; justify-content: flex-end; position: relative; overflow: hidden; border: 1px solid var(--border-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
             .glow-bar-fill { width: 100%; height: 0%; transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease; opacity: 0.9; }
@@ -320,6 +323,7 @@
         <!-- المالية -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
+          
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="font-size: 0.95rem; font-weight: 700;">متتبع الدخل</div>
@@ -432,7 +436,7 @@
     </div>
   </main>
 
-  <!-- نوافذ التسجيل والاشتراكات -->
+  <!-- النوافذ -->
   <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
