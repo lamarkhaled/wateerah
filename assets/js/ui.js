@@ -14,7 +14,7 @@ window.updateDayNightGreeting = function() {
   if (!isMorning) document.body.classList.add('night-mode-glow'); 
   else document.body.classList.remove('night-mode-glow');
   
-  const userName = window.userProfile?.name || 'صديقنا';
+  const userName = window.userProfile?.name || 'مستخدم';
   const wTxt = document.getElementById('welcomeText'); 
   if(wTxt) wTxt.innerText = `${greetingWord}، أهلاً بك يا ${userName}.`;
 };
@@ -53,17 +53,18 @@ window.renderWorkspaceVisibility = function() {
 
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
-    { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
-    { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
-    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'إدارة المشاريع والحملات' },
-    { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
-    { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة' },
-    { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم' },
-    { id: 'widget-habits', name: 'العادات', icon: '✨', desc: 'متتبع العادات اليومية' }
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' },
+    { id: 'widget-glowup', name: 'التوهج', desc: 'متتبع العناية والتوازن البصري', icon: '💖' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
-    window.appState.activeWidgets = ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'];
+    window.appState.activeWidgets = ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-glowup'];
   }
 
   const active = window.appState.activeWidgets;
@@ -108,6 +109,7 @@ window.openPage = function(wId) {
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
       if (wId === 'widget-habits' && window.renderLists) window.renderLists();
+      if (wId === 'widget-glowup' && window.renderGlowUp) window.renderGlowUp();
   } catch(e) {}
 
   const homeBtn = document.getElementById('homeBtnContainer');
@@ -129,13 +131,14 @@ window.goHome = function() {
 
 window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
-    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد' },
-    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة' },
-    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات' },
-    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة' },
-    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
-    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
-    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' }
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' },
+    { id: 'widget-glowup', name: 'التوهج', desc: 'متتبع العناية والتوازن البصري', icon: '💖' }
   ];
   const active = window.appState.activeWidgets || [];
   const libraryList = document.getElementById('widgetLibraryList');
@@ -145,6 +148,7 @@ window.renderWidgetLibraryModal = function() {
       return `
         <div class="list-item" style="padding: 12px 16px;">
           <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size: 1.5rem;">${w.icon}</div>
             <div>
               <div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div>
               <div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div>
@@ -185,4 +189,40 @@ window.closeModal = function(id) {
       modal.classList.remove('open');
       if (id === 'authModal') modal.style.display = 'none';
   }
+};
+
+window.renderGlowUp = function() {
+    const today = window.currentDateStr;
+    const state = window.appState.dailyRecords[today]?.glowUp || { water: 0, food: 0, mind: 0, skin: 0, sport: 0 };
+    const max = 3; 
+
+    ['water', 'food', 'mind', 'skin', 'sport'].forEach(axis => {
+        const fillEl = document.getElementById(`glow-fill-${axis}`);
+        if (fillEl) {
+            const pct = Math.min(100, (state[axis] / max) * 100);
+            fillEl.style.height = `${pct}%`;
+            if (pct >= 100) fillEl.classList.add('maxed');
+            else fillEl.classList.remove('maxed');
+        }
+    });
+};
+
+window.addGlow = function(axis) {
+    const today = window.currentDateStr;
+    if (!window.appState.dailyRecords[today].glowUp) window.appState.dailyRecords[today].glowUp = { water: 0, food: 0, mind: 0, skin: 0, sport: 0 };
+    
+    if (window.appState.dailyRecords[today].glowUp[axis] < 3) {
+        window.appState.dailyRecords[today].glowUp[axis] += 1;
+        window.renderGlowUp();
+        window.autoSave();
+    } else {
+        window.showToast('مكتمل لهذا اليوم!');
+    }
+};
+
+window.resetGlowUp = function() {
+    const today = window.currentDateStr;
+    window.appState.dailyRecords[today].glowUp = { water: 0, food: 0, mind: 0, skin: 0, sport: 0 };
+    window.renderGlowUp();
+    window.autoSave();
 };
