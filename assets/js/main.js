@@ -7,16 +7,15 @@ const ADMIN_EMAIL = "wateerahapp@gmail.com";
 window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
 window.draggedKanbanIndex = null;
-window.isDataLoadedFromCloud = false; 
 
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
-window.userProfile = { name: 'صديقنا', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 0, trialUsed: false };
+window.userProfile = { name: 'مستخدم', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 0, trialUsed: false };
 window.appState = {
   hasStarted: true, theme: 'default', 
-  activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
-  widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
+  activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-glowup'], 
+  widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-glowup'],
   dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] }
 };
@@ -29,11 +28,16 @@ window.autoSave = () => {
 
 window.saveCurrentWateerah = async (manual) => {
   if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
-  window.appState.dailyRecords[window.currentDateStr] = { focusGoal: document.getElementById('focusGoalInput')?.value || '', habits: window.appState.habits || [] };
+  const todayRec = window.appState.dailyRecords[window.currentDateStr] || {};
+  window.appState.dailyRecords[window.currentDateStr] = { 
+      focusGoal: document.getElementById('focusGoalInput')?.value || '', 
+      habits: window.appState.habits || [],
+      glowUp: todayRec.glowUp || { water: 0, food: 0, mind: 0, skin: 0, sport: 0 }
+  };
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   
   const user = auth.currentUser;
-  if (!user || user.email === ADMIN_EMAIL) return; 
+  if (!user || user.email === ADMIN_EMAIL) return;
   try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); } catch(e) {}
 };
 
@@ -42,17 +46,22 @@ window.loadTodayDate = function() {
   window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
   const liveDate = document.getElementById('liveDateText');
   if (liveDate) liveDate.innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
-  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', habits: [] };
+  
+  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', habits: [], glowUp: { water: 0, food: 0, mind: 0, skin: 0, sport: 0 } };
+  if (!daily.glowUp) daily.glowUp = { water: 0, food: 0, mind: 0, skin: 0, sport: 0 };
+  window.appState.dailyRecords[window.currentDateStr] = daily;
+  
   window.appState.habits = daily.habits || [];
   const focusInput = document.getElementById('focusGoalInput');
   if(focusInput) focusInput.value = daily.focusGoal || '';
   if(window.renderLists) window.renderLists();
   if(window.renderNotesList) window.renderNotesList();
+  if(window.renderGlowUp) window.renderGlowUp();
 };
 
 window.saveProfile = async () => {
   const nameInput = document.getElementById('profileNameInput');
-  window.userProfile.name = nameInput ? nameInput.value.trim() : 'لمار';
+  window.userProfile.name = nameInput ? nameInput.value.trim() : 'مستخدم';
   const headerName = document.getElementById('headerUserName');
   const headerAvatar = document.getElementById('headerAvatar');
   if(headerName) headerName.innerText = window.userProfile.name; 
@@ -76,11 +85,9 @@ onAuthStateChanged(auth, async (user) => {
   const onboardingScreen = document.getElementById('onboardingScreen');
 
   if (user) {
-    window.isVerifyingAccount = false;
     if(authModal) authModal.style.display = 'none'; 
     if(lockBtn) lockBtn.style.display = 'inline-block';
     
-    // الدخول كأدمن (إدارة النظام)
     if (user.email === ADMIN_EMAIL) {
         if(mainWorkspace) { mainWorkspace.classList.add('hidden-el'); mainWorkspace.style.display = 'none'; }
         if(onboardingScreen) { onboardingScreen.classList.add('hidden-el'); onboardingScreen.style.display = 'none'; }
@@ -90,14 +97,10 @@ onAuthStateChanged(auth, async (user) => {
         if(planBadge) planBadge.style.display = 'none';
         if(upgradeBtn) upgradeBtn.style.display = 'none';
         
-        // الانتظار قليلاً لضمان تحميل ملف الإدارة ثم جلب الأكواد
-        setTimeout(() => {
-            if(window.loadActiveCodesPage) window.loadActiveCodesPage();
-        }, 500);
+        setTimeout(() => { if(window.loadActiveCodesPage) window.loadActiveCodesPage(); }, 500);
         return; 
     }
 
-    // الدخول كمستخدم عادي (المنصة الأصلية)
     if(adminWorkspace) { adminWorkspace.classList.add('hidden-el'); adminWorkspace.style.display = 'none'; }
     if(profilePill) profilePill.style.display = 'flex';
     if(planBadge) planBadge.style.display = 'inline-block';
@@ -118,16 +121,15 @@ onAuthStateChanged(auth, async (user) => {
     const profileNameInput = document.getElementById('profileNameInput');
     
     if(headerName) headerName.innerText = window.userProfile.name || user.email; 
-    if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'ل')[0]; 
+    if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'م')[0]; 
     if(profileNameInput) profileNameInput.value = window.userProfile.name || '';
     
     window.loadTodayDate();
     if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
     if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
-
   } else {
-    if (!window.isVerifyingAccount && authModal) authModal.style.display = 'flex';
+    if (authModal) authModal.style.display = 'flex';
     if(lockBtn) lockBtn.style.display = 'none';
     if(profilePill) profilePill.style.display = 'none';
     if(adminWorkspace) adminWorkspace.style.display = 'none';
