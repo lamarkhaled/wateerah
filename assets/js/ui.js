@@ -53,13 +53,13 @@ window.renderWorkspaceVisibility = function() {
 
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
-    { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
-    { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
-    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'إدارة المشاريع والحملات' },
-    { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
-    { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة' },
-    { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم' },
-    { id: 'widget-habits', name: 'العادات', icon: '✨', desc: 'متتبع العادات اليومية' }
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
@@ -78,7 +78,6 @@ window.renderActiveWidgets = function() {
       if(!info) return '';
       return `
         <div class="app-icon-card" onclick="window.openPage('${wId}')">
-          <div class="app-icon" style="font-size: 24px; margin-bottom: 8px;">${info.icon}</div>
           <div class="app-icon-title">${info.name}</div>
         </div>
       `;
@@ -129,13 +128,13 @@ window.goHome = function() {
 
 window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
-    { id: 'widget-vision', name: 'الأهداف', icon: '🎯', desc: 'لوحة الأهداف والمقاصد' },
-    { id: 'widget-kanban', name: 'المهام', icon: '📋', desc: 'إدارة المهام المتنقلة' },
-    { id: 'widget-business', name: 'الأعمال', icon: '💼', desc: 'إدارة المشاريع والحملات' },
-    { id: 'widget-finance', name: 'المالية', icon: '💰', desc: 'إدارة المالية الشاملة' },
-    { id: 'widget-journal', name: 'التدوين', icon: '📝', desc: 'مساحة حرة للكتابة' },
-    { id: 'widget-focus', name: 'التركيز', icon: '🧭', desc: 'تحديد الهدف الأهم لليوم' },
-    { id: 'widget-habits', name: 'العادات', icon: '✨', desc: 'متتبع العادات اليومية' }
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' }
   ];
   const active = window.appState.activeWidgets || [];
   const libraryList = document.getElementById('widgetLibraryList');
@@ -145,7 +144,6 @@ window.renderWidgetLibraryModal = function() {
       return `
         <div class="list-item" style="padding: 12px 16px;">
           <div style="display:flex; align-items:center; gap:12px;">
-            <span style="font-size:1.8rem;">${w.icon}</span>
             <div>
               <div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div>
               <div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div>
