@@ -91,7 +91,6 @@ window.deleteAdminCodePage = async function(code) {
     } catch (error) {}
 };
 
-// إدارة المستخدمين
 window.loadAdminUsersList = async function() {
     if (auth.currentUser?.email !== ADMIN_EMAIL) return;
     const usersList = document.getElementById('adminUsersList');
@@ -122,7 +121,7 @@ window.loadAdminUsersList = async function() {
                     <div style="display:flex; gap: 6px; flex-wrap: wrap;">
                         <button class="btn btn-primary" style="padding: 6px; font-size: 0.75rem;" onclick="window.modifyUserSub('${uid}', 30)">+30 يوم</button>
                         <button class="btn btn-primary" style="padding: 6px; font-size: 0.75rem;" onclick="window.modifyUserSub('${uid}', 'lifetime')">مدى الحياة</button>
-                        <button class="btn btn-danger" style="padding: 6px; font-size: 0.75rem;" onclick="window.modifyUserSub('${uid}', 'cancel')">حذف الاشتراك</button>
+                        <button class="btn btn-danger" style="padding: 6px; font-size: 0.75rem;" onclick="window.modifyUserSub('${uid}', 'cancel')">إلغاء الاشتراك</button>
                     </div>
                 </div>
             </li>`;
