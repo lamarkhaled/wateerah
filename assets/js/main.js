@@ -7,13 +7,15 @@ const ADMIN_EMAIL = "wateerahapp@gmail.com";
 window.unverifiedUserObject = null;
 window.activeVisionIndex = null;
 window.draggedKanbanIndex = null;
+window.isDataLoadedFromCloud = false; 
 
 window.currentDateObj = new Date();
 window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 
 window.userProfile = { name: 'صديقنا', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 0, trialUsed: false };
 window.appState = {
-  hasStarted: true, theme: 'default', 
+  hasStarted: true, 
+  theme: 'default', 
   activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
   widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
   dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
@@ -29,10 +31,12 @@ window.autoSave = () => {
 window.saveCurrentWateerah = async (manual) => {
   if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
   window.appState.dailyRecords[window.currentDateStr] = { focusGoal: document.getElementById('focusGoalInput')?.value || '', habits: window.appState.habits || [] };
+  
   localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   
   const user = auth.currentUser;
-  if (!user || user.email === ADMIN_EMAIL) return;
+  // منع حفظ بيانات وهمية إذا كان الدخول بحساب الأدمن
+  if (!user || user.email === ADMIN_EMAIL) return; 
   try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); } catch(e) {}
 };
 
@@ -60,31 +64,46 @@ window.saveProfile = async () => {
   window.saveCurrentWateerah(true);
 };
 
+const savedLocal = localStorage.getItem('wateerah_local_state');
+if (savedLocal) { try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {} }
+
 onAuthStateChanged(auth, async (user) => {
   const authModal = document.getElementById('authModal');
   const lockBtn = document.getElementById('lockScreenBtn');
   const profilePill = document.getElementById('userProfilePill');
   const planBadge = document.getElementById('planBadge');
   const upgradeBtn = document.getElementById('upgradeBtn');
+  
+  const mainWorkspace = document.getElementById('mainWorkspace');
+  const adminWorkspace = document.getElementById('adminWorkspace');
+  const onboardingScreen = document.getElementById('onboardingScreen');
 
   if (user) {
+    window.isVerifyingAccount = false;
     if(authModal) authModal.style.display = 'none'; 
     if(lockBtn) lockBtn.style.display = 'inline-block';
     
+    // ----------------------------------------------------
+    // نظام العزل التام لحساب الإدارة
+    // ----------------------------------------------------
     if (user.email === ADMIN_EMAIL) {
-        document.getElementById('onboardingScreen').style.display = 'none';
-        document.getElementById('mainWorkspace').style.display = 'none';
-        document.getElementById('adminWorkspace').style.display = 'block';
+        if(mainWorkspace) mainWorkspace.classList.add('hidden-el');
+        if(onboardingScreen) onboardingScreen.classList.add('hidden-el');
+        if(adminWorkspace) adminWorkspace.style.display = 'block'; // فتح لوحة الأدمن
         
+        // إخفاء أزرار المستخدم العادي
         if(profilePill) profilePill.style.display = 'none';
         if(planBadge) planBadge.style.display = 'none';
         if(upgradeBtn) upgradeBtn.style.display = 'none';
         
         if(window.loadActiveCodesPage) window.loadActiveCodesPage();
-        return; 
+        return; // التوقف هنا للأدمن
     }
 
-    document.getElementById('adminWorkspace').style.display = 'none';
+    // ----------------------------------------------------
+    // نظام المستخدم العادي
+    // ----------------------------------------------------
+    if(adminWorkspace) adminWorkspace.style.display = 'none';
     if(profilePill) profilePill.style.display = 'flex';
     if(planBadge) planBadge.style.display = 'inline-block';
     if(upgradeBtn) upgradeBtn.style.display = 'inline-block';
@@ -101,19 +120,19 @@ onAuthStateChanged(auth, async (user) => {
     if (window.updateSubscriptionUI) window.updateSubscriptionUI();
     const headerName = document.getElementById('headerUserName');
     const headerAvatar = document.getElementById('headerAvatar');
-    const profileNameInput = document.getElementById('profileNameInput');
-    
     if(headerName) headerName.innerText = window.userProfile.name || user.email; 
     if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'ل')[0]; 
-    if(profileNameInput) profileNameInput.value = window.userProfile.name || '';
     
     window.loadTodayDate();
     if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
+    if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
     if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
+
   } else {
-    if (authModal) authModal.style.display = 'flex';
+    // حالة تسجيل الخروج
+    if (!window.isVerifyingAccount && authModal) authModal.style.display = 'flex';
     if(lockBtn) lockBtn.style.display = 'none';
     if(profilePill) profilePill.style.display = 'none';
-    document.getElementById('adminWorkspace').style.display = 'none';
+    if(adminWorkspace) adminWorkspace.style.display = 'none';
   }
 });
