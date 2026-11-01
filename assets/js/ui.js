@@ -53,18 +53,18 @@ window.renderWorkspaceVisibility = function() {
 
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
-    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
-    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
-    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
-    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
-    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
-    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
-    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' },
-    { id: 'widget-glowup', name: 'توازن اليوم', desc: 'مؤشر تتبع العناية الشخصية والتوازن', icon: '⚖️' }
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' },
+    { id: 'widget-rhythm', name: 'إيقاع الإنجاز', desc: 'مؤقت عمل عميق وروتين يومي' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
-    window.appState.activeWidgets = ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-glowup'];
+    window.appState.activeWidgets = ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-rhythm'];
   }
 
   const active = window.appState.activeWidgets;
@@ -79,7 +79,6 @@ window.renderActiveWidgets = function() {
       if(!info) return '';
       return `
         <div class="app-icon-card" onclick="window.openPage('${wId}')">
-          <div class="app-icon" style="font-size: 24px; margin-bottom: 8px;">${info.icon}</div>
           <div class="app-icon-title">${info.name}</div>
         </div>
       `;
@@ -109,7 +108,7 @@ window.openPage = function(wId) {
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
       if (wId === 'widget-habits' && window.renderLists) window.renderLists();
-      if (wId === 'widget-glowup' && window.renderGlowUp) window.renderGlowUp();
+      if (wId === 'widget-rhythm' && window.renderRoutines) window.renderRoutines();
   } catch(e) {}
 
   const homeBtn = document.getElementById('homeBtnContainer');
@@ -131,14 +130,14 @@ window.goHome = function() {
 
 window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
-    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
-    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
-    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
-    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
-    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
-    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
-    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' },
-    { id: 'widget-glowup', name: 'توازن اليوم', desc: 'مؤشر تتبع العناية والتوازن الشخصي', icon: '⚖️' }
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية' },
+    { id: 'widget-rhythm', name: 'إيقاع الإنجاز', desc: 'مؤقت عمل عميق وروتين يومي' }
   ];
   const active = window.appState.activeWidgets || [];
   const libraryList = document.getElementById('widgetLibraryList');
@@ -148,7 +147,6 @@ window.renderWidgetLibraryModal = function() {
       return `
         <div class="list-item" style="padding: 12px 16px;">
           <div style="display:flex; align-items:center; gap:12px;">
-            <div style="font-size: 1.5rem;">${w.icon}</div>
             <div>
               <div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div>
               <div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div>
@@ -191,38 +189,101 @@ window.closeModal = function(id) {
   }
 };
 
-window.renderGlowUp = function() {
-    const today = window.currentDateStr;
-    const state = window.appState.dailyRecords[today]?.glowUp || { water: 0, food: 0, mind: 0, skin: 0, sport: 0 };
-    const max = 3; 
+// إيقاع الإنجاز (Timer & Routine)
+window.timerInterval = null;
+window.timerTime = 25 * 60;
+window.timerMode = 'work';
 
-    ['water', 'food', 'mind', 'skin', 'sport'].forEach(axis => {
-        const fillEl = document.getElementById(`glow-fill-${axis}`);
-        if (fillEl) {
-            const pct = Math.min(100, (state[axis] / max) * 100);
-            fillEl.style.height = `${pct}%`;
-            if (pct >= 100) fillEl.classList.add('maxed');
-            else fillEl.classList.remove('maxed');
+window.formatTimer = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+};
+
+window.updateTimerDisplay = () => {
+    const d = document.getElementById('timerDisplay');
+    if(d) d.innerText = window.formatTimer(window.timerTime);
+};
+
+window.setTimerMode = (mode) => {
+    window.pauseTimer();
+    window.timerMode = mode;
+    window.timerTime = mode === 'work' ? 25 * 60 : 5 * 60;
+    document.getElementById('mode-work')?.classList.toggle('active', mode === 'work');
+    document.getElementById('mode-break')?.classList.toggle('active', mode === 'break');
+    window.updateTimerDisplay();
+};
+
+window.startTimer = () => {
+    if(window.timerInterval) return;
+    window.timerInterval = setInterval(() => {
+        if(window.timerTime > 0) {
+            window.timerTime--;
+            window.updateTimerDisplay();
+        } else {
+            window.pauseTimer();
+            window.showToast('انتهى الوقت المحدد!');
         }
-    });
+    }, 1000);
 };
 
-window.addGlow = function(axis) {
-    const today = window.currentDateStr;
-    if (!window.appState.dailyRecords[today].glowUp) window.appState.dailyRecords[today].glowUp = { water: 0, food: 0, mind: 0, skin: 0, sport: 0 };
-    
-    if (window.appState.dailyRecords[today].glowUp[axis] < 3) {
-        window.appState.dailyRecords[today].glowUp[axis] += 1;
-        window.renderGlowUp();
-        window.autoSave();
+window.pauseTimer = () => {
+    clearInterval(window.timerInterval);
+    window.timerInterval = null;
+};
+
+window.resetTimer = () => {
+    window.setTimerMode(window.timerMode);
+};
+
+window.renderRoutines = () => {
+    const state = window.appState.dailyRecords[window.currentDateStr] || {};
+    const mList = state.morningRoutine || [];
+    const eList = state.eveningRoutine || [];
+
+    const renderList = (list, type) => list.map((item, idx) => `
+        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px;">
+            <div class="item-left">
+                <div class="checkbox" onclick="window.toggleRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
+                <span style="font-size: 0.85rem;">${item.text}</span>
+            </div>
+            <button class="delete-btn" onclick="window.deleteRoutine('${type}', ${idx})">&times;</button>
+        </li>
+    `).join('');
+
+    document.getElementById('morningRoutineList').innerHTML = renderList(mList, 'morning') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
+    document.getElementById('eveningRoutineList').innerHTML = renderList(eList, 'evening') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
+};
+
+window.addRoutine = (type) => {
+    const input = document.getElementById(type === 'morning' ? 'newMorningTask' : 'newEveningTask');
+    const val = input.value.trim();
+    if(!val) return;
+    const state = window.appState.dailyRecords[window.currentDateStr];
+    if(type === 'morning') {
+        if(!state.morningRoutine) state.morningRoutine = [];
+        state.morningRoutine.push({text: val, done: false});
     } else {
-        window.showToast('مكتمل لهذا اليوم!');
+        if(!state.eveningRoutine) state.eveningRoutine = [];
+        state.eveningRoutine.push({text: val, done: false});
     }
+    input.value = '';
+    window.renderRoutines();
+    window.autoSave();
 };
 
-window.resetGlowUp = function() {
-    const today = window.currentDateStr;
-    window.appState.dailyRecords[today].glowUp = { water: 0, food: 0, mind: 0, skin: 0, sport: 0 };
-    window.renderGlowUp();
+window.toggleRoutine = (type, idx) => {
+    const state = window.appState.dailyRecords[window.currentDateStr];
+    const list = type === 'morning' ? state.morningRoutine : state.eveningRoutine;
+    list[idx].done = !list[idx].done;
+    window.renderRoutines();
+    window.autoSave();
+};
+
+window.deleteRoutine = (type, idx) => {
+    const state = window.appState.dailyRecords[window.currentDateStr];
+    const list = type === 'morning' ? state.morningRoutine : state.eveningRoutine;
+    list.splice(idx, 1);
+    window.renderRoutines();
     window.autoSave();
 };
