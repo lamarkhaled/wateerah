@@ -16,13 +16,13 @@ window.switchAuthView = function(view) {
 
   if (view === 'login') {
     loginView.style.display = 'block';
-    if(sub) sub.innerText = 'سجلي دخولك للوصول إلى مساحتك الخاصة';
+    if(sub) sub.innerText = 'سجل دخولك للوصول إلى مساحتك الخاصة';
   } else if (view === 'register') {
     regView.style.display = 'block';
-    if(sub) sub.innerText = 'أنشئي حسابك الجديد لتبدئي الترتيب';
+    if(sub) sub.innerText = 'أنشئ حسابك الجديد لتبدأ الترتيب';
   } else if (view === 'reset') {
     resetView.style.display = 'block';
-    if(sub) sub.innerText = 'أدخلي بريدك لإرسال رابط الاستعادة';
+    if(sub) sub.innerText = 'أدخل بريدك لإرسال رابط الاستعادة';
   }
 };
 
@@ -75,7 +75,7 @@ window.setupPricingModal = function() {
     const det = document.getElementById('subActiveDetails'); 
     
     if (isLifetime) {
-        if(daysRem) daysRem.innerText = `اشتراك مدى الحياة ♾️`;
+        if(daysRem) daysRem.innerText = `اشتراك مدى الحياة`;
         if(pbBg) pbBg.style.display = 'none';
         if(det) det.innerHTML = `الباقة: <strong>${window.userProfile.planType}</strong><br>تاريخ الانتهاء: <strong>صلاحية دائمة</strong>`;
     } else {
@@ -104,11 +104,11 @@ window.handleRegister = async () => {
     await signOut(auth); localStorage.removeItem('wateerah_local_state');
     const cred = await createUserWithEmailAndPassword(auth, email, pass); 
     
-    window.userProfile = { name: name || 'صديقنا', isPro: false, planType: 'الباقة الأساسية', trialUsed: false, totalSubDays: 0, expiryDate: '' };
+    window.userProfile = { name: name || 'مستخدم', isPro: false, planType: 'الباقة الأساسية', trialUsed: false, totalSubDays: 0, expiryDate: '' };
     window.appState = {
       hasStarted: true, theme: 'default', 
-      activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'], 
-      widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal'],
+      activeWidgets: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-glowup'], 
+      widgetOrder: ['widget-vision', 'widget-kanban', 'widget-business', 'widget-focus', 'widget-habits', 'widget-finance', 'widget-journal', 'widget-glowup'],
       dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
       visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] }
     };
@@ -117,7 +117,7 @@ window.handleRegister = async () => {
     window.showToast('تم التسجيل والدخول بنجاح!');
   } catch(e) { 
     document.getElementById('authModal').style.display = 'flex';
-    window.showToast('حدث خطأ في التسجيل، تأكدي من صحة البريد.'); 
+    window.showToast('حدث خطأ في التسجيل، تأكد من صحة البريد.'); 
   }
 };
 
@@ -177,7 +177,6 @@ window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeIn
         window.userProfile.totalSubDays = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
     }
     
-    // تحويل حالة الكود إلى "مستخدم" وتخزين اسم المستخدم بدلاً من الحذف
     await setDoc(codeRef, { status: 'used', usedBy: auth.currentUser.email, usedByName: window.userProfile.name, usedAt: new Date().toISOString() }, { merge: true });
     
     await window.saveCurrentWateerah(true); window.updateSubscriptionUI();
