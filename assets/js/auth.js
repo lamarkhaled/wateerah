@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const ADMIN_EMAIL = "wateerahapp@gmail.com";
 auth.languageCode = 'ar';
@@ -62,28 +62,34 @@ window.setupPricingModal = function() {
   const unsubView = document.getElementById('pricingViewUnsubscribed');
   const subView = document.getElementById('pricingViewSubscribed');
   const trialBox = document.getElementById('oneTimeTrialBox');
+  const pbBg = document.getElementById('subProgressBarBg');
   
   if (unsubView) unsubView.style.display = isSubscribed ? 'none' : 'block';
   if (subView) subView.style.display = isSubscribed ? 'block' : 'none';
   if (trialBox) trialBox.style.display = (!isSubscribed && !window.userProfile?.trialUsed) ? 'block' : 'none';
 
-  if (isSubscribed && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') {
-    const now = new Date(); now.setHours(0,0,0,0);
-    const expiryDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-')); expiryDate.setHours(0,0,0,0);
-    
-    let diffDays = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays <= 0) return window.updateSubscriptionUI();
-
-    const totalDays = window.userProfile.totalSubDays || 30;
+  if (isSubscribed && window.userProfile.expiryDate) {
+    const isLifetime = window.userProfile.expiryDate === 'دائم';
     const daysRem = document.getElementById('daysRemainingText'); 
-    if(daysRem) daysRem.innerText = `${diffDays} يوم متبقي`;
-    
     const prog = document.getElementById('subProgressBarFill'); 
-    if(prog) prog.style.width = `${Math.min(100, Math.max(0, Math.round((diffDays / totalDays) * 100)))}%`;
-    
     const det = document.getElementById('subActiveDetails'); 
-    if(det) det.innerHTML = `الباقة: <strong>${window.userProfile.planType}</strong><br>تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong>`;
+    
+    if (isLifetime) {
+        if(daysRem) daysRem.innerText = `اشتراك مدى الحياة ♾️`;
+        if(pbBg) pbBg.style.display = 'none';
+        if(det) det.innerHTML = `الباقة: <strong>${window.userProfile.planType}</strong><br>تاريخ الانتهاء: <strong>صلاحية دائمة</strong>`;
+    } else {
+        if(pbBg) pbBg.style.display = 'block';
+        const now = new Date(); now.setHours(0,0,0,0);
+        const expiryDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-')); expiryDate.setHours(0,0,0,0);
+        let diffDays = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 0) return window.updateSubscriptionUI();
+
+        const totalDays = window.userProfile.totalSubDays || 30;
+        if(daysRem) daysRem.innerText = `${diffDays} يوم متبقي`;
+        if(prog) prog.style.width = `${Math.min(100, Math.max(0, Math.round((diffDays / totalDays) * 100)))}%`;
+        if(det) det.innerHTML = `الباقة: <strong>${window.userProfile.planType}</strong><br>تاريخ الانتهاء: <strong>${window.userProfile.expiryDate}</strong>`;
+    }
   }
 };
 
@@ -95,7 +101,6 @@ window.handleRegister = async () => {
 
   try {
     document.getElementById('authModal').style.display = 'none';
-
     await signOut(auth); localStorage.removeItem('wateerah_local_state');
     const cred = await createUserWithEmailAndPassword(auth, email, pass); 
     
@@ -109,7 +114,6 @@ window.handleRegister = async () => {
     };
 
     await setDoc(doc(db, "users", cred.user.uid), { email, profile: window.userProfile, state: window.appState, status: 'نشط', createdAt: new Date().toISOString() });
-    
     window.showToast('تم التسجيل والدخول بنجاح!');
   } catch(e) { 
     document.getElementById('authModal').style.display = 'flex';
@@ -153,22 +157,33 @@ window.activateUserSubscriptionWithCode = async (inputId = 'userActivationCodeIn
   if(!auth.currentUser) return window.showToast('يجب تسجيل الدخول أولاً.');
   try {
     const codeRef = doc(db, "activationCodes", code); const snap = await getDoc(codeRef);
-    if(!snap.exists()) return window.showToast('عذراً، الكود غير صحيح أو مستخدم مسبقاً.');
-    const days = parseInt(snap.data().days) || 30; let startDate = new Date();
+    if(!snap.exists() || snap.data().status === 'used') return window.showToast('عذراً، الكود غير صحيح أو مستخدم مسبقاً.');
     
-    const todayNum = getLocalYYYYMMDD(startDate);
-    if (window.userProfile.isPro && window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') { 
-      const expNum = getLocalYYYYMMDD(new Date(window.userProfile.expiryDate.replace(/\//g, '-')));
-      if (expNum > todayNum) startDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-')); 
+    const data = snap.data();
+    window.userProfile.isPro = true; window.userProfile.planType = 'عضوية نشطة'; 
+
+    if (data.days === 'lifetime') {
+        window.userProfile.expiryDate = 'دائم';
+        window.userProfile.totalSubDays = 9999;
+    } else {
+        const days = parseInt(data.days) || 30; let startDate = new Date();
+        const todayNum = getLocalYYYYMMDD(startDate);
+        if (window.userProfile.expiryDate && window.userProfile.expiryDate !== 'دائم') { 
+          const expNum = getLocalYYYYMMDD(new Date(window.userProfile.expiryDate.replace(/\//g, '-')));
+          if (expNum > todayNum) startDate = new Date(window.userProfile.expiryDate.replace(/\//g, '-')); 
+        }
+        const expiryDate = new Date(startDate); expiryDate.setDate(expiryDate.getDate() + days);
+        window.userProfile.expiryDate = `${expiryDate.getFullYear()}-${String(expiryDate.getMonth() + 1).padStart(2, '0')}-${String(expiryDate.getDate()).padStart(2, '0')}`;
+        window.userProfile.totalSubDays = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
     }
     
-    const expiryDate = new Date(startDate); expiryDate.setDate(expiryDate.getDate() + days);
-    window.userProfile.isPro = true; window.userProfile.planType = 'عضوية نشطة'; 
-    window.userProfile.expiryDate = `${expiryDate.getFullYear()}-${String(expiryDate.getMonth() + 1).padStart(2, '0')}-${String(expiryDate.getDate()).padStart(2, '0')}`;
-    window.userProfile.totalSubDays = Math.ceil((expiryDate - new Date()) / (1000 * 60 * 60 * 24));
+    // تحويل حالة الكود إلى "مستخدم" وتخزين اسم المستخدم بدلاً من الحذف
+    await setDoc(codeRef, { status: 'used', usedBy: auth.currentUser.email, usedByName: window.userProfile.name, usedAt: new Date().toISOString() }, { merge: true });
     
-    await deleteDoc(codeRef); await window.saveCurrentWateerah(true); window.updateSubscriptionUI();
-    if(document.getElementById('userActivationCodeInput')) document.getElementById('userActivationCodeInput').value = ''; if(document.getElementById('userRenewalCodeInput')) document.getElementById('userRenewalCodeInput').value = '';
-    window.openModal('pricingModal'); window.showToast(`تم تمديد الاشتراك لـ ${days} يوم.`);
+    await window.saveCurrentWateerah(true); window.updateSubscriptionUI();
+    if(document.getElementById('userActivationCodeInput')) document.getElementById('userActivationCodeInput').value = ''; 
+    if(document.getElementById('userRenewalCodeInput')) document.getElementById('userRenewalCodeInput').value = '';
+    window.openModal('pricingModal'); 
+    window.showToast(data.days === 'lifetime' ? 'تهانينا! تم تفعيل الاشتراك مدى الحياة.' : `تم تمديد الاشتراك لـ ${data.days} يوم.`);
   } catch(e) { window.showToast('حدث خطأ أثناء تفعيل الكود.'); }
 };
