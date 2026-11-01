@@ -55,7 +55,6 @@
       <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <!-- لوحة تحكم الأدمن المستقلة -->
     <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
       <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -105,7 +104,6 @@
       </div>
     </div>
 
-    <!-- مساحة عمل المستخدم العادي -->
     <div id="mainWorkspace" class="hidden-el">
       <section class="hero-section">
         <div class="greeting-box">
@@ -140,7 +138,6 @@
 
       <div id="pageContainer" style="display: none;">
         
-        <!-- الأهداف -->
         <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div>
@@ -165,7 +162,6 @@
           <div id="corkboardContainer" class="corkboard-surface"></div>
         </div>
 
-        <!-- المهام -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
@@ -192,7 +188,6 @@
           </div>
         </div>
 
-        <!-- الأعمال -->
         <div id="widget-business" class="widget-card col-12 hidden-el" data-widget-id="widget-business">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">استوديو الأعمال</span></div></div>
           <div id="businessSummaryCard"></div>
@@ -257,21 +252,46 @@
           </div>
         </div>
 
-        <!-- التركيز -->
         <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
-            <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
           </div>
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
 
-        <!-- العادات -->
+        <!-- تطبيق الصحة والعناية (الميزة العملية الجديدة) -->
+        <div id="widget-care" class="widget-card col-12 hidden-el" data-widget-id="widget-care">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">الصحة والعناية</span></div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 16px;">
+            <!-- قسم الصحة -->
+            <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color);">
+              <h4 style="margin-bottom: 12px; font-size: 0.95rem;">الصحة والنشاط</h4>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="text" id="newHealthTask" placeholder="شرب لترين ماء، مشي 30 دقيقة..." style="flex:1; padding: 8px; border-radius: 8px;" onkeypress="if(event.key==='Enter') window.addCareRoutine('health')">
+                <button class="btn btn-subtle" onclick="window.addCareRoutine('health')">+</button>
+              </div>
+              <ul id="healthRoutineList" class="item-list"></ul>
+            </div>
+            
+            <!-- قسم العناية (Skin Care) -->
+            <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color);">
+              <h4 style="margin-bottom: 12px; font-size: 0.95rem;">العناية الشخصية (Skin Care)</h4>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="text" id="newSkinTask" placeholder="روتين البشرة، غسول، مرطب..." style="flex:1; padding: 8px; border-radius: 8px;" onkeypress="if(event.key==='Enter') window.addCareRoutine('skin')">
+                <button class="btn btn-subtle" onclick="window.addCareRoutine('skin')">+</button>
+              </div>
+              <ul id="skinRoutineList" class="item-list"></ul>
+            </div>
+          </div>
+        </div>
+
         <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">العادات</span></div>
             <div style="display: flex; gap: 8px; align-items: center;">
-              <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
               <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
             </div>
           </div>
@@ -288,51 +308,8 @@
           <ul id="habitsList" class="item-list"></ul>
         </div>
 
-        <!-- إيقاع الإنجاز (الميزة العملية الجديدة) -->
-        <div id="widget-rhythm" class="widget-card col-12 hidden-el" data-widget-id="widget-rhythm">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">إيقاع الإنجاز</span></div>
-          </div>
-          
-          <div style="text-align: center; margin-bottom: 24px; padding: 24px; background: var(--bg-glass-strong); border-radius: 16px; border: 1px solid var(--border-color);">
-            <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">مؤقت العمل العميق</div>
-            <div id="timerDisplay" style="font-size: 3.5rem; font-weight: 700; color: var(--accent-color); font-family: monospace; margin-bottom: 16px;">25:00</div>
-            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
-              <button class="btn btn-primary" onclick="window.startTimer()">بدء</button>
-              <button class="btn btn-subtle" onclick="window.pauseTimer()">إيقاف</button>
-              <button class="btn btn-danger" onclick="window.resetTimer()">إعادة</button>
-            </div>
-            <div style="display: flex; gap: 8px; justify-content: center;">
-              <button class="chip active" id="mode-work" onclick="window.setTimerMode('work')">عمل (25 دقيقة)</button>
-              <button class="chip" id="mode-break" onclick="window.setTimerMode('break')">راحة (5 دقائق)</button>
-            </div>
-          </div>
-          
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-            <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color);">
-              <h4 style="margin-bottom: 12px; font-size: 0.95rem;">روتين الصباح</h4>
-              <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <input type="text" id="newMorningTask" placeholder="إضافة خطوة..." style="flex:1; padding: 8px; border-radius: 8px;" onkeypress="if(event.key==='Enter') window.addRoutine('morning')">
-                <button class="btn btn-subtle" onclick="window.addRoutine('morning')">+</button>
-              </div>
-              <ul id="morningRoutineList" class="item-list"></ul>
-            </div>
-            
-            <div style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px solid var(--border-color);">
-              <h4 style="margin-bottom: 12px; font-size: 0.95rem;">روتين المساء</h4>
-              <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <input type="text" id="newEveningTask" placeholder="إضافة خطوة..." style="flex:1; padding: 8px; border-radius: 8px;" onkeypress="if(event.key==='Enter') window.addRoutine('evening')">
-                <button class="btn btn-subtle" onclick="window.addRoutine('evening')">+</button>
-              </div>
-              <ul id="eveningRoutineList" class="item-list"></ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- المالية -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
-          
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="font-size: 0.95rem; font-weight: 700;">متتبع الدخل</div>
@@ -424,7 +401,6 @@
           </div>
         </div>
 
-        <!-- التدوين -->
         <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
           <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
             <div class="card-title-wrap"><span class="card-title" style="color: var(--accent-color); font-size:1.2rem; font-weight: 700;">التدوين</span></div>
@@ -445,7 +421,6 @@
     </div>
   </main>
 
-  <!-- النوافذ -->
   <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
@@ -533,14 +508,6 @@
       <button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button>
       <h3 style="margin-bottom: 6px;">المكتبة</h3>
       <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    </div>
-  </div>
-
-  <div id="accountHistoryModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
-      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
-      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
-      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
     </div>
   </div>
   
