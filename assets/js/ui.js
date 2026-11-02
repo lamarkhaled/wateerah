@@ -58,14 +58,15 @@ window.renderActiveWidgets = function() {
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
-    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
+    { id: 'widget-budget', name: 'الميزانية الذكية', desc: 'متابعة الدخل والمنصرف', icon: '📈' },
+    { id: 'widget-wishlist', name: 'قائمة الأمنيات', desc: 'تتبع أمنياتك والمشتريات', icon: '🛍️' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
-    window.appState.activeWidgets = ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal'];
+    window.appState.activeWidgets = ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-budget', 'widget-wishlist', 'widget-journal', 'widget-focus', 'widget-habits'];
   }
 
   const active = window.appState.activeWidgets;
@@ -105,7 +106,8 @@ window.openPage = function(wId) {
   }
 
   try {
-      if (wId === 'widget-finance' && window.renderLists) window.renderLists();
+      if (wId === 'widget-budget' && window.renderBudget) window.renderBudget();
+      if (wId === 'widget-wishlist' && window.renderWishlist) window.renderWishlist();
       if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
@@ -138,7 +140,8 @@ window.renderWidgetLibraryModal = function() {
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
-    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
+    { id: 'widget-budget', name: 'الميزانية الذكية', desc: 'متابعة الدخل والمنصرف', icon: '📈' },
+    { id: 'widget-wishlist', name: 'قائمة الأمنيات', desc: 'تتبع أمنياتك والمشتريات', icon: '🛍️' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
@@ -194,7 +197,6 @@ window.closeModal = function(id) {
   }
 };
 
-// --- بروتوكول الصحة والعناية ---
 window.renderCareRoutines = () => {
     const state = window.appState.dailyRecords[window.currentDateStr] || {};
     const hList = state.healthRoutine || [];
@@ -250,7 +252,6 @@ window.deleteCareRoutine = (type, idx) => {
     window.autoSave();
 };
 
-// --- مصفوفة الأولويات ---
 window.renderMatrix = () => {
     if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
     const doEl = document.getElementById('matrix-do');
@@ -299,5 +300,114 @@ window.addMatrixTask = () => {
 window.deleteMatrixTask = (idx) => {
     window.appState.matrixTasks.splice(idx, 1);
     window.renderMatrix();
+    window.autoSave();
+};
+
+window.renderBudget = () => {
+    if (!window.appState.transactions) window.appState.transactions = [];
+    let income = 0, expense = 0;
+    const listHtml = window.appState.transactions.map((tx, idx) => {
+        const amount = parseFloat(tx.amount) || 0;
+        if (tx.type === 'income') income += amount;
+        else expense += amount;
+        const color = tx.type === 'income' ? '#22c55e' : '#ef4444';
+        const sign = tx.type === 'income' ? '+' : '-';
+        return `
+            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px solid var(--border-color); border-radius: 0;">
+                <div class="item-left">
+                    <span style="font-weight: 600;">${tx.title}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="color: ${color}; font-weight: bold; direction: ltr;">${sign}${amount} ر.س</span>
+                    <button class="delete-btn" onclick="window.deleteTransaction(${idx})">&times;</button>
+                </div>
+            </li>
+        `;
+    }).join('');
+
+    const balEl = document.getElementById('budgetBalanceTxt');
+    const incEl = document.getElementById('budgetIncomeTxt');
+    const expEl = document.getElementById('budgetExpenseTxt');
+    const listEl = document.getElementById('transactionsList');
+
+    if (balEl) balEl.innerText = (income - expense).toFixed(2);
+    if (incEl) incEl.innerText = income.toFixed(2);
+    if (expEl) expEl.innerText = expense.toFixed(2);
+    if (listEl) listEl.innerHTML = listHtml || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد عمليات مسجلة</div>';
+};
+
+window.addTransaction = () => {
+    const type = document.getElementById('newTxType').value;
+    const title = document.getElementById('newTxTitle').value.trim();
+    const amount = document.getElementById('newTxAmount').value;
+    if (!title || !amount) return;
+    if (!window.appState.transactions) window.appState.transactions = [];
+    window.appState.transactions.push({ type, title, amount: parseFloat(amount), date: window.currentDateStr });
+    
+    document.getElementById('newTxTitle').value = '';
+    document.getElementById('newTxAmount').value = '';
+    window.renderBudget();
+    window.autoSave();
+};
+
+window.deleteTransaction = (idx) => {
+    window.appState.transactions.splice(idx, 1);
+    window.renderBudget();
+    window.autoSave();
+};
+
+window.renderWishlist = () => {
+    if (!window.appState.wishlist) window.appState.wishlist = [];
+    let total = 0;
+    const priorityColors = { high: '#ef4444', medium: '#f59e0b', low: '#3b82f6' };
+    const priorityLabels = { high: 'قصوى', medium: 'متوسطة', low: 'منخفضة' };
+
+    const listHtml = window.appState.wishlist.map((w, idx) => {
+        const cost = parseFloat(w.cost) || 0;
+        total += cost;
+        const linkHtml = w.link ? `<a href="${w.link}" target="_blank" style="margin-right:8px; font-size:0.75rem; color:var(--accent-color); text-decoration:none;">🔗 الرابط</a>` : '';
+        return `
+            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px solid var(--border-color); border-radius: 0;">
+                <div class="item-left" style="display:flex; flex-direction:column; gap:4px;">
+                    <span style="font-weight: 600;">${w.title}</span>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.7rem; padding:2px 6px; border-radius:8px; background:var(--bg-subtle); color:${priorityColors[w.priority] || '#333'}">${priorityLabels[w.priority] || 'عادية'}</span>
+                        ${linkHtml}
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="font-weight: bold;">${cost} ر.س</span>
+                    <button class="delete-btn" onclick="window.deleteWishlistItem(${idx})">&times;</button>
+                </div>
+            </li>
+        `;
+    }).join('');
+
+    const totalEl = document.getElementById('wishlistTotal');
+    const listEl = document.getElementById('wishlistList');
+    if (totalEl) totalEl.innerText = total.toFixed(2) + ' ر.س';
+    if (listEl) listEl.innerHTML = listHtml || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">القائمة فارغة</div>';
+};
+
+window.addWishlistItem = () => {
+    const title = document.getElementById('newWishTitle').value.trim();
+    const cost = document.getElementById('newWishCost').value;
+    const priority = document.getElementById('newWishPriority').value;
+    const link = document.getElementById('newWishLink').value.trim();
+    if (!title) return;
+
+    if (!window.appState.wishlist) window.appState.wishlist = [];
+    window.appState.wishlist.push({ title, cost: parseFloat(cost)||0, priority, link });
+    
+    document.getElementById('newWishTitle').value = '';
+    document.getElementById('newWishCost').value = '';
+    document.getElementById('newWishLink').value = '';
+    window.renderWishlist();
+    window.autoSave();
+};
+
+window.deleteWishlistItem = (idx) => {
+    window.appState.wishlist.splice(idx, 1);
+    window.renderWishlist();
     window.autoSave();
 };
