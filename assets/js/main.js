@@ -57,6 +57,7 @@ window.loadTodayDate = function() {
   window.appState.habits = daily.habits || [];
   const focusInput = document.getElementById('focusGoalInput');
   if(focusInput) focusInput.value = daily.focusGoal || '';
+  
   if(window.renderLists) window.renderLists();
   if(window.renderNotesList) window.renderNotesList();
   if(window.renderCareRoutines) window.renderCareRoutines();
