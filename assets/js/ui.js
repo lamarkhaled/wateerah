@@ -58,14 +58,14 @@ window.renderActiveWidgets = function() {
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
-    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية، الأمنيات، والبنوك', icon: '💰' },
+    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية والأمنيات والبنوك', icon: '💰' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
-    window.appState.activeWidgets = ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal'];
+    window.appState.activeWidgets = ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal', 'widget-focus', 'widget-habits'];
   }
 
   const active = window.appState.activeWidgets;
@@ -138,7 +138,7 @@ window.renderWidgetLibraryModal = function() {
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
-    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية، الأمنيات والبنوك', icon: '💰' },
+    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية، الأمنيات، والبنوك', icon: '💰' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
@@ -194,13 +194,14 @@ window.closeModal = function(id) {
   }
 };
 
+// --- بروتوكول الصحة والعناية ---
 window.renderCareRoutines = () => {
     const state = window.appState.dailyRecords[window.currentDateStr] || {};
     const hList = state.healthRoutine || [];
     const sList = state.skinRoutine || [];
 
     const renderList = (list, type) => list.map((item, idx) => `
-        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px; background: transparent;">
+        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
             <div class="item-left">
                 <div class="checkbox" onclick="window.toggleCareRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
                 <span style="font-size: 0.85rem;">${item.text}</span>
@@ -249,6 +250,7 @@ window.deleteCareRoutine = (type, idx) => {
     window.autoSave();
 };
 
+// --- مصفوفة الأولويات ---
 window.renderMatrix = () => {
     if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
     const doEl = document.getElementById('matrix-do');
@@ -300,7 +302,7 @@ window.deleteMatrixTask = (idx) => {
     window.autoSave();
 };
 
-// المالية المدمجة
+// --- المالية والميزانية المدمجة (تم التأكد من كل المعرفات هنا) ---
 window.renderBudget = () => {
     if (!window.appState.transactions) window.appState.transactions = [];
     let income = 0, expense = 0;
