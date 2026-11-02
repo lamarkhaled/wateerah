@@ -65,6 +65,7 @@
             </div>
             <button class="btn btn-danger" onclick="window.handleLogout()">خروج للإدارة</button>
         </div>
+        
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
           <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); grid-column: 1 / -1;">
             <h3 style="margin-bottom: 15px;">قاعدة بيانات المستخدمين وإدارة الاشتراكات</h3>
@@ -207,7 +208,7 @@
           </div>
         </div>
 
-        <!-- المهام كانبان -->
+        <!-- المهام المتنقلة -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
@@ -234,7 +235,7 @@
           </div>
         </div>
 
-        <!-- الصحة والعناية -->
+        <!-- بروتوكول الصحة والعناية -->
         <div id="widget-care" class="widget-card col-12 hidden-el" data-widget-id="widget-care">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بروتوكول العناية الشخصية</span></div>
@@ -275,55 +276,45 @@
           </div>
         </div>
 
-        <!-- المالية الشاملة المدمجة -->
+        <!-- المالية الشاملة المدمجة بالكامل -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
           
-          <!-- 1. الميزانية الذكية (الدخل والمصروفات) -->
+          <!-- 1. متتبع الدخل والمصروفات -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">الميزانية الذكية وتتبع العمليات</div>
+              <div style="font-size: 0.95rem; font-weight: 700;">الميزانية وتتبع العمليات</div>
               <button id="addTxPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addTxForm').style.display='block'; this.style.display='none';">+</button>
             </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; text-align: center;">
-              <div style="background: var(--bg-subtle); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">إجمالي الدخل</div>
-                <div id="budgetIncomeTxt" style="font-size: 1.1rem; font-weight: bold; color: #22c55e;">0</div>
-              </div>
-              <div style="background: var(--bg-subtle); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">إجمالي المصروفات</div>
-                <div id="budgetExpenseTxt" style="font-size: 1.1rem; font-weight: bold; color: #ef4444;">0</div>
-              </div>
-              <div style="background: var(--bg-subtle); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">الرصيد المتبقي</div>
-                <div id="budgetBalanceTxt" style="font-size: 1.1rem; font-weight: bold; color: var(--accent-color);">0</div>
-              </div>
-            </div>
-
             <div id="addTxForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                 <strong style="font-size: 0.85rem; color: var(--accent-color);">عملية مالية جديدة</strong>
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addTxForm').style.display='none'; document.getElementById('addTxPlusBtn').style.display='flex';">&times;</button>
               </div>
               <div class="add-row" style="margin-top: 0; align-items: stretch;">
-                <select id="newTxType" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                <select id="newTxType" style="flex:1;">
                   <option value="income">دخل (+)</option>
                   <option value="expense">مصروف (-)</option>
                 </select>
-                <input type="text" id="newTxTitle" placeholder="الوصف (راتب، قهوة...)" style="flex:2;">
+                <input type="text" id="newTxTitle" placeholder="الوصف..." style="flex:2;">
                 <input type="number" id="newTxAmount" placeholder="المبلغ" style="flex:1;">
                 <button class="btn btn-primary" onclick="window.addTransaction()">تسجيل</button>
               </div>
             </div>
-            
             <ul id="transactionsList" class="item-list"></ul>
+            <div id="budgetSummaryCard" style="display: flex; justify-content: space-between; margin-top: 12px; padding: 12px; background: var(--bg-subtle); border-radius: 12px; font-size: 0.85rem; font-weight: bold;">
+                <span style="color: #22c55e;">دخول: <span id="budgetIncomeTxt">0</span></span>
+                <span style="color: #ef4444;">خروج: <span id="budgetExpenseTxt">0</span></span>
+                <span style="color: var(--accent-color);">الصافي: <span id="budgetBalanceTxt">0</span></span>
+            </div>
           </div>
 
           <!-- 2. توزيع الدخل الشهري -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل (خطة الميزانية)</div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل (خطة الراتب)</span>
+              </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 0.85rem;">الدخل المتوقع:</span>
                 <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderLists(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
@@ -333,7 +324,7 @@
             <div id="distributionResults" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;"></div>
           </div>
 
-          <!-- 3. قائمة الأمنيات المتقدمة -->
+          <!-- 3. قائمة الأمنيات -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات (Wishlist)</div>
@@ -347,7 +338,7 @@
               <div class="add-row" style="align-items: stretch; margin-top: 0;">
                 <input type="text" id="newWishTitle" placeholder="الاسم..." style="flex:2;">
                 <input type="number" id="newWishCost" placeholder="السعر" style="flex:1;">
-                <select id="newWishPriority" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                <select id="newWishPriority" style="flex:1;">
                   <option value="high">أولوية قصوى</option>
                   <option value="medium">متوسطة</option>
                   <option value="low">منخفضة</option>
@@ -520,7 +511,6 @@
     </div>
   </main>
 
-  <!-- النوافذ المنبثقة -->
   <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
@@ -594,6 +584,36 @@
       <button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button>
       <h3 style="margin-bottom: 6px;">المكتبة</h3>
       <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+  </div>
+
+  <div id="accountHistoryModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
+      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
+      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
+      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
+    </div>
+  </div>
+  
+  <div id="visionDetailModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
+        <button class="modal-close" style="top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white;" onclick="window.closeModal('visionDetailModal')">&times;</button>
+        <img id="vModalImg" src="" style="width: 100%; height: 200px; object-fit: cover;">
+        <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 id="vModalTitle" style="margin: 0; font-size: 1.25rem;"></h3>
+                <span id="vModalPercentBadge" style="background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">0% مكتمل</span>
+            </div>
+            <div class="progress-bar-bg" style="height: 6px; margin-bottom: 20px;"><div id="vModalProgressBar" class="progress-bar-fill" style="width: 0%;"></div></div>
+            <div class="form-group"><label>تاريخ الهدف</label><input type="date" id="vModalDate" onchange="window.saveVisionModalChanges()"></div>
+            <div class="form-group"><label>خطة التنفيذ</label><textarea id="vModalPlan" rows="3" placeholder="اكتب خطتك هنا..." oninput="window.saveVisionModalChanges()"></textarea></div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">المهام الصغرى</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="vModalNewTaskInput" placeholder="مهمة جديدة..." style="flex: 1;" onkeypress="if(event.key==='Enter') window.addVisionSubTask()"><button class="btn btn-subtle" onclick="window.addVisionSubTask()">إضافة</button></div>
+                <ul id="vModalTasksList" class="item-list"></ul>
+            </div>
+            <button class="btn btn-danger" style="width: 100%; justify-content: center; font-size: 0.85rem;" onclick="window.deleteCurrentVisionItem()">حذف الهدف</button>
+        </div>
     </div>
   </div>
 
