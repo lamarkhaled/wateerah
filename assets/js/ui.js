@@ -58,15 +58,14 @@ window.renderActiveWidgets = function() {
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
-    { id: 'widget-budget', name: 'الميزانية الذكية', desc: 'متابعة الدخل والمنصرف', icon: '📈' },
-    { id: 'widget-wishlist', name: 'قائمة الأمنيات', desc: 'تتبع أمنياتك والمشتريات', icon: '🛍️' },
+    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية، الأمنيات والبنوك', icon: '💰' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
-    window.appState.activeWidgets = ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-budget', 'widget-wishlist', 'widget-journal', 'widget-focus', 'widget-habits'];
+    window.appState.activeWidgets = ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal'];
   }
 
   const active = window.appState.activeWidgets;
@@ -106,8 +105,7 @@ window.openPage = function(wId) {
   }
 
   try {
-      if (wId === 'widget-budget' && window.renderBudget) window.renderBudget();
-      if (wId === 'widget-wishlist' && window.renderWishlist) window.renderWishlist();
+      if (wId === 'widget-finance') { window.renderBudget(); window.renderWishlist(); window.renderLists(); }
       if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
@@ -140,8 +138,7 @@ window.renderWidgetLibraryModal = function() {
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
-    { id: 'widget-budget', name: 'الميزانية الذكية', desc: 'متابعة الدخل والمنصرف', icon: '📈' },
-    { id: 'widget-wishlist', name: 'قائمة الأمنيات', desc: 'تتبع أمنياتك والمشتريات', icon: '🛍️' },
+    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية، الأمنيات والبنوك', icon: '💰' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
@@ -197,16 +194,17 @@ window.closeModal = function(id) {
   }
 };
 
+// --- بروتوكول الصحة والعناية ---
 window.renderCareRoutines = () => {
     const state = window.appState.dailyRecords[window.currentDateStr] || {};
     const hList = state.healthRoutine || [];
     const sList = state.skinRoutine || [];
 
     const renderList = (list, type) => list.map((item, idx) => `
-        <li class="list-item ${item.done ? 'completed' : ''}">
+        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px; background: transparent;">
             <div class="item-left">
                 <div class="checkbox" onclick="window.toggleCareRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
-                <span>${item.text}</span>
+                <span style="font-size: 0.85rem;">${item.text}</span>
             </div>
             <button class="delete-btn" onclick="window.deleteCareRoutine('${type}', ${idx})">&times;</button>
         </li>
@@ -214,8 +212,8 @@ window.renderCareRoutines = () => {
 
     const hEl = document.getElementById('healthRoutineList');
     const sEl = document.getElementById('skinRoutineList');
-    if(hEl) hEl.innerHTML = renderList(hList, 'health');
-    if(sEl) sEl.innerHTML = renderList(sList, 'skin');
+    if(hEl) hEl.innerHTML = renderList(hList, 'health') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
+    if(sEl) sEl.innerHTML = renderList(sList, 'skin') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
 };
 
 window.addCareRoutine = (type) => {
@@ -252,6 +250,7 @@ window.deleteCareRoutine = (type, idx) => {
     window.autoSave();
 };
 
+// --- مصفوفة الأولويات ---
 window.renderMatrix = () => {
     if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
     const doEl = document.getElementById('matrix-do');
@@ -267,8 +266,8 @@ window.renderMatrix = () => {
     window.appState.matrixTasks.forEach((task, idx) => {
         counts[task.type]++;
         const html = `
-            <li class="list-item">
-                <div class="item-left">${task.text}</div>
+            <li class="list-item" style="padding: 6px 12px; margin-bottom: 6px; background: transparent; border: 1px dashed var(--border-color);">
+                <div class="item-left" style="font-size: 0.85rem;">${task.text}</div>
                 <button class="delete-btn" onclick="window.deleteMatrixTask(${idx})">&times;</button>
             </li>
         `;
@@ -303,6 +302,7 @@ window.deleteMatrixTask = (idx) => {
     window.autoSave();
 };
 
+// --- المالية والميزانية المدمجة ---
 window.renderBudget = () => {
     if (!window.appState.transactions) window.appState.transactions = [];
     let income = 0, expense = 0;
@@ -313,12 +313,12 @@ window.renderBudget = () => {
         const color = tx.type === 'income' ? '#22c55e' : '#ef4444';
         const sign = tx.type === 'income' ? '+' : '-';
         return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px solid var(--border-color); border-radius: 0;">
+            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
                 <div class="item-left">
-                    <span style="font-weight: 600;">${tx.title}</span>
+                    <span style="font-weight: 600; font-size:0.85rem;">${tx.title}</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="color: ${color}; font-weight: bold; direction: ltr;">${sign}${amount} ر.س</span>
+                    <span style="color: ${color}; font-weight: bold; direction: ltr; font-size:0.85rem;">${sign}${amount} ر.س</span>
                     <button class="delete-btn" onclick="window.deleteTransaction(${idx})">&times;</button>
                 </div>
             </li>
@@ -367,16 +367,16 @@ window.renderWishlist = () => {
         total += cost;
         const linkHtml = w.link ? `<a href="${w.link}" target="_blank" style="margin-right:8px; font-size:0.75rem; color:var(--accent-color); text-decoration:none;">🔗 الرابط</a>` : '';
         return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px solid var(--border-color); border-radius: 0;">
+            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
                 <div class="item-left" style="display:flex; flex-direction:column; gap:4px;">
-                    <span style="font-weight: 600;">${w.title}</span>
+                    <span style="font-weight: 600; font-size:0.85rem;">${w.title}</span>
                     <div style="display:flex; align-items:center; gap:8px;">
                         <span style="font-size:0.7rem; padding:2px 6px; border-radius:8px; background:var(--bg-subtle); color:${priorityColors[w.priority] || '#333'}">${priorityLabels[w.priority] || 'عادية'}</span>
                         ${linkHtml}
                     </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight: bold;">${cost} ر.س</span>
+                    <span style="font-weight: bold; font-size:0.85rem;">${cost} ر.س</span>
                     <button class="delete-btn" onclick="window.deleteWishlistItem(${idx})">&times;</button>
                 </div>
             </li>
