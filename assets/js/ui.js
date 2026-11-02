@@ -54,11 +54,11 @@ window.renderWorkspaceVisibility = function() {
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
-    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء', icon: '📊' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف المهام بذكاء', icon: '📊' },
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
-    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
-    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية والأمنيات والبنوك', icon: '💰' },
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية', icon: '🌿' },
+    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية، الأمنيات، والبنوك', icon: '💰' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
@@ -105,7 +105,7 @@ window.openPage = function(wId) {
   }
 
   try {
-      if (wId === 'widget-finance') { window.renderBudget(); window.renderLists(); window.renderWishlist(); }
+      if (wId === 'widget-finance') { window.renderBudget(); window.renderWishlist(); window.renderLists(); window.renderBanks(); window.renderSubscriptions(); }
       if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
@@ -134,7 +134,7 @@ window.goHome = function() {
 window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
-    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء', icon: '📊' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف المهام بذكاء', icon: '📊' },
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
@@ -192,222 +192,4 @@ window.closeModal = function(id) {
       modal.classList.remove('open');
       if (id === 'authModal') modal.style.display = 'none';
   }
-};
-
-// --- بروتوكول الصحة والعناية ---
-window.renderCareRoutines = () => {
-    const state = window.appState.dailyRecords[window.currentDateStr] || {};
-    const hList = state.healthRoutine || [];
-    const sList = state.skinRoutine || [];
-
-    const renderList = (list, type) => list.map((item, idx) => `
-        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-            <div class="item-left">
-                <div class="checkbox" onclick="window.toggleCareRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
-                <span style="font-size: 0.85rem;">${item.text}</span>
-            </div>
-            <button class="delete-btn" onclick="window.deleteCareRoutine('${type}', ${idx})">&times;</button>
-        </li>
-    `).join('');
-
-    const hEl = document.getElementById('healthRoutineList');
-    const sEl = document.getElementById('skinRoutineList');
-    if(hEl) hEl.innerHTML = renderList(hList, 'health') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
-    if(sEl) sEl.innerHTML = renderList(sList, 'skin') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
-};
-
-window.addCareRoutine = (type) => {
-    const input = document.getElementById(type === 'health' ? 'newHealthTask' : 'newSkinTask');
-    if(!input) return;
-    const val = input.value.trim();
-    if(!val) return;
-    const state = window.appState.dailyRecords[window.currentDateStr];
-    if(type === 'health') {
-        if(!state.healthRoutine) state.healthRoutine = [];
-        state.healthRoutine.push({text: val, done: false});
-    } else {
-        if(!state.skinRoutine) state.skinRoutine = [];
-        state.skinRoutine.push({text: val, done: false});
-    }
-    input.value = '';
-    window.renderCareRoutines();
-    window.autoSave();
-};
-
-window.toggleCareRoutine = (type, idx) => {
-    const state = window.appState.dailyRecords[window.currentDateStr];
-    const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
-    list[idx].done = !list[idx].done;
-    window.renderCareRoutines();
-    window.autoSave();
-};
-
-window.deleteCareRoutine = (type, idx) => {
-    const state = window.appState.dailyRecords[window.currentDateStr];
-    const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
-    list.splice(idx, 1);
-    window.renderCareRoutines();
-    window.autoSave();
-};
-
-// --- مصفوفة الأولويات ---
-window.renderMatrix = () => {
-    if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
-    const doEl = document.getElementById('matrix-do');
-    const scheduleEl = document.getElementById('matrix-schedule');
-    const delegateEl = document.getElementById('matrix-delegate');
-    const dropEl = document.getElementById('matrix-drop');
-
-    if(!doEl) return;
-    doEl.innerHTML = ''; scheduleEl.innerHTML = ''; delegateEl.innerHTML = ''; dropEl.innerHTML = '';
-    
-    let counts = { do: 0, schedule: 0, delegate: 0, drop: 0 };
-
-    window.appState.matrixTasks.forEach((task, idx) => {
-        counts[task.type]++;
-        const html = `
-            <li class="list-item" style="padding: 6px 12px; margin-bottom: 6px; background: transparent; border: 1px dashed var(--border-color);">
-                <div class="item-left" style="font-size: 0.85rem;">${task.text}</div>
-                <button class="delete-btn" onclick="window.deleteMatrixTask(${idx})">&times;</button>
-            </li>
-        `;
-        if (task.type === 'do') doEl.innerHTML += html;
-        if (task.type === 'schedule') scheduleEl.innerHTML += html;
-        if (task.type === 'delegate') delegateEl.innerHTML += html;
-        if (task.type === 'drop') dropEl.innerHTML += html;
-    });
-
-    ['do', 'schedule', 'delegate', 'drop'].forEach(key => {
-        const cEl = document.getElementById(`count-${key}`);
-        if(cEl) cEl.innerText = counts[key];
-    });
-};
-
-window.addMatrixTask = () => {
-    const textEl = document.getElementById('newMatrixTitle');
-    const typeEl = document.getElementById('newMatrixType');
-    if(!textEl.value.trim()) return;
-    
-    if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
-    window.appState.matrixTasks.push({ text: textEl.value.trim(), type: typeEl.value });
-    
-    textEl.value = '';
-    window.renderMatrix();
-    window.autoSave();
-};
-
-window.deleteMatrixTask = (idx) => {
-    window.appState.matrixTasks.splice(idx, 1);
-    window.renderMatrix();
-    window.autoSave();
-};
-
-// --- المالية والميزانية المدمجة (تم التأكد من كل المعرفات هنا) ---
-window.renderBudget = () => {
-    if (!window.appState.transactions) window.appState.transactions = [];
-    let income = 0, expense = 0;
-    const listHtml = window.appState.transactions.map((tx, idx) => {
-        const amount = parseFloat(tx.amount) || 0;
-        if (tx.type === 'income') income += amount;
-        else expense += amount;
-        const color = tx.type === 'income' ? '#22c55e' : '#ef4444';
-        const sign = tx.type === 'income' ? '+' : '-';
-        return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <div class="item-left">
-                    <span style="font-weight: 600; font-size:0.85rem;">${tx.title}</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="color: ${color}; font-weight: bold; direction: ltr; font-size:0.85rem;">${sign}${amount} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteTransaction(${idx})">&times;</button>
-                </div>
-            </li>
-        `;
-    }).join('');
-
-    const balEl = document.getElementById('budgetBalanceTxt');
-    const incEl = document.getElementById('budgetIncomeTxt');
-    const expEl = document.getElementById('budgetExpenseTxt');
-    const listEl = document.getElementById('transactionsList');
-
-    if (balEl) balEl.innerText = (income - expense).toFixed(2);
-    if (incEl) incEl.innerText = income.toFixed(2);
-    if (expEl) expEl.innerText = expense.toFixed(2);
-    if (listEl) listEl.innerHTML = listHtml || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد عمليات مالية مسجلة</div>';
-};
-
-window.addTransaction = () => {
-    const type = document.getElementById('newTxType').value;
-    const title = document.getElementById('newTxTitle').value.trim();
-    const amount = document.getElementById('newTxAmount').value;
-    if (!title || !amount) return;
-    if (!window.appState.transactions) window.appState.transactions = [];
-    window.appState.transactions.push({ type, title, amount: parseFloat(amount), date: window.currentDateStr });
-    
-    document.getElementById('newTxTitle').value = '';
-    document.getElementById('newTxAmount').value = '';
-    window.renderBudget();
-    window.autoSave();
-};
-
-window.deleteTransaction = (idx) => {
-    window.appState.transactions.splice(idx, 1);
-    window.renderBudget();
-    window.autoSave();
-};
-
-window.renderWishlist = () => {
-    if (!window.appState.wishlist) window.appState.wishlist = [];
-    let total = 0;
-    const priorityColors = { high: '#ef4444', medium: '#f59e0b', low: '#3b82f6' };
-    const priorityLabels = { high: 'قصوى', medium: 'متوسطة', low: 'منخفضة' };
-
-    const listHtml = window.appState.wishlist.map((w, idx) => {
-        const cost = parseFloat(w.cost) || 0;
-        total += cost;
-        const linkHtml = w.link ? `<a href="${w.link}" target="_blank" style="margin-right:8px; font-size:0.75rem; color:var(--accent-color); text-decoration:none;">🔗 الرابط</a>` : '';
-        return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <div class="item-left" style="display:flex; flex-direction:column; gap:4px;">
-                    <span style="font-weight: 600; font-size:0.85rem;">${w.title}</span>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.7rem; padding:2px 6px; border-radius:8px; background:var(--bg-subtle); color:${priorityColors[w.priority] || '#333'}">${priorityLabels[w.priority] || 'عادية'}</span>
-                        ${linkHtml}
-                    </div>
-                </div>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight: bold; font-size:0.85rem;">${cost} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteWishlistItem(${idx})">&times;</button>
-                </div>
-            </li>
-        `;
-    }).join('');
-
-    const totalEl = document.getElementById('wishlistTotal');
-    const listEl = document.getElementById('wishlistList');
-    if (totalEl) totalEl.innerText = total.toFixed(2) + ' ر.س';
-    if (listEl) listEl.innerHTML = listHtml || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد أمنيات حالياً</div>';
-};
-
-window.addWishlistItem = () => {
-    const title = document.getElementById('newWishTitle').value.trim();
-    const cost = document.getElementById('newWishCost').value;
-    const priority = document.getElementById('newWishPriority').value;
-    const link = document.getElementById('newWishLink').value.trim();
-    if (!title) return;
-
-    if (!window.appState.wishlist) window.appState.wishlist = [];
-    window.appState.wishlist.push({ title, cost: parseFloat(cost)||0, priority, link });
-    
-    document.getElementById('newWishTitle').value = '';
-    document.getElementById('newWishCost').value = '';
-    document.getElementById('newWishLink').value = '';
-    window.renderWishlist();
-    window.autoSave();
-};
-
-window.deleteWishlistItem = (idx) => {
-    window.appState.wishlist.splice(idx, 1);
-    window.renderWishlist();
-    window.autoSave();
 };
