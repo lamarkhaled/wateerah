@@ -58,7 +58,7 @@ window.renderActiveWidgets = function() {
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
-    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية، الأمنيات والبنوك', icon: '💰' },
+    { id: 'widget-finance', name: 'المالية', desc: 'الميزانية، الأمنيات، والبنوك', icon: '💰' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
@@ -105,7 +105,7 @@ window.openPage = function(wId) {
   }
 
   try {
-      if (wId === 'widget-finance') { window.renderBudget(); window.renderWishlist(); window.renderLists(); }
+      if (wId === 'widget-finance') { window.renderBudget(); window.renderLists(); window.renderWishlist(); }
       if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
@@ -194,7 +194,6 @@ window.closeModal = function(id) {
   }
 };
 
-// --- بروتوكول الصحة والعناية ---
 window.renderCareRoutines = () => {
     const state = window.appState.dailyRecords[window.currentDateStr] || {};
     const hList = state.healthRoutine || [];
@@ -250,7 +249,6 @@ window.deleteCareRoutine = (type, idx) => {
     window.autoSave();
 };
 
-// --- مصفوفة الأولويات ---
 window.renderMatrix = () => {
     if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
     const doEl = document.getElementById('matrix-do');
@@ -302,7 +300,7 @@ window.deleteMatrixTask = (idx) => {
     window.autoSave();
 };
 
-// --- المالية والميزانية المدمجة ---
+// المالية المدمجة
 window.renderBudget = () => {
     if (!window.appState.transactions) window.appState.transactions = [];
     let income = 0, expense = 0;
@@ -333,7 +331,7 @@ window.renderBudget = () => {
     if (balEl) balEl.innerText = (income - expense).toFixed(2);
     if (incEl) incEl.innerText = income.toFixed(2);
     if (expEl) expEl.innerText = expense.toFixed(2);
-    if (listEl) listEl.innerHTML = listHtml || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد عمليات مسجلة</div>';
+    if (listEl) listEl.innerHTML = listHtml || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد عمليات مالية مسجلة</div>';
 };
 
 window.addTransaction = () => {
@@ -386,7 +384,7 @@ window.renderWishlist = () => {
     const totalEl = document.getElementById('wishlistTotal');
     const listEl = document.getElementById('wishlistList');
     if (totalEl) totalEl.innerText = total.toFixed(2) + ' ر.س';
-    if (listEl) listEl.innerHTML = listHtml || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">القائمة فارغة</div>';
+    if (listEl) listEl.innerHTML = listHtml || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد أمنيات حالياً</div>';
 };
 
 window.addWishlistItem = () => {
