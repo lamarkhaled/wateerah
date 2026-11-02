@@ -14,11 +14,11 @@ window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
 window.userProfile = { name: 'مستخدم', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 0, trialUsed: false };
 window.appState = {
   hasStarted: true, theme: 'default', 
-  activeWidgets: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal'], 
-  widgetOrder: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal'],
+  activeWidgets: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-budget', 'widget-wishlist', 'widget-journal', 'widget-focus', 'widget-habits'], 
+  widgetOrder: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-budget', 'widget-wishlist', 'widget-journal', 'widget-focus', 'widget-habits'],
   dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] },
-  matrixTasks: []
+  matrixTasks: [], transactions: []
 };
 
 let saveTimer; 
@@ -61,6 +61,8 @@ window.loadTodayDate = function() {
   if(window.renderNotesList) window.renderNotesList();
   if(window.renderCareRoutines) window.renderCareRoutines();
   if(window.renderMatrix) window.renderMatrix();
+  if(window.renderBudget) window.renderBudget();
+  if(window.renderWishlist) window.renderWishlist();
 };
 
 window.saveProfile = async () => {
