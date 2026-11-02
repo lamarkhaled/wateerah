@@ -55,7 +55,6 @@
       <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <!-- لوحة الإدارة المستقلة -->
     <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
       <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -92,7 +91,6 @@
       </div>
     </div>
 
-    <!-- مساحة عمل المستخدم -->
     <div id="mainWorkspace" class="hidden-el">
       <section class="hero-section">
         <div class="greeting-box">
@@ -140,14 +138,16 @@
             </div>
             <div class="add-row" style="margin-top: 0; align-items: stretch;">
               <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex:2;">
-              <label style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;">
-                رفع صورة <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;">
+              <!-- زر رفع الصورة من الجوال مباشرة -->
+              <label id="visionImgLabel" style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;">
+                <span id="visionImgText">📷 إرفاق صورة</span>
+                <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;" onchange="document.getElementById('visionImgText').innerText='✅ تم الإرفاق'; this.parentElement.style.borderColor='var(--accent-color)'; this.parentElement.style.color='var(--accent-color)';">
               </label>
               <input type="date" id="newVisionDate" style="flex:1;">
               <button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت</button>
             </div>
           </div>
-          <div id="corkboardContainer" class="corkboard-surface"></div>
+          <div id="corkboardContainer" class="corkboard-surface" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;"></div>
         </div>
 
         <!-- مصفوفة الأولويات -->
@@ -163,7 +163,7 @@
             </div>
             <div class="add-row" style="margin-top: 0;">
               <input type="text" id="newMatrixTitle" placeholder="اسم المهمة..." style="flex: 2;">
-              <select id="newMatrixType" style="flex: 1;">
+              <select id="newMatrixType" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
                 <option value="do">عاجل ومهم (نفذ فوراً)</option>
                 <option value="schedule">مهم وغير عاجل (جدولها)</option>
                 <option value="delegate">عاجل وغير مهم (فوضها)</option>
@@ -299,7 +299,7 @@
               </div>
               <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
                 <input type="text" id="newProjectName" placeholder="الاسم..." style="flex:2; min-width:130px;">
-                <select id="newProjectType" style="flex:1; min-width:110px;">
+                <select id="newProjectType" style="flex:1; min-width:110px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
                   <option value="تصميم">تصميم</option>
                   <option value="برمجة">برمجة</option>
                   <option value="منتج/متجر">منتج/متجر</option>
@@ -324,7 +324,7 @@
               </div>
               <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
                 <input type="text" id="newCampaignName" placeholder="الفكرة..." style="flex:2; min-width:140px;">
-                <select id="newCampaignPlatform" style="flex:1; min-width:100px;">
+                <select id="newCampaignPlatform" style="flex:1; min-width:100px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
                   <option value="إنستغرام">إنستغرام</option>
                   <option value="تيك توك">تيك توك</option>
                   <option value="متجر">متجر</option>
@@ -338,11 +338,10 @@
           </div>
         </div>
 
-        <!-- المالية الشاملة المدمجة بالكامل -->
+        <!-- المالية الشاملة -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
           
-          <!-- 1. متتبع الدخل والمصروفات -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="font-size: 0.95rem; font-weight: 700;">الميزانية وتتبع العمليات</div>
@@ -364,29 +363,25 @@
               </div>
             </div>
             <ul id="transactionsList" class="item-list"></ul>
-            <div id="budgetSummaryCard" style="display: flex; justify-content: space-between; margin-top: 12px; padding: 12px; background: var(--bg-subtle); border-radius: 12px; font-size: 0.85rem; font-weight: bold;">
+            <div style="display: flex; justify-content: space-between; margin-top: 12px; padding: 12px; background: var(--bg-subtle); border-radius: 12px; font-size: 0.85rem; font-weight: bold;">
                 <span style="color: #22c55e;">دخول: <span id="budgetIncomeTxt">0</span></span>
                 <span style="color: #ef4444;">خروج: <span id="budgetExpenseTxt">0</span></span>
                 <span style="color: var(--accent-color);">الصافي: <span id="budgetBalanceTxt">0</span></span>
             </div>
           </div>
 
-          <!-- 2. توزيع الدخل الشهري -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل (خطة الراتب)</span>
-              </div>
+              <div style="display: flex; align-items: center; gap: 12px;"><span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل</span></div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 0.85rem;">الدخل المتوقع:</span>
-                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderLists(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
+                <span style="font-size: 0.85rem;">الراتب المتوقع:</span>
+                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderBudget(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
                 <span style="font-size: 0.85rem;">ر.س</span>
               </div>
             </div>
             <div id="distributionResults" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;"></div>
           </div>
 
-          <!-- 3. قائمة الأمنيات المتقدمة -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات (Wishlist)</div>
@@ -416,7 +411,6 @@
             <ul id="wishlistList" class="item-list"></ul>
           </div>
 
-          <!-- 4. البنوك والحسابات -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <div>
@@ -438,10 +432,9 @@
             <div id="banksContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
           </div>
 
-          <!-- 5. الاشتراكات الشهرية -->
           <div style="margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية والفواتير</div>
+              <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية</div>
               <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addSubForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addSubForm" style="display: none; background: var(--bg-subtle); padding: 18px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
@@ -459,6 +452,7 @@
           </div>
         </div>
 
+        <!-- التركيز -->
         <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
@@ -467,6 +461,7 @@
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
 
+        <!-- العادات -->
         <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">العادات</span></div>
@@ -488,6 +483,7 @@
           <ul id="habitsList" class="item-list"></ul>
         </div>
 
+        <!-- التدوين -->
         <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
           <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
             <div class="card-title-wrap"><span class="card-title" style="color: var(--accent-color); font-size:1.2rem; font-weight: 700;">التدوين</span></div>
@@ -508,6 +504,7 @@
     </div>
   </main>
 
+  <!-- النوافذ -->
   <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
@@ -614,9 +611,10 @@
     </div>
   </div>
 
+  <!-- هذا الملف هو المحرك الفعلي لكل المزايا بالداخل (لا تنسي نسخه في ملفك) -->
   <script type="module" src="./assets/js/firebase-config.js"></script>
   <script type="module" src="./assets/js/ui.js"></script>
-  <script type="module" src="./assets/js/widgets.js"></script>
+  <script type="module" src="./assets/js/widgets.js"></script> 
   <script type="module" src="./assets/js/auth.js"></script>
   <script type="module" src="./assets/js/admin.js"></script>
   <script type="module" src="./assets/js/main.js"></script>
