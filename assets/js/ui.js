@@ -54,10 +54,10 @@ window.renderWorkspaceVisibility = function() {
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
-    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء', icon: '📊' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'تصنيف المهام بذكاء', icon: '📊' },
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
-    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع روتين الصحة والبشرة', icon: '🌿' },
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'روتين الصحة والبشرة', icon: '🌿' },
     { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
@@ -134,7 +134,7 @@ window.goHome = function() {
 window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
-    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'تصنيف وإنجاز المهام بذكاء', icon: '📊' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'تصنيف المهام بذكاء', icon: '📊' },
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
