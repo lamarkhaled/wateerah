@@ -53,15 +53,15 @@ window.renderWorkspaceVisibility = function() {
 
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
-    { id: 'widget-vision', name: 'الأهداف' },
-    { id: 'widget-matrix', name: 'مصفوفة الأولويات' },
-    { id: 'widget-kanban', name: 'المهام' },
-    { id: 'widget-business', name: 'الأعمال' },
-    { id: 'widget-care', name: 'الصحة والعناية' },
-    { id: 'widget-finance', name: 'المالية' },
-    { id: 'widget-journal', name: 'التدوين' },
-    { id: 'widget-focus', name: 'التركيز' },
-    { id: 'widget-habits', name: 'العادات' }
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء', icon: '📊' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
   ];
 
   if (!window.appState.activeWidgets || window.appState.activeWidgets.length === 0) {
@@ -80,6 +80,7 @@ window.renderActiveWidgets = function() {
       if(!info) return '';
       return `
         <div class="app-icon-card" onclick="window.openPage('${wId}')">
+          <div class="app-icon" style="font-size: 24px; margin-bottom: 8px;">${info.icon}</div>
           <div class="app-icon-title">${info.name}</div>
         </div>
       `;
@@ -132,15 +133,15 @@ window.goHome = function() {
 
 window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
-    { id: 'widget-vision', name: 'الأهداف' },
-    { id: 'widget-matrix', name: 'مصفوفة الأولويات' },
-    { id: 'widget-kanban', name: 'المهام' },
-    { id: 'widget-business', name: 'الأعمال' },
-    { id: 'widget-care', name: 'الصحة والعناية' },
-    { id: 'widget-finance', name: 'المالية' },
-    { id: 'widget-journal', name: 'التدوين' },
-    { id: 'widget-focus', name: 'التركيز' },
-    { id: 'widget-habits', name: 'العادات' }
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء', icon: '📊' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
   ];
   const active = window.appState.activeWidgets || [];
   const libraryList = document.getElementById('widgetLibraryList');
@@ -150,8 +151,10 @@ window.renderWidgetLibraryModal = function() {
       return `
         <div class="list-item" style="padding: 12px 16px;">
           <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:1.8rem;">${w.icon}</span>
             <div>
               <div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div>
             </div>
           </div>
           ${isAdded ? `<button class="btn btn-danger" onclick="window.removeWidget('${w.id}')">إزالة</button>` : `<button class="btn btn-primary" onclick="window.addWidgetToWorkspace('${w.id}')">تنزيل</button>`}
