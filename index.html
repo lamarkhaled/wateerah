@@ -55,7 +55,7 @@
       <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <!-- لوحة تحكم الإدارة المستقلة -->
+    <!-- لوحة تحكم الإدارة المستقلة (للأدمن فقط) -->
     <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
       <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -79,7 +79,6 @@
                     <option value="30">شهر (1)</option>
                     <option value="60">شهران (2)</option>
                     <option value="90">3 أشهر</option>
-                    <option value="120">4 أشهر</option>
                     <option value="180">6 أشهر</option>
                     <option value="365">سنة كاملة (12)</option>
                     <option value="lifetime">مدى الحياة</option>
@@ -117,7 +116,7 @@
           <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
         </div>
         <div class="toolbar-group" id="toolbarToolsContainer">
-          <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة +</button>
+          <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة</button>
         </div>
         <div class="toolbar-group" id="homeBtnContainer" style="display: none;">
           <button class="btn btn-primary" style="font-weight: 700; padding: 8px 16px;" onclick="window.goHome()">العودة للرئيسية</button>
@@ -138,7 +137,9 @@
         <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div>
-            <button id="addVisionPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addVisionForm').style.display='block'; this.style.display='none';">+</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button id="addVisionPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addVisionForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
           </div>
           <div id="addVisionForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -157,50 +158,7 @@
           <div id="corkboardContainer" class="corkboard-surface"></div>
         </div>
 
-        <!-- مصفوفة الأولويات (الميزة العملية الجديدة) -->
-        <div id="widget-matrix" class="widget-card col-12 hidden-el" data-widget-id="widget-matrix">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">مصفوفة الأولويات</span></div>
-            <button id="addMatrixPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addMatrixForm').style.display='block'; this.style.display='none';">+</button>
-          </div>
-          <div id="addMatrixForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-              <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة جديدة</strong>
-              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addMatrixForm').style.display='none'; document.getElementById('addMatrixPlusBtn').style.display='flex';">&times;</button>
-            </div>
-            <div class="add-row" style="margin-top: 0;">
-              <input type="text" id="newMatrixTitle" placeholder="اسم المهمة..." style="flex: 2;">
-              <select id="newMatrixType" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
-                <option value="do">عاجل ومهم (نفذ فوراً)</option>
-                <option value="schedule">مهم وغير عاجل (جدولها)</option>
-                <option value="delegate">عاجل وغير مهم (فوضها)</option>
-                <option value="drop">غير مهم وغير عاجل (إلغاء)</option>
-              </select>
-              <button class="btn btn-primary" onclick="window.addMatrixTask()">إضافة</button>
-            </div>
-          </div>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px;">
-            <div style="background: var(--bg-subtle); border: 2px solid #22c55e; border-radius: 16px; padding: 16px;">
-                <h4 style="color: #22c55e; margin-bottom: 12px; font-size: 0.95rem; display: flex; justify-content: space-between;">نفّذ فوراً <span id="count-do" style="font-size: 0.8rem; background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px;">0</span></h4>
-                <ul id="matrix-do" class="item-list" style="min-height: 50px;"></ul>
-            </div>
-            <div style="background: var(--bg-subtle); border: 2px solid #3b82f6; border-radius: 16px; padding: 16px;">
-                <h4 style="color: #3b82f6; margin-bottom: 12px; font-size: 0.95rem; display: flex; justify-content: space-between;">جدولها (للمستقبل) <span id="count-schedule" style="font-size: 0.8rem; background: #3b82f6; color: white; padding: 2px 8px; border-radius: 12px;">0</span></h4>
-                <ul id="matrix-schedule" class="item-list" style="min-height: 50px;"></ul>
-            </div>
-            <div style="background: var(--bg-subtle); border: 2px solid #f59e0b; border-radius: 16px; padding: 16px;">
-                <h4 style="color: #f59e0b; margin-bottom: 12px; font-size: 0.95rem; display: flex; justify-content: space-between;">فوّضها (لشخص آخر) <span id="count-delegate" style="font-size: 0.8rem; background: #f59e0b; color: white; padding: 2px 8px; border-radius: 12px;">0</span></h4>
-                <ul id="matrix-delegate" class="item-list" style="min-height: 50px;"></ul>
-            </div>
-            <div style="background: var(--bg-subtle); border: 2px solid #ef4444; border-radius: 16px; padding: 16px;">
-                <h4 style="color: #ef4444; margin-bottom: 12px; font-size: 0.95rem; display: flex; justify-content: space-between;">تجاهلها (مضيعة للوقت) <span id="count-drop" style="font-size: 0.8rem; background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px;">0</span></h4>
-                <ul id="matrix-drop" class="item-list" style="min-height: 50px;"></ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- المهام المتنقلة -->
+        <!-- المهام -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
@@ -224,35 +182,6 @@
             <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div>
             <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div>
             <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div>
-          </div>
-        </div>
-
-        <!-- بروتوكول الصحة والعناية (الميزة العملية المعدلة) -->
-        <div id="widget-care" class="widget-card col-12 hidden-el" data-widget-id="widget-care">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بروتوكول العناية الشخصية</span></div>
-          </div>
-          
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 10px;">
-            <!-- الصحة والنشاط -->
-            <div style="background: var(--bg-subtle); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color);">
-              <h4 style="margin-bottom: 16px; font-size: 1rem; color: var(--text-primary); border-bottom: 2px solid var(--accent-color); padding-bottom: 8px; display: inline-block;">الصحة والنشاط البدني</h4>
-              <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                <input type="text" id="newHealthTask" placeholder="شرب لترين ماء، مشي 30 دقيقة..." style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);" onkeypress="if(event.key==='Enter') window.addCareRoutine('health')">
-                <button class="btn btn-primary" onclick="window.addCareRoutine('health')">إضافة</button>
-              </div>
-              <ul id="healthRoutineList" class="item-list"></ul>
-            </div>
-            
-            <!-- العناية بالبشرة (Skin Care) -->
-            <div style="background: var(--bg-subtle); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color);">
-              <h4 style="margin-bottom: 16px; font-size: 1rem; color: var(--text-primary); border-bottom: 2px solid var(--accent-color); padding-bottom: 8px; display: inline-block;">العناية بالبشرة (Skin Care)</h4>
-              <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                <input type="text" id="newSkinTask" placeholder="غسول، سيروم، واقي شمس..." style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);" onkeypress="if(event.key==='Enter') window.addCareRoutine('skin')">
-                <button class="btn btn-primary" onclick="window.addCareRoutine('skin')">إضافة</button>
-              </div>
-              <ul id="skinRoutineList" class="item-list"></ul>
-            </div>
           </div>
         </div>
 
@@ -325,6 +254,7 @@
         <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
+            <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
           </div>
           <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
         </div>
@@ -332,7 +262,10 @@
         <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">العادات</span></div>
-            <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
+              <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
           </div>
           <div id="addHabitForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -489,6 +422,15 @@
     </div>
   </div>
 
+  <div id="verificationNoticeModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px; text-align: center;">
+      <h3 style="margin-bottom: 14px;">تفعيل البريد الإلكتروني</h3>
+      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">يرجى تفعيل حسابك من بريدك الإلكتروني.</p>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button>
+      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="window.returnToLogin()">العودة لتسجيل الدخول</button>
+    </div>
+  </div>
+
   <div id="pricingModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 450px;">
       <button class="modal-close" onclick="window.closeModal('pricingModal')">&times;</button>
@@ -528,6 +470,14 @@
     </div>
   </div>
 
+  <div id="accountHistoryModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
+      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
+      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
+      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
+    </div>
+  </div>
+  
   <div id="visionDetailModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 400px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
         <button class="modal-close" style="top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white;" onclick="window.closeModal('visionDetailModal')">&times;</button>
