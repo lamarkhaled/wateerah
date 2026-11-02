@@ -55,7 +55,7 @@
       <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <!-- لوحة تحكم الإدارة المستقلة (للأدمن فقط) -->
+    <!-- لوحة تحكم الإدارة المستقلة -->
     <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
       <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -158,6 +158,59 @@
           <div id="corkboardContainer" class="corkboard-surface"></div>
         </div>
 
+        <!-- مصفوفة الأولويات بالشكل النظيف الأصلي -->
+        <div id="widget-matrix" class="widget-card col-12 hidden-el" data-widget-id="widget-matrix">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">مصفوفة الأولويات</span></div>
+            <button id="addMatrixPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addMatrixForm').style.display='block'; this.style.display='none';">+</button>
+          </div>
+          <div id="addMatrixForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة جديدة</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addMatrixForm').style.display='none'; document.getElementById('addMatrixPlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0;">
+              <input type="text" id="newMatrixTitle" placeholder="اسم المهمة..." style="flex: 2;">
+              <select id="newMatrixType" style="flex: 1;">
+                <option value="do">عاجل ومهم (نفذ فوراً)</option>
+                <option value="schedule">مهم وغير عاجل (جدولها)</option>
+                <option value="delegate">عاجل وغير مهم (فوضها)</option>
+                <option value="drop">غير مهم (إلغاء)</option>
+              </select>
+              <button class="btn btn-primary" onclick="window.addMatrixTask()">إضافة</button>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">نفّذ فوراً (عاجل ومهم)</div>
+              <span id="count-do" style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">0</span>
+            </div>
+            <ul id="matrix-do" class="item-list"></ul>
+          </div>
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">جدولها للمستقبل (مهم وغير عاجل)</div>
+              <span id="count-schedule" style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">0</span>
+            </div>
+            <ul id="matrix-schedule" class="item-list"></ul>
+          </div>
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">فوّضها (عاجل وغير مهم)</div>
+              <span id="count-delegate" style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">0</span>
+            </div>
+            <ul id="matrix-delegate" class="item-list"></ul>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">تجاهلها (غير مهم)</div>
+              <span id="count-drop" style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">0</span>
+            </div>
+            <ul id="matrix-drop" class="item-list"></ul>
+          </div>
+        </div>
+
         <!-- المهام -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
           <div class="card-header">
@@ -182,6 +235,49 @@
             <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div>
             <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div>
             <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div>
+          </div>
+        </div>
+
+        <!-- بروتوكول الصحة والعناية بالشكل النظيف الأصلي -->
+        <div id="widget-care" class="widget-card col-12 hidden-el" data-widget-id="widget-care">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بروتوكول العناية الشخصية</span></div>
+          </div>
+          
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">الصحة والنشاط البدني</div>
+              <button id="addHealthPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHealthForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addHealthForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة صحية جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addHealthForm').style.display='none'; document.getElementById('addHealthPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newHealthTask" placeholder="شرب ماء، مشي 30 دقيقة..." onkeypress="if(event.key==='Enter') window.addCareRoutine('health')">
+                <button class="btn btn-primary" onclick="window.addCareRoutine('health')">إضافة</button>
+              </div>
+            </div>
+            <ul id="healthRoutineList" class="item-list"></ul>
+          </div>
+
+          <div style="margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">العناية بالبشرة (Skin Care)</div>
+              <button id="addSkinPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addSkinForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addSkinForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة عناية جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addSkinForm').style.display='none'; document.getElementById('addSkinPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newSkinTask" placeholder="غسول، سيروم، مرطب..." onkeypress="if(event.key==='Enter') window.addCareRoutine('skin')">
+                <button class="btn btn-primary" onclick="window.addCareRoutine('skin')">إضافة</button>
+              </div>
+            </div>
+            <ul id="skinRoutineList" class="item-list"></ul>
           </div>
         </div>
 
@@ -211,7 +307,7 @@
               </div>
               <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
                 <input type="text" id="newProjectName" placeholder="الاسم..." style="flex:2; min-width:130px;">
-                <select id="newProjectType" style="flex:1; min-width:110px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                <select id="newProjectType" style="flex:1; min-width:110px;">
                   <option value="تصميم">تصميم</option>
                   <option value="برمجة">برمجة</option>
                   <option value="منتج/متجر">منتج/متجر</option>
@@ -236,7 +332,7 @@
               </div>
               <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
                 <input type="text" id="newCampaignName" placeholder="الفكرة..." style="flex:2; min-width:140px;">
-                <select id="newCampaignPlatform" style="flex:1; min-width:100px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                <select id="newCampaignPlatform" style="flex:1; min-width:100px;">
                   <option value="إنستغرام">إنستغرام</option>
                   <option value="تيك توك">تيك توك</option>
                   <option value="متجر">متجر</option>
@@ -401,12 +497,14 @@
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
       <p id="authModalSub" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.5;">سجل دخولك للوصول إلى مساحتك</p>
+      
       <div id="viewLogin">
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني</label><input type="email" id="loginEmail" style="padding: 14px; border-radius: 12px;"></div>
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">كلمة المرور</label><input type="password" id="loginPassword" style="padding: 14px; border-radius: 12px;"></div>
         <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleLogin()">دخول</button>
         <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('register')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">إنشاء حساب جديد</a><a href="#" onclick="window.switchAuthView('reset')" style="color: var(--text-secondary); text-decoration: none;">نسيت كلمة المرور؟</a></div>
       </div>
+
       <div id="viewRegister" style="display: none;">
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">الاسم</label><input type="text" id="regName" style="padding: 14px; border-radius: 12px;"></div>
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني</label><input type="email" id="regEmail" style="padding: 14px; border-radius: 12px;"></div>
@@ -414,20 +512,12 @@
         <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleRegister()">التسجيل وبدء الاستخدام</button>
         <div style="font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('login')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">العودة لتسجيل الدخول</a></div>
       </div>
+
       <div id="viewReset" style="display: none;">
         <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني المسجل</label><input type="email" id="resetEmail" style="padding: 14px; border-radius: 12px;"></div>
         <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleResetPassword()">إرسال الرابط</button>
         <div style="font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('login')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">العودة لتسجيل الدخول</a></div>
       </div>
-    </div>
-  </div>
-
-  <div id="verificationNoticeModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 400px; text-align: center;">
-      <h3 style="margin-bottom: 14px;">تفعيل البريد الإلكتروني</h3>
-      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">يرجى تفعيل حسابك من بريدك الإلكتروني.</p>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button>
-      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="window.returnToLogin()">العودة لتسجيل الدخول</button>
     </div>
   </div>
 
@@ -467,36 +557,6 @@
       <button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button>
       <h3 style="margin-bottom: 6px;">المكتبة</h3>
       <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    </div>
-  </div>
-
-  <div id="accountHistoryModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
-      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
-      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
-      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
-    </div>
-  </div>
-  
-  <div id="visionDetailModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 400px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
-        <button class="modal-close" style="top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white;" onclick="window.closeModal('visionDetailModal')">&times;</button>
-        <img id="vModalImg" src="" style="width: 100%; height: 200px; object-fit: cover;">
-        <div style="padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 id="vModalTitle" style="margin: 0; font-size: 1.25rem;"></h3>
-                <span id="vModalPercentBadge" style="background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">0% مكتمل</span>
-            </div>
-            <div class="progress-bar-bg" style="height: 6px; margin-bottom: 20px;"><div id="vModalProgressBar" class="progress-bar-fill" style="width: 0%;"></div></div>
-            <div class="form-group"><label>تاريخ الهدف</label><input type="date" id="vModalDate" onchange="window.saveVisionModalChanges()"></div>
-            <div class="form-group"><label>خطة التنفيذ</label><textarea id="vModalPlan" rows="3" placeholder="اكتب خطتك هنا..." oninput="window.saveVisionModalChanges()"></textarea></div>
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px;">المهام الصغرى</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="vModalNewTaskInput" placeholder="مهمة جديدة..." style="flex: 1;" onkeypress="if(event.key==='Enter') window.addVisionSubTask()"><button class="btn btn-subtle" onclick="window.addVisionSubTask()">إضافة</button></div>
-                <ul id="vModalTasksList" class="item-list"></ul>
-            </div>
-            <button class="btn btn-danger" style="width: 100%; justify-content: center; font-size: 0.85rem;" onclick="window.deleteCurrentVisionItem()">حذف الهدف</button>
-        </div>
     </div>
   </div>
 
