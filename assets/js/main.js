@@ -18,7 +18,7 @@ window.appState = {
   widgetOrder: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal', 'widget-focus', 'widget-habits'],
   dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] },
-  matrixTasks: [], transactions: []
+  matrixTasks: []
 };
 
 let saveTimer; 
@@ -62,8 +62,8 @@ window.loadTodayDate = function() {
   if(window.renderNotesList) window.renderNotesList();
   if(window.renderCareRoutines) window.renderCareRoutines();
   if(window.renderMatrix) window.renderMatrix();
-  if(window.renderBudget) window.renderBudget();
-  if(window.renderWishlist) window.renderWishlist();
+  if(window.renderBanks) window.renderBanks();
+  if(window.renderSubscriptions) window.renderSubscriptions();
 };
 
 window.saveProfile = async () => {
