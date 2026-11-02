@@ -1,608 +1,144 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>وتيرة — صمّم إيقاع يومك</title>
+import { auth, db } from './firebase-config.js';
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const ADMIN_EMAIL = "wateerahapp@gmail.com";
+
+window.unverifiedUserObject = null;
+window.activeVisionIndex = null;
+window.draggedKanbanIndex = null;
+
+window.currentDateObj = new Date();
+window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
+
+window.userProfile = { name: 'مستخدم', planType: 'الباقة الأساسية', isPro: false, expiryDate: '', totalSubDays: 0, trialUsed: false };
+window.appState = {
+  hasStarted: true, theme: 'default', 
+  activeWidgets: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal', 'widget-focus', 'widget-habits'], 
+  widgetOrder: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal', 'widget-focus', 'widget-habits'],
+  dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
+  visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] },
+  matrixTasks: []
+};
+
+let saveTimer; 
+window.autoSave = () => { 
+  clearTimeout(saveTimer); 
+  saveTimer = setTimeout(() => window.saveCurrentWateerah(false), 800); 
+};
+
+window.saveCurrentWateerah = async (manual) => {
+  if (!window.appState.dailyRecords) window.appState.dailyRecords = {};
+  const todayRec = window.appState.dailyRecords[window.currentDateStr] || {};
+  window.appState.dailyRecords[window.currentDateStr] = { 
+      focusGoal: document.getElementById('focusGoalInput')?.value || '', 
+      habits: window.appState.habits || [],
+      healthRoutine: todayRec.healthRoutine || [],
+      skinRoutine: todayRec.skinRoutine || []
+  };
+  localStorage.setItem('wateerah_local_state', JSON.stringify(window.appState));
   
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="وتيرة">
-  <meta name="theme-color" content="#F9F8F6">
+  const user = auth.currentUser;
+  if (!user || user.email === ADMIN_EMAIL) return;
+  try { await setDoc(doc(db, "users", user.uid), { email: user.email, profile: window.userProfile, state: window.appState, updatedAt: new Date().toISOString() }, { merge: true }); } catch(e) {}
+};
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+window.loadTodayDate = function() {
+  window.currentDateObj = new Date();
+  window.currentDateStr = window.currentDateObj.toISOString().slice(0, 10);
+  const liveDate = document.getElementById('liveDateText');
+  if (liveDate) liveDate.innerText = window.currentDateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
   
-  <link rel="stylesheet" href="./assets/css/variables.css">
-  <link rel="stylesheet" href="./assets/css/base.css">
-  <link rel="stylesheet" href="./assets/css/layout.css">
-  <link rel="stylesheet" href="./assets/css/components.css">
-</head>
-<body>
+  const daily = window.appState.dailyRecords[window.currentDateStr] || { focusGoal: '', habits: [], healthRoutine: [], skinRoutine: [] };
+  if (!daily.healthRoutine) daily.healthRoutine = [];
+  if (!daily.skinRoutine) daily.skinRoutine = [];
+  window.appState.dailyRecords[window.currentDateStr] = daily;
+  
+  window.appState.habits = daily.habits || [];
+  const focusInput = document.getElementById('focusGoalInput');
+  if(focusInput) focusInput.value = daily.focusGoal || '';
+  
+  if(window.renderLists) window.renderLists();
+  if(window.renderNotesList) window.renderNotesList();
+  if(window.renderCareRoutines) window.renderCareRoutines();
+  if(window.renderMatrix) window.renderMatrix();
+  if(window.renderBanks) window.renderBanks();
+  if(window.renderSubscriptions) window.renderSubscriptions();
+};
 
-  <div id="toastContainer"></div>
+window.saveProfile = async () => {
+  const nameInput = document.getElementById('profileNameInput');
+  window.userProfile.name = nameInput ? nameInput.value.trim() : 'مستخدم';
+  const headerName = document.getElementById('headerUserName');
+  const headerAvatar = document.getElementById('headerAvatar');
+  if(headerName) headerName.innerText = window.userProfile.name; 
+  if(headerAvatar) headerAvatar.innerText = window.userProfile.name[0];
+  if(window.closeModal) window.closeModal('profileModal'); 
+  window.saveCurrentWateerah(true);
+};
 
-  <header>
-    <div class="header-inner">
-      <div class="brand">
-        <h1>وتيرة<span class="dot">.</span></h1>
-        <p>نظام إدارة الحياة الشخصي</p>
-      </div>
-      <div class="nav-actions">
-        <button id="iosInstallBtn" class="btn btn-subtle" onclick="window.openModal('iosGuideModal')">تثبيت التطبيق</button>
-        <button id="lockScreenBtn" class="btn btn-danger" style="display: none; padding: 6px 12px; font-size: 0.8rem;" onclick="window.handleLogout()">تسجيل خروج</button>
-        <span id="planBadge" class="pro-badge" onclick="window.openModal('pricingModal')">الباقة الأساسية</span>
-        <button id="upgradeBtn" class="btn" onclick="window.openModal('pricingModal')">إدارة الاشتراك</button>
-        <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="window.openModal('profileModal')">
-          <div id="headerAvatar" class="avatar-circle">و</div>
-          <span id="headerUserName">مستخدم</span>
-        </div>
-      </div>
-    </div>
-  </header>
+const savedLocal = localStorage.getItem('wateerah_local_state');
+if (savedLocal) { try { window.appState = { ...window.appState, ...JSON.parse(savedLocal) }; } catch(e) {} }
 
-  <main>
-    <section id="onboardingScreen" class="hidden-el">
-      <div class="time-pill" id="onboardingTimePill">الفترة الصباحية</div>
-      <h2 id="onboardingGreeting">صباح الخير، أهلاً بك في وتيرة</h2>
-      <p>اختر المظهر المفضل لديك للبدء.</p>
-      <div class="theme-selector-grid">
-        <div class="theme-card active" onclick="window.selectOnboardingTheme('default', this)">ورق دافئ</div>
-        <div class="theme-card" onclick="window.selectOnboardingTheme('minimal', this)">صباح نقي</div>
-        <div class="theme-card" onclick="window.selectOnboardingTheme('dark', this)">سكون ليلي</div>
-      </div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
-    </section>
+onAuthStateChanged(auth, async (user) => {
+  const authModal = document.getElementById('authModal');
+  const lockBtn = document.getElementById('lockScreenBtn');
+  const profilePill = document.getElementById('userProfilePill');
+  const planBadge = document.getElementById('planBadge');
+  const upgradeBtn = document.getElementById('upgradeBtn');
+  
+  const mainWorkspace = document.getElementById('mainWorkspace');
+  const adminWorkspace = document.getElementById('adminWorkspace');
+  const onboardingScreen = document.getElementById('onboardingScreen');
 
-    <!-- لوحة الإدارة المستقلة -->
-    <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
-      <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <div>
-                <h2 style="color: var(--accent-color); margin-bottom: 6px; font-size: 2rem;">لوحة الإدارة المركزية</h2>
-                <p style="color: var(--text-secondary); margin: 0;">إدارة المستخدمين، المبيعات، وإصدار التراخيص.</p>
-            </div>
-            <button class="btn btn-danger" onclick="window.handleLogout()">خروج للإدارة</button>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
-          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); grid-column: 1 / -1;">
-            <h3 style="margin-bottom: 15px;">قاعدة بيانات المستخدمين وإدارة الاشتراكات</h3>
-            <ul id="adminUsersList" class="item-list" style="max-height: 400px; overflow-y: auto;"></ul>
-          </div>
-          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color);">
-            <h3 style="margin-bottom: 15px;">إصدار تراخيص جديدة</h3>
-            <div class="form-group" style="display: flex; gap: 8px;">
-                <input type="text" id="adminCodeInputPage" placeholder="الكود (اختياري)..." style="flex: 2; padding: 12px; border-radius: 10px;">
-                <select id="adminDaysSelectPage" style="flex: 1.5; padding: 12px; border-radius: 10px; background: var(--bg-subtle);">
-                    <option value="30">شهر (1)</option>
-                    <option value="90">3 أشهر</option>
-                    <option value="180">6 أشهر</option>
-                    <option value="365">سنة كاملة (12)</option>
-                    <option value="lifetime">مدى الحياة</option>
-                </select>
-            </div>
-            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="window.generateActivationCodePage()">توليد واعتماد الكود</button>
-          </div>
-          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color);">
-            <h3 style="margin-bottom: 15px;">الأكواد النشطة المتاحة للبيع</h3>
-            <ul id="adminCodesListPage" class="item-list" style="max-height: 220px; overflow-y: auto;"></ul>
-          </div>
-          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); grid-column: 1 / -1;">
-            <h3 style="margin-bottom: 15px;">سجل الأكواد المستخدمة</h3>
-            <ul id="adminUsedCodesListPage" class="item-list" style="max-height: 250px; overflow-y: auto;"></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- مساحة عمل المستخدم -->
-    <div id="mainWorkspace" class="hidden-el">
-      <section class="hero-section">
-        <div class="greeting-box">
-          <div id="liveDateText" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-color); margin-bottom: 6px;"></div>
-          <h2 id="welcomeText" style="margin-top: 0;">صباح الخير، أهلاً بك.</h2>
-          <p id="dayNightSubtext">رتّب أولوياتك بهدوء وتركيز.</p>
-        </div>
-      </section>
-
-      <section class="toolbar-ios">
-        <div class="toolbar-group">
-          <span class="toolbar-label">المظهر:</span>
-          <button class="chip active" data-theme-btn="default" onclick="window.setTheme('default', this)">ورق دافئ</button>
-          <button class="chip" data-theme-btn="minimal" onclick="window.setTheme('minimal', this)">صباح نقي</button>
-          <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
-        </div>
-        <div class="toolbar-group" id="toolbarToolsContainer">
-          <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة +</button>
-        </div>
-        <div class="toolbar-group" id="homeBtnContainer" style="display: none;">
-          <button class="btn btn-primary" style="font-weight: 700; padding: 8px 16px;" onclick="window.goHome()">العودة للرئيسية</button>
-        </div>
-      </section>
-
-      <div id="emptyWorkspaceState" class="hidden-el">
-        <h3>لا توجد تطبيقات مثبتة</h3>
-        <p>اضغط على زر المكتبة لتنزيل التطبيقات التي تحتاجها.</p>
-        <button class="btn btn-primary" onclick="window.openModal('addWidgetModal')">فتح المكتبة</button>
-      </div>
-
-      <div id="appLauncherGrid" class="app-launcher-grid"></div>
-
-      <div id="pageContainer" style="display: none;">
+  if (user) {
+    if(authModal) authModal.style.display = 'none'; 
+    if(lockBtn) lockBtn.style.display = 'inline-block';
+    
+    if (user.email === ADMIN_EMAIL) {
+        if(mainWorkspace) { mainWorkspace.classList.add('hidden-el'); mainWorkspace.style.display = 'none'; }
+        if(onboardingScreen) { onboardingScreen.classList.add('hidden-el'); onboardingScreen.style.display = 'none'; }
+        if(adminWorkspace) { adminWorkspace.classList.remove('hidden-el'); adminWorkspace.style.display = 'block'; }
         
-        <!-- الأهداف -->
-        <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div>
-            <button id="addVisionPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addVisionForm').style.display='block'; this.style.display='none';">+</button>
-          </div>
-          <div id="addVisionForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-              <strong style="font-size: 0.85rem; color: var(--accent-color);">هدف جديد</strong>
-              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addVisionForm').style.display='none'; document.getElementById('addVisionPlusBtn').style.display='flex';">&times;</button>
-            </div>
-            <div class="add-row" style="margin-top: 0; align-items: stretch;">
-              <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex:2;">
-              <label id="visionImgLabel" style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;">
-                <span id="visionImgText">📷 إرفاق صورة</span>
-                <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;" onchange="document.getElementById('visionImgText').innerText='✅ تم الإرفاق'; this.parentElement.style.borderColor='var(--accent-color)'; this.parentElement.style.color='var(--accent-color)';">
-              </label>
-              <input type="date" id="newVisionDate" style="flex:1;">
-              <button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت</button>
-            </div>
-          </div>
-          <div id="corkboardContainer" class="corkboard-surface" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;"></div>
-        </div>
+        if(profilePill) profilePill.style.display = 'none';
+        if(planBadge) planBadge.style.display = 'none';
+        if(upgradeBtn) upgradeBtn.style.display = 'none';
+        
+        setTimeout(() => { if(window.loadActiveCodesPage) window.loadActiveCodesPage(); }, 500);
+        return; 
+    }
 
-        <!-- مصفوفة الأولويات -->
-        <div id="widget-matrix" class="widget-card col-12 hidden-el" data-widget-id="widget-matrix">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">مصفوفة الأولويات</span></div>
-            <button id="addMatrixPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addMatrixForm').style.display='block'; this.style.display='none';">+</button>
-          </div>
-          <div id="addMatrixForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-              <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة جديدة</strong>
-              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addMatrixForm').style.display='none'; document.getElementById('addMatrixPlusBtn').style.display='flex';">&times;</button>
-            </div>
-            <div class="add-row" style="margin-top: 0;">
-              <input type="text" id="newMatrixTitle" placeholder="اسم المهمة..." style="flex: 2;">
-              <select id="newMatrixType" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
-                <option value="do">عاجل ومهم (نفذ فوراً)</option>
-                <option value="schedule">مهم وغير عاجل (جدولها)</option>
-                <option value="delegate">عاجل وغير مهم (فوضها)</option>
-                <option value="drop">غير مهم (إلغاء)</option>
-              </select>
-              <button class="btn btn-primary" onclick="window.addMatrixTask()">إضافة</button>
-            </div>
-          </div>
-          
-          <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <strong style="color: var(--danger-color); font-size: 0.95rem;">عاجل ومهم (نفذ فوراً)</strong>
-              <span id="count-do" style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary);">0</span>
-            </div>
-            <ul id="matrix-do" class="item-list"></ul>
-          </div>
-          <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <strong style="color: var(--accent-color); font-size: 0.95rem;">مهم ومجدول (خطط له)</strong>
-              <span id="count-schedule" style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary);">0</span>
-            </div>
-            <ul id="matrix-schedule" class="item-list"></ul>
-          </div>
-          <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <strong style="color: #f59e0b; font-size: 0.95rem;">عاجل وغير مهم (فوّض)</strong>
-              <span id="count-delegate" style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary);">0</span>
-            </div>
-            <ul id="matrix-delegate" class="item-list"></ul>
-          </div>
-          <div style="margin-bottom: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <strong style="color: var(--text-secondary); font-size: 0.95rem;">غير مهم (تجاهل)</strong>
-              <span id="count-drop" style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary);">0</span>
-            </div>
-            <ul id="matrix-drop" class="item-list"></ul>
-          </div>
-        </div>
+    if(adminWorkspace) { adminWorkspace.classList.add('hidden-el'); adminWorkspace.style.display = 'none'; }
+    if(profilePill) profilePill.style.display = 'flex';
+    if(planBadge) planBadge.style.display = 'inline-block';
+    if(upgradeBtn) upgradeBtn.style.display = 'inline-block';
 
-        <!-- المهام (الكانبان) -->
-        <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
-            <button id="addKanbanPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addKanbanForm').style.display='block'; this.style.display='none';">+</button>
-          </div>
-          <div id="addKanbanForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-              <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة جديدة</strong>
-              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addKanbanForm').style.display='none'; document.getElementById('addKanbanPlusBtn').style.display='flex';">&times;</button>
-            </div>
-            <div class="add-row" style="margin-top: 0;">
-              <input type="text" id="newKanbanTitle" placeholder="عنوان المهمة...">
-              <select id="newKanbanStatus"><option value="idea">فكرة</option><option value="scheduled">مجدول</option><option value="progress">تنفيذ</option><option value="done">مكتمل</option></select>
-              <select id="newKanbanPriority"><option value="urgent">عاجل</option><option value="normal" selected>عادي</option><option value="low">غير مهم</option></select>
-              <input type="date" id="newKanbanDate">
-              <button class="btn btn-primary" onclick="window.addKanbanTask()">تأكيد</button>
-            </div>
-          </div>
-          <div class="kanban-grid">
-            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'idea')"><div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div><div class="kanban-cards-wrap" id="col-idea"></div></div>
-            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div>
-            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div>
-            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div>
-          </div>
-        </div>
-
-        <!-- الصحة والعناية -->
-        <div id="widget-care" class="widget-card col-12 hidden-el" data-widget-id="widget-care">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">الصحة والعناية الشخصية</span></div>
-          </div>
-          
-          <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <strong style="font-size: 0.95rem;">الصحة والنشاط البدني</strong>
-              <button id="addHealthPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHealthForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            <div id="addHealthForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة صحية جديدة</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addHealthForm').style.display='none'; document.getElementById('addHealthPlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0;">
-                <input type="text" id="newHealthTask" placeholder="شرب ماء، مشي 30 دقيقة..." onkeypress="if(event.key==='Enter') window.addCareRoutine('health')">
-                <button class="btn btn-primary" onclick="window.addCareRoutine('health')">إضافة</button>
-              </div>
-            </div>
-            <ul id="healthRoutineList" class="item-list"></ul>
-          </div>
-
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <strong style="font-size: 0.95rem;">العناية بالبشرة (Skin Care)</strong>
-              <button id="addSkinPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addSkinForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            <div id="addSkinForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة عناية جديدة</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addSkinForm').style.display='none'; document.getElementById('addSkinPlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0;">
-                <input type="text" id="newSkinTask" placeholder="غسول، سيروم، مرطب..." onkeypress="if(event.key==='Enter') window.addCareRoutine('skin')">
-                <button class="btn btn-primary" onclick="window.addCareRoutine('skin')">إضافة</button>
-              </div>
-            </div>
-            <ul id="skinRoutineList" class="item-list"></ul>
-          </div>
-        </div>
-
-        <!-- المالية الشاملة (الأصلية كما طلبتِ) -->
-        <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
-          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
-          
-          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">متتبع الدخل</div>
-              <button id="addIncomePlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addIncomeForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            <div id="addIncomeForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">مصدر دخل جديد</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addIncomeForm').style.display='none'; document.getElementById('addIncomePlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
-                <input type="text" id="newIncomeName" placeholder="المصدر..." style="flex:2; min-width:120px;">
-                <input type="number" id="newIncomeAmount" placeholder="المبلغ" style="flex:1; min-width:90px;">
-                <input type="date" id="newIncomeDate" style="flex:1.5; min-width:130px;">
-                <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addIncome()">إضافة</button>
-              </div>
-            </div>
-            <div id="incomeSummaryCard"></div>
-            <ul id="incomeSourcesList" class="item-list" style="margin-top: 12px;"></ul>
-          </div>
-
-          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 0.85rem;">الإجمالي:</span>
-                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderLists(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
-                <span style="font-size: 0.85rem;">ر.س</span>
-              </div>
-            </div>
-            <div id="distributionResults" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;"></div>
-          </div>
-
-          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات</div>
-              <button id="addWishPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addWishForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            <div id="addWishForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">أمنية جديدة</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addWishForm').style.display='none'; document.getElementById('addWishPlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="align-items: stretch; margin-top: 0;">
-                <input type="text" id="newWishTitle" placeholder="الاسم..." style="flex:2;">
-                <input type="number" id="newWishCost" placeholder="السعر" style="flex:1;">
-                <button class="btn btn-primary" style="flex:1;" onclick="window.addWishlistItem()">تأكيد</button>
-              </div>
-            </div>
-            <ul id="wishlistList" class="item-list"></ul>
-          </div>
-
-          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <div>
-                <div style="font-size: 0.95rem; font-weight: 700;">البنوك والحسابات</div>
-                <div id="banksTotalOverview" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-top: 4px;">مجموع الأرصدة: 0 ر.س</div>
-              </div>
-              <button id="addBankPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addBankForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            <div id="addBankForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">بنك جديد</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankForm').style.display='none'; document.getElementById('addBankPlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0;">
-                <input type="text" id="newBankName" placeholder="اسم البنك...">
-                <button class="btn btn-primary" onclick="window.addBank()">تأكيد</button>
-              </div>
-            </div>
-            <div id="banksContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
-          </div>
-
-          <div style="margin-bottom: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية</div>
-              <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addSubForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            <div id="addSubForm" style="display: none; background: var(--bg-subtle); padding: 18px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">اشتراك جديد</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addSubForm').style.display='none'; document.getElementById('addSubPlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
-                <input type="text" id="newSubName" placeholder="الاسم..." style="flex:2; min-width: 120px;">
-                <input type="number" id="newSubCost" placeholder="المبلغ" style="flex:1; min-width: 80px;">
-                <button class="btn btn-primary" style="flex:1;" onclick="window.addSubscription()">تأكيد</button>
-              </div>
-            </div>
-            <ul id="subscriptionsList" class="item-list"></ul>
-          </div>
-        </div>
-
-        <!-- الأعمال -->
-        <div id="widget-business" class="widget-card col-12 hidden-el" data-widget-id="widget-business">
-          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">استوديو الأعمال</span></div></div>
-          <div id="businessSummaryCard"></div>
-        </div>
-
-        <div id="businessDetailsPage" class="widget-card col-12 hidden-el" style="display: none;">
-          <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-              <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeBusinessDetails()">الرئيسية</button>
-              <div class="card-title" style="font-size: 1.15rem; font-weight: 700;">المشاريع والحملات</div>
-              <div style="width: 70px;"></div>
-            </div>
-          </div>
-          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">المشاريع والعملاء</div>
-              <button id="addProjectPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addProjectForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            <div id="addProjectForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">مشروع جديد</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addProjectForm').style.display='none'; document.getElementById('addProjectPlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
-                <input type="text" id="newProjectName" placeholder="الاسم..." style="flex:2; min-width:130px;">
-                <select id="newProjectType" style="flex:1; min-width:110px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
-                  <option value="تصميم">تصميم</option>
-                  <option value="برمجة">برمجة</option>
-                  <option value="منتج/متجر">منتج/متجر</option>
-                  <option value="استشارة">استشارة</option>
-                </select>
-                <input type="number" id="newProjectPrice" placeholder="السعر" style="flex:1; min-width:80px;">
-                <input type="date" id="newProjectDate" title="تاريخ التسليم" style="flex:1.2; min-width:110px;">
-                <button class="btn btn-primary" style="flex:1; min-width:80px;" onclick="window.addBusinessProject()">إضافة</button>
-              </div>
-            </div>
-            <ul id="businessProjectsList" class="item-list"></ul>
-          </div>
-          <div style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">الحملات والمحتوى</div>
-              <button id="addCampaignPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addCampaignForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-            <div id="addCampaignForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">حملة جديدة</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addCampaignForm').style.display='none'; document.getElementById('addCampaignPlusBtn').style.display='flex';">&times;</button>
-              </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
-                <input type="text" id="newCampaignName" placeholder="الفكرة..." style="flex:2; min-width:140px;">
-                <select id="newCampaignPlatform" style="flex:1; min-width:100px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
-                  <option value="إنستغرام">إنستغرام</option>
-                  <option value="تيك توك">تيك توك</option>
-                  <option value="متجر">متجر</option>
-                  <option value="إكس">إكس</option>
-                </select>
-                <input type="date" id="newCampaignDate" title="تاريخ النشر" style="flex:1.2; min-width:110px;">
-                <button class="btn btn-primary" style="flex:1; min-width:80px;" onclick="window.addBusinessCampaign()">إضافة</button>
-              </div>
-            </div>
-            <ul id="businessCampaignsList" class="item-list"></ul>
-          </div>
-        </div>
-
-        <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
-            <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
-          </div>
-          <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
-        </div>
-
-        <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
-          <div class="card-header">
-            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">العادات</span></div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
-              <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
-            </div>
-          </div>
-          <div id="addHabitForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-              <strong style="font-size: 0.85rem; color: var(--accent-color);">عادة جديدة</strong>
-              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addHabitForm').style.display='none'; document.getElementById('addHabitPlusBtn').style.display='flex';">&times;</button>
-            </div>
-            <div class="add-row" style="margin-top: 0;">
-              <input type="text" id="newHabitInput" placeholder="أدخل العادة..." onkeypress="if(event.key==='Enter') window.addHabit()">
-              <button class="btn btn-primary" onclick="window.addHabit()">إضافة</button>
-            </div>
-          </div>
-          <ul id="habitsList" class="item-list"></ul>
-        </div>
-
-        <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
-          <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-            <div class="card-title-wrap"><span class="card-title" style="color: var(--accent-color); font-size:1.2rem; font-weight: 700;">التدوين</span></div>
-            <button style="background:none; border:none; color:var(--accent-color); font-size:1rem; font-weight:700; cursor:pointer;" onclick="window.createNewNote()">ملاحظة جديدة</button>
-          </div>
-          <div id="notesListView" style="flex: 1; overflow-y: auto; background: var(--bg-glass-strong); display: block;"></div>
-          <div id="noteEditorView" style="display: none; flex: 1; flex-direction: column; background: var(--bg-glass-strong); padding: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <button style="background:none; border:none; color:var(--accent-color); font-weight:700; cursor:pointer; font-size:1rem;" onclick="window.showNotesList()">العودة</button>
-              <button style="background:none; border:none; color:var(--danger-color); font-size:1rem; cursor:pointer;" onclick="window.deleteCurrentNote()">حذف</button>
-            </div>
-            <div id="currentNoteDate" style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 16px;"></div>
-            <div id="noteContentEditable" class="apple-notes-editor" contenteditable="true" placeholder="ملاحظة جديدة..." oninput="window.autoSaveNote()"></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </main>
-
-  <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
-    <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
-      <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
-      <p id="authModalSub" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.5;">سجل دخولك للوصول إلى مساحتك</p>
-      
-      <div id="viewLogin">
-        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني</label><input type="email" id="loginEmail" style="padding: 14px; border-radius: 12px;"></div>
-        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">كلمة المرور</label><input type="password" id="loginPassword" style="padding: 14px; border-radius: 12px;"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleLogin()">دخول</button>
-        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('register')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">إنشاء حساب جديد</a><a href="#" onclick="window.switchAuthView('reset')" style="color: var(--text-secondary); text-decoration: none;">نسيت كلمة المرور؟</a></div>
-      </div>
-
-      <div id="viewRegister" style="display: none;">
-        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">الاسم</label><input type="text" id="regName" style="padding: 14px; border-radius: 12px;"></div>
-        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني</label><input type="email" id="regEmail" style="padding: 14px; border-radius: 12px;"></div>
-        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">كلمة المرور</label><input type="password" id="regPassword" style="padding: 14px; border-radius: 12px;"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleRegister()">التسجيل وبدء الاستخدام</button>
-        <div style="font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('login')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">العودة لتسجيل الدخول</a></div>
-      </div>
-
-      <div id="viewReset" style="display: none;">
-        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني المسجل</label><input type="email" id="resetEmail" style="padding: 14px; border-radius: 12px;"></div>
-        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleResetPassword()">إرسال الرابط</button>
-        <div style="font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('login')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">العودة لتسجيل الدخول</a></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="verificationNoticeModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 400px; text-align: center;">
-      <h3 style="margin-bottom: 14px;">تفعيل البريد الإلكتروني</h3>
-      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">يرجى تفعيل حسابك من بريدك الإلكتروني.</p>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button>
-      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="window.returnToLogin()">العودة لتسجيل الدخول</button>
-    </div>
-  </div>
-
-  <div id="pricingModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 450px;">
-      <button class="modal-close" onclick="window.closeModal('pricingModal')">&times;</button>
-      <h3 style="margin-bottom: 14px;">إدارة الاشتراك</h3>
-      <div id="pricingViewUnsubscribed">
-         <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">حسابك الحالي على الباقة الأساسية.</p>
-         <div class="form-group"><input type="text" id="userActivationCodeInput" placeholder="أدخل كود التفعيل هنا..." style="padding: 12px; border-radius: 8px;"></div>
-         <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.activateUserSubscriptionWithCode('userActivationCodeInput')">تفعيل الاشتراك</button>
-         <div id="oneTimeTrialBox" style="margin-top: 20px; padding: 15px; border: 1px dashed var(--accent-color); border-radius: 12px; text-align: center;"><button class="btn btn-subtle" onclick="window.activateOneTimeFreeTrial()">تفعيل التجربة المجانية الآن</button></div>
-      </div>
-      <div id="pricingViewSubscribed" style="display: none;">
-         <div id="subActiveDetails" style="font-size: 0.95rem; margin-bottom: 10px; line-height: 1.6;"></div>
-         <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;"><span id="daysRemainingText"></span></div>
-         <div class="progress-bar-bg" id="subProgressBarBg" style="height: 10px; margin-bottom: 20px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 0%;"></div></div>
-         <h4 style="margin-bottom: 10px; font-size: 0.9rem;">تجديد الاشتراك</h4>
-         <div class="form-group" style="display: flex; gap: 8px;"><input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 8px; border-radius: 8px;"><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="profileModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 400px;">
-      <button class="modal-close" onclick="window.closeModal('profileModal')">&times;</button>
-      <h3 style="margin-bottom: 14px;">إعدادات الحساب</h3>
-      <div class="form-group"><label>الاسم</label><input type="text" id="profileNameInput"></div>
-      <div class="form-group"><label>معرف الحساب</label><input type="text" id="profileUidDisplay" readonly style="opacity: 0.7;"></div>
-      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.saveProfile()">حفظ التغييرات</button>
-      <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="window.handleLogout()">تسجيل الخروج</button>
-    </div>
-  </div>
-
-  <div id="addWidgetModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 480px;">
-      <button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button>
-      <h3 style="margin-bottom: 6px;">المكتبة</h3>
-      <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    </div>
-  </div>
-
-  <div id="accountHistoryModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
-      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
-      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
-      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
-    </div>
-  </div>
-  
-  <div id="visionDetailModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 400px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
-        <button class="modal-close" style="top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white;" onclick="window.closeModal('visionDetailModal')">&times;</button>
-        <img id="vModalImg" src="" style="width: 100%; height: 200px; object-fit: cover;">
-        <div style="padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 id="vModalTitle" style="margin: 0; font-size: 1.25rem;"></h3>
-                <span id="vModalPercentBadge" style="background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">0% مكتمل</span>
-            </div>
-            <div class="progress-bar-bg" style="height: 6px; margin-bottom: 20px;"><div id="vModalProgressBar" class="progress-bar-fill" style="width: 0%;"></div></div>
-            <div class="form-group"><label>تاريخ الهدف</label><input type="date" id="vModalDate" onchange="window.saveVisionModalChanges()"></div>
-            <div class="form-group"><label>خطة التنفيذ</label><textarea id="vModalPlan" rows="3" placeholder="اكتب خطتك هنا..." oninput="window.saveVisionModalChanges()"></textarea></div>
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px;">المهام الصغرى</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="vModalNewTaskInput" placeholder="مهمة جديدة..." style="flex: 1;" onkeypress="if(event.key==='Enter') window.addVisionSubTask()"><button class="btn btn-subtle" onclick="window.addVisionSubTask()">إضافة</button></div>
-                <ul id="vModalTasksList" class="item-list"></ul>
-            </div>
-            <button class="btn btn-danger" style="width: 100%; justify-content: center; font-size: 0.85rem;" onclick="window.deleteCurrentVisionItem()">حذف الهدف</button>
-        </div>
-    </div>
-  </div>
-
-  <script type="module" src="./assets/js/firebase-config.js"></script>
-  <script type="module" src="./assets/js/ui.js"></script>
-  <script type="module" src="./assets/js/widgets.js"></script>
-  <script type="module" src="./assets/js/auth.js"></script>
-  <script type="module" src="./assets/js/admin.js"></script>
-  <script type="module" src="./assets/js/main.js"></script>
-
-</body>
-</html>
+    try { 
+      const snap = await getDoc(doc(db, "users", user.uid)); 
+      if(snap.exists()) { 
+        const d = snap.data(); 
+        if(d.profile) window.userProfile = { ...window.userProfile, ...d.profile }; 
+        if(d.state && Object.keys(d.state).length > 0) window.appState = { ...window.appState, ...d.state };
+      } 
+    } catch(e) {}
+    
+    if (window.updateSubscriptionUI) window.updateSubscriptionUI();
+    const headerName = document.getElementById('headerUserName');
+    const headerAvatar = document.getElementById('headerAvatar');
+    const profileNameInput = document.getElementById('profileNameInput');
+    
+    if(headerName) headerName.innerText = window.userProfile.name || user.email; 
+    if(headerAvatar) headerAvatar.innerText = (window.userProfile.name || 'م')[0]; 
+    if(profileNameInput) profileNameInput.value = window.userProfile.name || '';
+    
+    window.loadTodayDate();
+    if(window.updateDayNightGreeting) window.updateDayNightGreeting(); 
+    if(window.applyTheme) window.applyTheme(window.appState.theme || 'default'); 
+    if(window.renderWorkspaceVisibility) window.renderWorkspaceVisibility();
+  } else {
+    if (authModal) authModal.style.display = 'flex';
+    if(lockBtn) lockBtn.style.display = 'none';
+    if(profilePill) profilePill.style.display = 'none';
+    if(adminWorkspace) adminWorkspace.style.display = 'none';
+  }
+});
