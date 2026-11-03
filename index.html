@@ -55,7 +55,7 @@
       <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <!-- لوحة الإدارة -->
+    <!-- لوحة الإدارة المستقلة -->
     <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
       <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -204,7 +204,7 @@
           </div>
         </div>
 
-        <!-- المهام (الكانبان) -->
+        <!-- المهام المتنقلة -->
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
@@ -272,55 +272,63 @@
           </div>
         </div>
 
-        <!-- المالية الشاملة (تصميم القوائم الشفاف الأصلي) -->
+        <!-- المالية الشاملة (المحسنة) -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
           
+          <!-- متتبع الدخل -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">الميزانية وتتبع العمليات</div>
-              <button id="addTxPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addTxForm').style.display='block'; this.style.display='none';">+</button>
+              <div style="font-size: 0.95rem; font-weight: 700;">متتبع الدخل</div>
+              <button id="addIncomePlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addIncomeForm').style.display='block'; this.style.display='none';">+</button>
             </div>
-            <div id="addTxForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+            <div id="addIncomeForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">عملية مالية جديدة</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addTxForm').style.display='none'; document.getElementById('addTxPlusBtn').style.display='flex';">&times;</button>
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مصدر دخل جديد</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addIncomeForm').style.display='none'; document.getElementById('addIncomePlusBtn').style.display='flex';">&times;</button>
               </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch;">
-                <select id="newTxType" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
-                  <option value="income">دخل (+)</option>
-                  <option value="expense">مصروف (-)</option>
-                </select>
-                <input type="text" id="newTxTitle" placeholder="الوصف..." style="flex:2;">
-                <input type="number" id="newTxAmount" placeholder="المبلغ" style="flex:1;">
-                <button class="btn btn-primary" onclick="window.addTransaction()">تسجيل</button>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
+                <input type="text" id="newIncomeName" placeholder="المصدر..." style="flex:2; min-width:120px;">
+                <input type="number" id="newIncomeAmount" placeholder="المبلغ" style="flex:1; min-width:90px;">
+                <input type="date" id="newIncomeDate" style="flex:1.5; min-width:130px;">
+                <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addIncome()">إضافة</button>
               </div>
             </div>
-            <ul id="transactionsList" class="item-list"></ul>
-            <div id="budgetSummaryCard" style="display: flex; justify-content: space-between; margin-top: 12px; padding: 12px; font-size: 0.85rem; font-weight: bold;">
-                <span style="color: #22c55e;">دخول: <span id="budgetIncomeTxt">0</span></span>
-                <span style="color: #ef4444;">خروج: <span id="budgetExpenseTxt">0</span></span>
-                <span style="color: var(--accent-color);">الصافي: <span id="budgetBalanceTxt">0</span></span>
-            </div>
+            <ul id="incomeSourcesList" class="item-list"></ul>
+            <div id="incomeSummaryCard"></div>
           </div>
 
+          <!-- توزيع الدخل المخصص -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
               <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل</span>
+                <span style="font-size: 0.95rem; font-weight: 700;">تخصيص وتوزيع الدخل</span>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 0.85rem;">الدخل المتوقع:</span>
-                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderBudget(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
+                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderAllocations(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
                 <span style="font-size: 0.85rem;">ر.س</span>
               </div>
             </div>
-            <div id="distributionResults" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;"></div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; text-align: left;">
+              نسبة التوزيع المتبقية: <span id="remainingPercent" style="font-weight:bold; color:var(--accent-color);">100%</span>
+            </div>
+            <div id="allocationResults" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 16px;"></div>
+            
+            <div id="addAllocForm" style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color);">
+              <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; color: var(--text-primary);">إضافة قسم جديد للتوزيع</div>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="newAllocName" placeholder="احتياجات، ادخار..." style="flex:2; padding: 8px; border-radius: 8px;">
+                <input type="number" id="newAllocPercent" placeholder="النسبة %" style="flex:1; padding: 8px; border-radius: 8px;">
+                <button class="btn btn-subtle" onclick="window.addAllocation()">إضافة</button>
+              </div>
+            </div>
           </div>
 
+          <!-- قائمة الأمنيات -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات (Wishlist)</div>
+              <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات</div>
               <button id="addWishPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addWishForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addWishForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
@@ -331,22 +339,13 @@
               <div class="add-row" style="align-items: stretch; margin-top: 0;">
                 <input type="text" id="newWishTitle" placeholder="الاسم..." style="flex:2;">
                 <input type="number" id="newWishCost" placeholder="السعر" style="flex:1;">
-                <select id="newWishPriority" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
-                  <option value="high">أولوية قصوى</option>
-                  <option value="medium">متوسطة</option>
-                  <option value="low">منخفضة</option>
-                </select>
-                <input type="url" id="newWishLink" placeholder="الرابط (اختياري)..." style="flex:2;">
-                <button class="btn btn-primary" onclick="window.addWishlistItem()">إضافة</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="window.addWishlistItem()">تأكيد</button>
               </div>
-            </div>
-            <div style="margin-bottom: 12px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); display:flex; justify-content:space-between;">
-                <span>إجمالي الأمنيات المادية</span>
-                <span id="wishlistTotal" style="color: var(--accent-color);">0 ر.س</span>
             </div>
             <ul id="wishlistList" class="item-list"></ul>
           </div>
 
+          <!-- البنوك والحسابات -->
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <div>
@@ -361,38 +360,54 @@
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankForm').style.display='none'; document.getElementById('addBankPlusBtn').style.display='flex';">&times;</button>
               </div>
               <div class="add-row" style="margin-top: 0;">
-                <input type="text" id="newBankName" placeholder="اسم البنك...">
-                <button class="btn btn-primary" onclick="window.addBank()">تأكيد</button>
+                <input type="text" id="newBankName" placeholder="اسم البنك (الراجحي، الأهلي)...">
+                <button class="btn btn-primary" onclick="window.addBank()">إضافة البنك</button>
               </div>
             </div>
             <div id="banksContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
           </div>
 
+          <!-- الاشتراكات (المتقدمة) -->
           <div style="margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية</div>
-              <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addSubForm').style.display='block'; this.style.display='none';">+</button>
+              <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية والسنوية</div>
+              <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="window.prepareSubscriptionForm(); document.getElementById('addSubForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addSubForm" style="display: none; background: var(--bg-subtle); padding: 18px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                 <strong style="font-size: 0.85rem; color: var(--accent-color);">اشتراك جديد</strong>
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addSubForm').style.display='none'; document.getElementById('addSubPlusBtn').style.display='flex';">&times;</button>
               </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
-                <input type="text" id="newSubName" placeholder="الاسم..." style="flex:2; min-width: 120px;">
-                <input type="number" id="newSubCost" placeholder="المبلغ" style="flex:1; min-width: 80px;">
-                <button class="btn btn-primary" style="flex:1;" onclick="window.addSubscription()">تأكيد</button>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="display: flex; gap: 8px;">
+                      <input type="text" id="newSubName" placeholder="اسم الاشتراك..." style="flex:2; padding: 10px; border-radius: 8px;">
+                      <input type="number" id="newSubCost" placeholder="السعر" style="flex:1; padding: 10px; border-radius: 8px;">
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                      <select id="newSubCycle" style="flex:1; padding: 10px; border-radius: 8px;">
+                          <option value="monthly">شهري</option>
+                          <option value="yearly">سنوي</option>
+                      </select>
+                      <select id="newSubBank" style="flex:1.5; padding: 10px; border-radius: 8px;">
+                          <!-- يتم تعبئتها ديناميكياً بأسماء البنوك -->
+                      </select>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <label style="font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap;">تاريخ البدء:</label>
+                      <input type="date" id="newSubDate" style="flex:1; padding: 10px; border-radius: 8px;">
+                      <button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button>
+                  </div>
               </div>
             </div>
             <ul id="subscriptionsList" class="item-list"></ul>
           </div>
         </div>
 
-        <!-- صفحة تفاصيل البنك (الحسابات والحركة بالتصميم النظيف) -->
+        <!-- صفحة تفاصيل البنك الفرعية -->
         <div id="bankDetailsPage" class="widget-card col-12 hidden-el" style="display: none;">
           <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-              <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeBankDetails()">المالية</button>
+              <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeBankDetails()">عودة للمالية</button>
               <div class="card-title" id="activeBankTitle" style="font-size: 1.15rem; font-weight: 700;">اسم البنك</div>
               <div style="width: 70px;"></div>
             </div>
@@ -405,12 +420,12 @@
             </div>
             <div id="addBankAccountForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">حساب جديد</strong>
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">حساب فرعي جديد</strong>
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankAccountForm').style.display='none'; document.getElementById('addBankAccountPlusBtn').style.display='flex';">&times;</button>
               </div>
               <div class="add-row" style="margin-top: 0;">
-                <input type="text" id="newBankAccountName" placeholder="جاري، ادخار..." style="flex:2;">
-                <input type="number" id="newBankAccountBalance" placeholder="الرصيد" style="flex:1;">
+                <input type="text" id="newBankAccountName" placeholder="جاري، ادخار، استثمار..." style="flex:2;">
+                <input type="number" id="newBankAccountBalance" placeholder="الرصيد الافتتاحي" style="flex:1;">
                 <button class="btn btn-primary" onclick="window.addBankAccount()">إضافة</button>
               </div>
             </div>
@@ -419,20 +434,20 @@
 
           <div style="margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">حركة الحساب (العمليات)</div>
+              <div style="font-size: 0.95rem; font-weight: 700;">حركة الحساب (صادر ووارد)</div>
               <button id="addBankTxPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addBankTxForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addBankTxForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">عملية جديدة</strong>
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">عملية بنكية جديدة</strong>
                 <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankTxForm').style.display='none'; document.getElementById('addBankTxPlusBtn').style.display='flex';">&times;</button>
               </div>
               <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
                 <select id="newBankTxType" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
-                  <option value="in">إيداع (+)</option>
-                  <option value="out">سحب (-)</option>
+                  <option value="in">وارد (+)</option>
+                  <option value="out">صادر (-)</option>
                 </select>
-                <input type="text" id="newBankTxDesc" placeholder="الوصف..." style="flex:2;">
+                <input type="text" id="newBankTxDesc" placeholder="الوصف (راتب، تحويل...)" style="flex:2;">
                 <input type="number" id="newBankTxAmount" placeholder="المبلغ" style="flex:1;">
                 <button class="btn btn-primary" onclick="window.addBankTransaction()">تسجيل</button>
               </div>
@@ -555,6 +570,7 @@
     </div>
   </main>
 
+  <!-- النوافذ -->
   <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
@@ -628,36 +644,6 @@
       <button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button>
       <h3 style="margin-bottom: 6px;">المكتبة</h3>
       <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
-    </div>
-  </div>
-
-  <div id="accountHistoryModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
-      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
-      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
-      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
-    </div>
-  </div>
-  
-  <div id="visionDetailModal" class="modal-overlay">
-    <div class="modal-box" style="max-width: 400px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
-        <button class="modal-close" style="top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white;" onclick="window.closeModal('visionDetailModal')">&times;</button>
-        <img id="vModalImg" src="" style="width: 100%; height: 200px; object-fit: cover;">
-        <div style="padding: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 id="vModalTitle" style="margin: 0; font-size: 1.25rem;"></h3>
-                <span id="vModalPercentBadge" style="background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">0% مكتمل</span>
-            </div>
-            <div class="progress-bar-bg" style="height: 6px; margin-bottom: 20px;"><div id="vModalProgressBar" class="progress-bar-fill" style="width: 0%;"></div></div>
-            <div class="form-group"><label>تاريخ الهدف</label><input type="date" id="vModalDate" onchange="window.saveVisionModalChanges()"></div>
-            <div class="form-group"><label>خطة التنفيذ</label><textarea id="vModalPlan" rows="3" placeholder="اكتب خطتك هنا..." oninput="window.saveVisionModalChanges()"></textarea></div>
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-weight: 600; margin-bottom: 8px;">المهام الصغرى</label>
-                <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="vModalNewTaskInput" placeholder="مهمة جديدة..." style="flex: 1;" onkeypress="if(event.key==='Enter') window.addVisionSubTask()"><button class="btn btn-subtle" onclick="window.addVisionSubTask()">إضافة</button></div>
-                <ul id="vModalTasksList" class="item-list"></ul>
-            </div>
-            <button class="btn btn-danger" style="width: 100%; justify-content: center; font-size: 0.85rem;" onclick="window.deleteCurrentVisionItem()">حذف الهدف</button>
-        </div>
     </div>
   </div>
 
