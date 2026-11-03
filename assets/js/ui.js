@@ -54,11 +54,11 @@ window.renderWorkspaceVisibility = function() {
 window.renderActiveWidgets = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
-    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'تصنيف المهام بذكاء', icon: '📊' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء', icon: '📊' },
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
-    { id: 'widget-care', name: 'الصحة والعناية', desc: 'روتين الصحة والبشرة', icon: '🌿' },
-    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة والبنوك', icon: '💰' },
     { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
     { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
     { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
@@ -105,7 +105,7 @@ window.openPage = function(wId) {
   }
 
   try {
-      if (wId === 'widget-finance') { window.renderLists(); window.renderBanks(); window.renderSubscriptions(); }
+      if (wId === 'widget-finance') { window.renderAllocations(); window.renderBanks(); window.renderLists(); }
       if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
       if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
@@ -134,7 +134,7 @@ window.goHome = function() {
 window.renderWidgetLibraryModal = function() {
   const AVAILABLE_APPS = [
     { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
-    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'تصنيف المهام بذكاء', icon: '📊' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'لتصنيف وإنجاز المهام بذكاء', icon: '📊' },
     { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
     { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
     { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
@@ -192,4 +192,17 @@ window.closeModal = function(id) {
       modal.classList.remove('open');
       if (id === 'authModal') modal.style.display = 'none';
   }
+};
+
+window.prepareSubscriptionForm = function() {
+    const bankSelect = document.getElementById('newSubBank');
+    if(bankSelect) {
+        if(!window.appState.banks || window.appState.banks.length === 0) {
+            bankSelect.innerHTML = '<option value="">الرجاء إضافة بنك أولاً</option>';
+            bankSelect.disabled = true;
+        } else {
+            bankSelect.disabled = false;
+            bankSelect.innerHTML = window.appState.banks.map((b, idx) => `<option value="${idx}">${b.name}</option>`).join('');
+        }
+    }
 };
