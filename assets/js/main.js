@@ -16,7 +16,11 @@ window.appState = {
   hasStarted: true, theme: 'default', 
   activeWidgets: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal', 'widget-focus', 'widget-habits'], 
   widgetOrder: ['widget-vision', 'widget-matrix', 'widget-kanban', 'widget-business', 'widget-care', 'widget-finance', 'widget-journal', 'widget-focus', 'widget-habits'],
-  dailyRecords: {}, notes: [], allocations: [], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
+  dailyRecords: {}, notes: [], allocations: [
+      { label: 'الاحتياجات', percent: 50 },
+      { label: 'الرغبات', percent: 30 },
+      { label: 'الادخار', percent: 20 }
+  ], monthlyExpenses: [], incomeSources: [], incomeTarget: 5000,
   visionBoard: [], kanbanTasks: [], banks: [], wishlist: [], subscriptions: [], business: { projects: [], campaigns: [] },
   matrixTasks: []
 };
@@ -63,6 +67,8 @@ window.loadTodayDate = function() {
   if(window.renderCareRoutines) window.renderCareRoutines();
   if(window.renderMatrix) window.renderMatrix();
   if(window.renderBanks) window.renderBanks();
+  if(window.renderSubscriptions) window.renderSubscriptions();
+  if(window.renderAllocations) window.renderAllocations();
 };
 
 window.saveProfile = async () => {
