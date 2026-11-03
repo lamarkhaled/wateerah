@@ -581,6 +581,30 @@
     </div>
   </main>
 
+  <!-- شريط التنقل السفلي للجوال (Tab Bar) -->
+  <nav class="ios-tab-bar">
+    <button class="tab-btn active" data-tab="home" onclick="window.goHome()">
+      <span class="tab-icon">🏠</span>
+      <span>الرئيسية</span>
+    </button>
+    <button class="tab-btn" data-tab="widget-kanban" onclick="window.openPage('widget-kanban')">
+      <span class="tab-icon">📋</span>
+      <span>المهام</span>
+    </button>
+    <button class="tab-btn" data-tab="widget-finance" onclick="window.openPage('widget-finance')">
+      <span class="tab-icon">💰</span>
+      <span>المالية</span>
+    </button>
+    <button class="tab-btn" data-tab="widget-journal" onclick="window.openPage('widget-journal')">
+      <span class="tab-icon">📝</span>
+      <span>التدوين</span>
+    </button>
+    <button class="tab-btn" data-tab="library" onclick="window.openModal('addWidgetModal')">
+      <span class="tab-icon">🗂️</span>
+      <span>المكتبة</span>
+    </button>
+  </nav>
+
   <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
     <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
       <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
