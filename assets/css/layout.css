@@ -1,19 +1,26 @@
-header { position: sticky; top: 0; z-index: 200; background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios); border-bottom: 1px solid var(--border-color); padding: 14px 24px; }
+header { position: sticky; top: 0; z-index: 200; background: var(--bg-glass); backdrop-filter: var(--blur-ios); -webkit-backdrop-filter: var(--blur-ios); border-bottom: 1px solid var(--border-color); padding: calc(14px + env(safe-area-inset-top)) 24px 14px; }
 .header-inner { max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .brand { display: flex; align-items: baseline; gap: 8px; } .brand h1 { font-size: 1.55rem; font-weight: 700; letter-spacing: -0.5px; } .brand span.dot { color: var(--accent-color); font-size: 2rem; line-height: 0; } .brand p { font-size: 0.8rem; color: var(--text-secondary); margin-right: 6px; padding-right: 10px; border-right: 1px solid var(--border-color); }
 .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-main { max-width: 1240px; margin: 28px auto 0; padding: 0 20px; padding-bottom: 120px; }
+main { max-width: 1240px; margin: 28px auto 0; padding: 0 20px; padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
 .hero-section { margin-bottom: 22px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: stretch; }
 @media (max-width: 850px) { .hero-section { grid-template-columns: 1fr; } }
 .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; } .col-6 { grid-column: span 6; } .col-12 { grid-column: span 12; }
 @media (max-width: 900px) { .col-6 { grid-column: span 12; } }
 
-/* نظام الصفحات للجوال (Tab Bar) المحسن للمنطقة الآمنة */
+.kanban-grid { display: flex; gap: 16px; align-items: flex-start; }
+.kanban-col { flex: 1; min-width: 250px; }
+
+@media (max-width: 768px) {
+  .kanban-grid { overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 16px; -webkit-overflow-scrolling: touch; scrollbar-width: none; margin: 0 -16px; padding: 0 16px 16px 16px; }
+  .kanban-grid::-webkit-scrollbar { display: none; }
+  .kanban-col { min-width: 85%; scroll-snap-align: center; flex-shrink: 0; }
+}
+
 .ios-tab-bar {
   display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
   background: var(--bg-glass-strong); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
-  border-top: 1px solid var(--border-color); 
-  padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); 
+  border-top: 1px solid var(--border-color); padding: 12px 20px calc(24px + env(safe-area-inset-bottom)); 
   justify-content: space-around; align-items: center;
 }
 .tab-btn {
@@ -24,7 +31,6 @@ main { max-width: 1240px; margin: 28px auto 0; padding: 0 20px; padding-bottom: 
 .tab-btn.active { color: var(--accent-color); font-weight: 700; }
 .tab-btn.active .tab-icon { filter: grayscale(0%) opacity(1); transform: scale(1.1); }
 
-/* إخفاء الشبكة على الجوال وعرض الصفحة النشطة فقط وتفعيل الشريط */
 @media (max-width: 768px) {
   .ios-tab-bar { display: flex; }
   .mobile-hidden { display: none !important; }
