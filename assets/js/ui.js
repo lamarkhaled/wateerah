@@ -206,3 +206,70 @@ window.prepareSubscriptionForm = function() {
         }
     }
 };
+
+window.resendVerificationEmailDirectly = async () => { 
+    window.showToast('تم إرسال رابط التفعيل إلى بريدك.'); 
+    window.closeModal('verificationNoticeModal'); 
+};
+
+window.returnToLogin = () => { 
+    window.closeModal('verificationNoticeModal'); 
+    window.switchAuthView('login'); 
+};
+
+window.createNewNote = function() {
+    document.getElementById('notesListView').style.display = 'none';
+    document.getElementById('noteEditorView').style.display = 'flex';
+    document.getElementById('noteContentEditable').innerHTML = '';
+    document.getElementById('currentNoteDate').innerText = new Date().toLocaleDateString('ar-SA');
+    window.activeNoteIndex = -1;
+};
+
+window.showNotesList = function() {
+    document.getElementById('noteEditorView').style.display = 'none';
+    document.getElementById('notesListView').style.display = 'block';
+    if(window.renderNotesList) window.renderNotesList();
+};
+
+window.autoSaveNote = function() {
+    const content = document.getElementById('noteContentEditable').innerHTML;
+    if(!window.appState.notes) window.appState.notes = [];
+    if(window.activeNoteIndex === -1) {
+        window.appState.notes.unshift({ date: new Date().toISOString(), content });
+        window.activeNoteIndex = 0;
+    } else {
+        window.appState.notes[window.activeNoteIndex].content = content;
+    }
+    window.autoSave();
+};
+
+window.deleteCurrentNote = function() {
+    if(window.activeNoteIndex > -1) {
+        window.appState.notes.splice(window.activeNoteIndex, 1);
+        window.autoSave();
+    }
+    window.showNotesList();
+};
+
+window.renderNotesList = function() {
+    if(!window.appState.notes) window.appState.notes = [];
+    const list = document.getElementById('notesListView');
+    if(list) {
+        list.innerHTML = window.appState.notes.map((n, idx) => {
+            const preview = n.content.replace(/<[^>]*>?/gm, '').substring(0, 40) + '...';
+            const d = new Date(n.date).toLocaleDateString('ar-SA');
+            return `<div class="note-list-item" onclick="window.openNote(${idx})">
+                <div style="font-size:0.75rem; color:var(--text-secondary);">${d}</div>
+                <div style="font-size:0.9rem; font-weight:600;">${preview}</div>
+            </div>`;
+        }).join('') || '<div style="padding:20px; text-align:center; color:var(--text-secondary); font-size:0.85rem;">لا توجد ملاحظات</div>';
+    }
+};
+
+window.openNote = function(idx) {
+    window.activeNoteIndex = idx;
+    document.getElementById('notesListView').style.display = 'none';
+    document.getElementById('noteEditorView').style.display = 'flex';
+    document.getElementById('noteContentEditable').innerHTML = window.appState.notes[idx].content;
+    document.getElementById('currentNoteDate').innerText = new Date(window.appState.notes[idx].date).toLocaleDateString('ar-SA');
+};
