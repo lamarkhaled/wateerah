@@ -55,7 +55,7 @@
       <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
     </section>
 
-    <!-- لوحة الإدارة المستقلة -->
+    <!-- لوحة الإدارة -->
     <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
       <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -131,7 +131,7 @@
         <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div>
-            <button id="addVisionPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addVisionForm').style.display='block'; this.style.display='none';">+</button>
+            <button id="addVisionPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addVisionForm').style.display='block'; this.style.display='none';">+</button>
           </div>
           <div id="addVisionForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -140,7 +140,6 @@
             </div>
             <div class="add-row" style="margin-top: 0; align-items: stretch;">
               <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex:2;">
-              <!-- زر الرفع من الجوال -->
               <label id="visionImgLabel" style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;">
                 <span id="visionImgText">📷 إرفاق صورة</span>
                 <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;" onchange="document.getElementById('visionImgText').innerText='✅ تم الإرفاق'; this.parentElement.style.borderColor='var(--accent-color)'; this.parentElement.style.color='var(--accent-color)';">
@@ -152,11 +151,11 @@
           <div id="corkboardContainer" class="corkboard-surface" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;"></div>
         </div>
 
-        <!-- مصفوفة الأولويات المندمجة بتصميم القوائم -->
+        <!-- مصفوفة الأولويات -->
         <div id="widget-matrix" class="widget-card col-12 hidden-el" data-widget-id="widget-matrix">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">مصفوفة الأولويات</span></div>
-            <button id="addMatrixPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addMatrixForm').style.display='block'; this.style.display='none';">+</button>
+            <button id="addMatrixPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addMatrixForm').style.display='block'; this.style.display='none';">+</button>
           </div>
           <div id="addMatrixForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -174,6 +173,7 @@
               <button class="btn btn-primary" onclick="window.addMatrixTask()">إضافة</button>
             </div>
           </div>
+          
           <div style="margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <strong style="color: var(--danger-color); font-size: 0.95rem;">عاجل ومهم (نفذ فوراً)</strong>
@@ -208,7 +208,7 @@
         <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
           <div class="card-header">
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
-            <button id="addKanbanPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addKanbanForm').style.display='block'; this.style.display='none';">+</button>
+            <button id="addKanbanPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addKanbanForm').style.display='block'; this.style.display='none';">+</button>
           </div>
           <div id="addKanbanForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -239,7 +239,7 @@
           <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <strong style="font-size: 0.95rem;">الصحة والنشاط البدني</strong>
-              <button id="addHealthPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addHealthForm').style.display='block'; this.style.display='none';">+</button>
+              <button id="addHealthPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHealthForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addHealthForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -256,7 +256,7 @@
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <strong style="font-size: 0.95rem;">العناية بالبشرة (Skin Care)</strong>
-              <button id="addSkinPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addSkinForm').style.display='block'; this.style.display='none';">+</button>
+              <button id="addSkinPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addSkinForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addSkinForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -272,29 +272,36 @@
           </div>
         </div>
 
-        <!-- المالية الشاملة (نسختك الأصلية بالملّي) -->
+        <!-- المالية الشاملة (تصميم القوائم الشفاف الأصلي) -->
         <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
           <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
           
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">متتبع الدخل</div>
-              <button id="addIncomePlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addIncomeForm').style.display='block'; this.style.display='none';">+</button>
+              <div style="font-size: 0.95rem; font-weight: 700;">الميزانية وتتبع العمليات</div>
+              <button id="addTxPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addTxForm').style.display='block'; this.style.display='none';">+</button>
             </div>
-            <div id="addIncomeForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+            <div id="addTxForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                <strong style="font-size: 0.85rem; color: var(--accent-color);">مصدر دخل جديد</strong>
-                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addIncomeForm').style.display='none'; document.getElementById('addIncomePlusBtn').style.display='flex';">&times;</button>
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">عملية مالية جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addTxForm').style.display='none'; document.getElementById('addTxPlusBtn').style.display='flex';">&times;</button>
               </div>
-              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
-                <input type="text" id="newIncomeName" placeholder="المصدر..." style="flex:2; min-width:120px;">
-                <input type="number" id="newIncomeAmount" placeholder="المبلغ" style="flex:1; min-width:90px;">
-                <input type="date" id="newIncomeDate" style="flex:1.5; min-width:130px;">
-                <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addIncome()">إضافة</button>
+              <div class="add-row" style="margin-top: 0; align-items: stretch;">
+                <select id="newTxType" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                  <option value="income">دخل (+)</option>
+                  <option value="expense">مصروف (-)</option>
+                </select>
+                <input type="text" id="newTxTitle" placeholder="الوصف..." style="flex:2;">
+                <input type="number" id="newTxAmount" placeholder="المبلغ" style="flex:1;">
+                <button class="btn btn-primary" onclick="window.addTransaction()">تسجيل</button>
               </div>
             </div>
-            <div id="incomeSummaryCard"></div>
-            <ul id="incomeSourcesList" class="item-list" style="margin-top: 12px;"></ul>
+            <ul id="transactionsList" class="item-list"></ul>
+            <div id="budgetSummaryCard" style="display: flex; justify-content: space-between; margin-top: 12px; padding: 12px; font-size: 0.85rem; font-weight: bold;">
+                <span style="color: #22c55e;">دخول: <span id="budgetIncomeTxt">0</span></span>
+                <span style="color: #ef4444;">خروج: <span id="budgetExpenseTxt">0</span></span>
+                <span style="color: var(--accent-color);">الصافي: <span id="budgetBalanceTxt">0</span></span>
+            </div>
           </div>
 
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
@@ -303,8 +310,8 @@
                 <span style="font-size: 0.95rem; font-weight: 700;">توزيع الدخل</span>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 0.85rem;">الإجمالي:</span>
-                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderLists(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
+                <span style="font-size: 0.85rem;">الدخل المتوقع:</span>
+                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderBudget(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
                 <span style="font-size: 0.85rem;">ر.س</span>
               </div>
             </div>
@@ -313,8 +320,8 @@
 
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-              <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات</div>
-              <button id="addWishPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addWishForm').style.display='block'; this.style.display='none';">+</button>
+              <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات (Wishlist)</div>
+              <button id="addWishPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addWishForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addWishForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -324,8 +331,18 @@
               <div class="add-row" style="align-items: stretch; margin-top: 0;">
                 <input type="text" id="newWishTitle" placeholder="الاسم..." style="flex:2;">
                 <input type="number" id="newWishCost" placeholder="السعر" style="flex:1;">
-                <button class="btn btn-primary" style="flex:1;" onclick="window.addWishlistItem()">تأكيد</button>
+                <select id="newWishPriority" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                  <option value="high">أولوية قصوى</option>
+                  <option value="medium">متوسطة</option>
+                  <option value="low">منخفضة</option>
+                </select>
+                <input type="url" id="newWishLink" placeholder="الرابط (اختياري)..." style="flex:2;">
+                <button class="btn btn-primary" onclick="window.addWishlistItem()">إضافة</button>
               </div>
+            </div>
+            <div style="margin-bottom: 12px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); display:flex; justify-content:space-between;">
+                <span>إجمالي الأمنيات المادية</span>
+                <span id="wishlistTotal" style="color: var(--accent-color);">0 ر.س</span>
             </div>
             <ul id="wishlistList" class="item-list"></ul>
           </div>
@@ -336,7 +353,7 @@
                 <div style="font-size: 0.95rem; font-weight: 700;">البنوك والحسابات</div>
                 <div id="banksTotalOverview" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-top: 4px;">مجموع الأرصدة: 0 ر.س</div>
               </div>
-              <button id="addBankPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addBankForm').style.display='block'; this.style.display='none';">+</button>
+              <button id="addBankPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addBankForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addBankForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -354,7 +371,7 @@
           <div style="margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية</div>
-              <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addSubForm').style.display='block'; this.style.display='none';">+</button>
+              <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addSubForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addSubForm" style="display: none; background: var(--bg-subtle); padding: 18px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -368,6 +385,59 @@
               </div>
             </div>
             <ul id="subscriptionsList" class="item-list"></ul>
+          </div>
+        </div>
+
+        <!-- صفحة تفاصيل البنك (الحسابات والحركة بالتصميم النظيف) -->
+        <div id="bankDetailsPage" class="widget-card col-12 hidden-el" style="display: none;">
+          <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeBankDetails()">المالية</button>
+              <div class="card-title" id="activeBankTitle" style="font-size: 1.15rem; font-weight: 700;">اسم البنك</div>
+              <div style="width: 70px;"></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">الحسابات الفرعية</div>
+              <button id="addBankAccountPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addBankAccountForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addBankAccountForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">حساب جديد</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankAccountForm').style.display='none'; document.getElementById('addBankAccountPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newBankAccountName" placeholder="جاري، ادخار..." style="flex:2;">
+                <input type="number" id="newBankAccountBalance" placeholder="الرصيد" style="flex:1;">
+                <button class="btn btn-primary" onclick="window.addBankAccount()">إضافة</button>
+              </div>
+            </div>
+            <ul id="bankAccountsList" class="item-list"></ul>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">حركة الحساب (العمليات)</div>
+              <button id="addBankTxPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addBankTxForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addBankTxForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">عملية جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankTxForm').style.display='none'; document.getElementById('addBankTxPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
+                <select id="newBankTxType" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                  <option value="in">إيداع (+)</option>
+                  <option value="out">سحب (-)</option>
+                </select>
+                <input type="text" id="newBankTxDesc" placeholder="الوصف..." style="flex:2;">
+                <input type="number" id="newBankTxAmount" placeholder="المبلغ" style="flex:1;">
+                <button class="btn btn-primary" onclick="window.addBankTransaction()">تسجيل</button>
+              </div>
+            </div>
+            <ul id="bankTransactionsList" class="item-list"></ul>
           </div>
         </div>
 
@@ -388,7 +458,7 @@
           <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <div style="font-size: 0.95rem; font-weight: 700;">المشاريع والعملاء</div>
-              <button id="addProjectPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addProjectForm').style.display='block'; this.style.display='none';">+</button>
+              <button id="addProjectPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addProjectForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addProjectForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -413,7 +483,7 @@
           <div style="margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <div style="font-size: 0.95rem; font-weight: 700;">الحملات والمحتوى</div>
-              <button id="addCampaignPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addCampaignForm').style.display='block'; this.style.display='none';">+</button>
+              <button id="addCampaignPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addCampaignForm').style.display='block'; this.style.display='none';">+</button>
             </div>
             <div id="addCampaignForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -449,7 +519,7 @@
             <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">العادات</span></div>
             <div style="display: flex; gap: 8px; align-items: center;">
               <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
-              <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
+              <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
             </div>
           </div>
           <div id="addHabitForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
@@ -558,6 +628,14 @@
       <button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button>
       <h3 style="margin-bottom: 6px;">المكتبة</h3>
       <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+  </div>
+
+  <div id="accountHistoryModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
+      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
+      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
+      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
     </div>
   </div>
   
