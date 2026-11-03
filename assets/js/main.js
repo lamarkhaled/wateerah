@@ -63,7 +63,6 @@ window.loadTodayDate = function() {
   if(window.renderCareRoutines) window.renderCareRoutines();
   if(window.renderMatrix) window.renderMatrix();
   if(window.renderBanks) window.renderBanks();
-  if(window.renderSubscriptions) window.renderSubscriptions();
 };
 
 window.saveProfile = async () => {
