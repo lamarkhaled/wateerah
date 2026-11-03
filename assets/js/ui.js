@@ -88,17 +88,6 @@ window.renderActiveWidgets = function() {
   }
 };
 
-/* تحديث أزرار التنقل السفلية */
-window.updateMobileTabs = function(activeId) {
-  document.querySelectorAll('.ios-tab-bar .tab-btn').forEach(btn => {
-    if(btn.getAttribute('data-tab') === activeId) {
-        btn.classList.add('active');
-    } else {
-        btn.classList.remove('active');
-    }
-  });
-};
-
 window.openPage = function(wId) {
   const launcher = document.getElementById('appLauncherGrid'); if (launcher) launcher.style.display = 'none';
   const emptyState = document.getElementById('emptyWorkspaceState'); if (emptyState) emptyState.classList.add('hidden-el');
@@ -119,3 +108,101 @@ window.openPage = function(wId) {
       if (wId === 'widget-finance') { window.renderLists(); window.renderBanks(); window.renderAllocations(); window.renderSubscriptions(); }
       if (wId === 'widget-business' && window.renderBusinessWidget) { window.renderBusinessWidget(); window.renderBusinessDetailsView(); }
       if (wId === 'widget-vision' && window.renderVisionBoard) window.renderVisionBoard();
+      if (wId === 'widget-kanban' && window.renderKanbanBoard) window.renderKanbanBoard();
+      if (wId === 'widget-habits' && window.renderLists) window.renderLists();
+      if (wId === 'widget-care' && window.renderCareRoutines) window.renderCareRoutines();
+      if (wId === 'widget-matrix' && window.renderMatrix) window.renderMatrix();
+  } catch(e) {}
+
+  const homeBtn = document.getElementById('homeBtnContainer');
+  const toolsBtn = document.getElementById('toolbarToolsContainer');
+  if (homeBtn) homeBtn.style.display = 'flex';
+  if (toolsBtn) toolsBtn.style.display = 'none';
+};
+
+window.goHome = function() {
+  const pageContainer = document.getElementById('pageContainer'); if (pageContainer) pageContainer.style.display = 'none';
+  document.querySelectorAll('.widget-card').forEach(card => { card.classList.add('hidden-el'); card.style.display = 'none'; });
+  window.renderActiveWidgets();
+  
+  const homeBtn = document.getElementById('homeBtnContainer');
+  const toolsBtn = document.getElementById('toolbarToolsContainer');
+  if (homeBtn) homeBtn.style.display = 'none';
+  if (toolsBtn) toolsBtn.style.display = 'flex';
+};
+
+window.renderWidgetLibraryModal = function() {
+  const AVAILABLE_APPS = [
+    { id: 'widget-vision', name: 'الأهداف', desc: 'لوحة الأهداف والمقاصد', icon: '🎯' },
+    { id: 'widget-matrix', name: 'مصفوفة الأولويات', desc: 'تصنيف المهام بذكاء', icon: '📊' },
+    { id: 'widget-kanban', name: 'المهام', desc: 'إدارة المهام المتنقلة', icon: '📋' },
+    { id: 'widget-business', name: 'الأعمال', desc: 'إدارة المشاريع والحملات', icon: '💼' },
+    { id: 'widget-care', name: 'الصحة والعناية', desc: 'تتبع بروتوكول العناية الشخصية', icon: '🌿' },
+    { id: 'widget-finance', name: 'المالية', desc: 'إدارة المالية الشاملة', icon: '💰' },
+    { id: 'widget-journal', name: 'التدوين', desc: 'مساحة حرة للكتابة', icon: '📝' },
+    { id: 'widget-focus', name: 'التركيز', desc: 'تحديد الهدف الأهم', icon: '🧭' },
+    { id: 'widget-habits', name: 'العادات', desc: 'متتبع العادات اليومية', icon: '✨' }
+  ];
+  const active = window.appState.activeWidgets || [];
+  const libraryList = document.getElementById('widgetLibraryList');
+  if (libraryList) {
+    libraryList.innerHTML = AVAILABLE_APPS.map(w => {
+      const isAdded = active.includes(w.id);
+      return `
+        <div class="list-item" style="padding: 12px 16px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:1.8rem;">${w.icon}</span>
+            <div>
+              <div style="font-weight: 600; font-size: 0.95rem;">${w.name}</div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);">${w.desc}</div>
+            </div>
+          </div>
+          ${isAdded ? `<button class="btn btn-danger" onclick="window.removeWidget('${w.id}')">إزالة</button>` : `<button class="btn btn-primary" onclick="window.addWidgetToWorkspace('${w.id}')">تنزيل</button>`}
+        </div>
+      `;
+    }).join('');
+  }
+};
+
+window.addWidgetToWorkspace = (wId) => { 
+  if (!window.appState.activeWidgets) window.appState.activeWidgets = []; 
+  if (!window.appState.activeWidgets.includes(wId)) window.appState.activeWidgets.push(wId); 
+  window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); 
+};
+
+window.removeWidget = (wId) => { 
+  window.appState.activeWidgets = (window.appState.activeWidgets || []).filter(id => id !== wId); 
+  window.renderActiveWidgets(); window.renderWidgetLibraryModal(); window.autoSave(); 
+};
+
+window.openModal = async function(id) {
+  if (id === 'addWidgetModal' && window.renderWidgetLibraryModal) window.renderWidgetLibraryModal();
+  if (id === 'pricingModal' && window.setupPricingModal) window.setupPricingModal();
+  
+  const modal = document.getElementById(id); 
+  if (modal) {
+      modal.classList.add('open');
+      if (id === 'authModal') modal.style.display = 'flex';
+  }
+};
+
+window.closeModal = function(id) {
+  const modal = document.getElementById(id); 
+  if (modal) {
+      modal.classList.remove('open');
+      if (id === 'authModal') modal.style.display = 'none';
+  }
+};
+
+window.prepareSubscriptionForm = function() {
+    const bankSelect = document.getElementById('newSubBank');
+    if(bankSelect) {
+        if(!window.appState.banks || window.appState.banks.length === 0) {
+            bankSelect.innerHTML = '<option value="">لا توجد بنوك مسجلة</option>';
+            bankSelect.disabled = true;
+        } else {
+            bankSelect.disabled = false;
+            bankSelect.innerHTML = window.appState.banks.map((b, idx) => `<option value="${idx}">${b.name}</option>`).join('');
+        }
+    }
+};
