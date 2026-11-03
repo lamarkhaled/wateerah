@@ -145,7 +145,6 @@ window.deleteVisionSubTask = (idx) => {
     window.renderVisionTasks(); window.autoSave();
 };
 
-// --- بروتوكول الصحة والعناية ---
 window.renderCareRoutines = () => {
     const state = window.appState.dailyRecords[window.currentDateStr] || {};
     const hList = state.healthRoutine || [];
@@ -203,7 +202,6 @@ window.deleteCareRoutine = (type, idx) => {
     window.autoSave();
 };
 
-// --- مصفوفة الأولويات ---
 window.renderMatrix = () => {
     if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
     const doEl = document.getElementById('matrix-do');
@@ -257,11 +255,9 @@ window.deleteMatrixTask = (idx) => {
     window.autoSave();
 };
 
-
-// --- المالية والبنوك والاشتراكات ---
-
 window.activeBankIndex = null;
 
+// دالة عرض البنوك بالتصميم الناعم والأنيق
 window.renderBanks = () => {
     if(!window.appState.banks) window.appState.banks = [];
     const container = document.getElementById('banksContainer');
@@ -278,14 +274,17 @@ window.renderBanks = () => {
             totalAllBanks += bankTotal;
             
             return `
-            <div class="list-item" style="padding: 12px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="window.openBankDetails(${idx})">
-                <span style="font-weight: 600; font-size: 0.95rem;">${b.name}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight: bold; color: var(--accent-color);">${bankTotal} ر.س</span>
-                    <button class="delete-btn" onclick="event.stopPropagation(); window.deleteBank(${idx})">&times;</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-subtle); border-radius: 16px; border: none; cursor: pointer; transition: transform 0.2s;" onclick="window.openBankDetails(${idx})">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 1.2rem;">🏦</div>
+                    <span style="font-weight: 600; font-size: 1rem;">${b.name}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <span style="font-weight: bold; font-size: 1.05rem;">${bankTotal} ر.س</span>
+                    <button class="delete-btn" style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); window.deleteBank(${idx})">&times;</button>
                 </div>
             </div>`;
-        }).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد بنوك مسجلة</div>';
+        }).join('') || '<div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:20px; background: var(--bg-subtle); border-radius: 16px;">لا توجد بنوك مسجلة</div>';
     }
     const overview = document.getElementById('banksTotalOverview');
     if(overview) overview.innerText = `مجموع الأرصدة: ${totalAllBanks} ر.س`;
@@ -329,6 +328,7 @@ window.closeBankDetails = () => {
     window.renderBanks();
 };
 
+// تصميم الحسابات الفرعية الناعم
 window.renderBankDetailsView = () => {
     if(window.activeBankIndex === null) return;
     const bank = window.appState.banks[window.activeBankIndex];
@@ -336,14 +336,14 @@ window.renderBankDetailsView = () => {
     const accList = document.getElementById('bankAccountsList');
     if(accList) {
         accList.innerHTML = (bank.accounts || []).map((acc, idx) => `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <span style="font-weight:bold;">${acc.name}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; color:var(--text-primary);">${acc.balance} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteBankAccount(${idx})">&times;</button>
+            <li style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-subtle); border-radius: 16px; margin-bottom: 12px;">
+                <span style="font-weight:600; font-size: 0.95rem;">${acc.name}</span>
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <span style="font-weight:bold; font-size: 1.05rem; color:var(--text-primary);">${acc.balance} ر.س</span>
+                    <button class="delete-btn" style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" onclick="window.deleteBankAccount(${idx})">&times;</button>
                 </div>
             </li>
-        `).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد حسابات فرعية</div>';
+        `).join('') || '<div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:20px; background: var(--bg-subtle); border-radius: 16px;">لا توجد حسابات فرعية</div>';
     }
     
     const txList = document.getElementById('bankTransactionsList');
@@ -352,15 +352,15 @@ window.renderBankDetailsView = () => {
             const color = tx.type === 'in' ? '#22c55e' : '#ef4444';
             const sign = tx.type === 'in' ? '+' : '-';
             return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <span style="font-weight:600;">${tx.desc}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; color:${color}; direction:ltr;">${sign}${tx.amount} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteBankTransaction(${idx})">&times;</button>
+            <li style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-subtle); border-radius: 16px; margin-bottom: 12px;">
+                <span style="font-weight:600; font-size: 0.95rem;">${tx.desc}</span>
+                <div style="display:flex; align-items:center; gap:16px;">
+                    <span style="font-weight:bold; font-size: 1.05rem; color:${color}; direction:ltr;">${sign}${tx.amount} ر.س</span>
+                    <button class="delete-btn" style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" onclick="window.deleteBankTransaction(${idx})">&times;</button>
                 </div>
             </li>
             `;
-        }).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد حركات مسجلة</div>';
+        }).join('') || '<div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:20px; background: var(--bg-subtle); border-radius: 16px;">لا توجد حركات مسجلة</div>';
     }
 };
 
@@ -407,7 +407,6 @@ window.deleteBankTransaction = (idx) => {
     window.renderBankDetailsView(); window.autoSave();
 };
 
-// --- التوزيع المخصص (الميزة الجديدة) ---
 window.renderAllocations = () => {
     if(!window.appState.allocations) window.appState.allocations = [
         { label: 'الاحتياجات', percent: 50 },
@@ -466,13 +465,15 @@ window.deleteAllocation = (idx) => {
     window.renderAllocations(); window.autoSave();
 };
 
-// --- الاشتراكات المتقدمة (تواريخ وارتباط بالبنك) ---
+// تصميم الاشتراكات المتقدمة والأنيقة
 window.renderSubscriptions = () => {
     if(!window.appState.subscriptions) window.appState.subscriptions = [];
     const list = document.getElementById('subscriptionsList');
+    let totalCost = 0;
     if(!list) return;
 
     list.innerHTML = window.appState.subscriptions.map((s, idx) => {
+        totalCost += parseFloat(s.cost) || 0;
         const startDate = new Date(s.date);
         let endDate = new Date(s.date);
         let cycleText = '';
@@ -485,26 +486,34 @@ window.renderSubscriptions = () => {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
         let statusHtml = '';
-        if (diffDays <= 3 && diffDays >= 0) statusHtml = `<span style="color:var(--danger-color); font-size:0.75rem; font-weight:bold;">ينتهي قريباً (${diffDays} أيام)</span>`;
-        else if (diffDays < 0) statusHtml = `<span style="color:var(--danger-color); font-size:0.75rem; font-weight:bold;">منتهي الصلاحية</span>`;
-        else statusHtml = `<span style="color:var(--text-secondary); font-size:0.75rem;">باقي ${diffDays} يوم</span>`;
+        if (diffDays <= 3 && diffDays >= 0) statusHtml = `<span style="color:var(--danger-color); font-size:0.75rem; font-weight:bold; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 8px;">ينتهي خلال ${diffDays} أيام</span>`;
+        else if (diffDays < 0) statusHtml = `<span style="color:var(--danger-color); font-size:0.75rem; font-weight:bold; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 8px;">منتهي</span>`;
+        else statusHtml = `<span style="color:var(--text-secondary); font-size:0.75rem; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 8px;">باقي ${diffDays} يوم</span>`;
 
         const bankName = s.bankIdx !== '' && window.appState.banks[s.bankIdx] ? window.appState.banks[s.bankIdx].name : 'بدون بنك';
 
         return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <div class="item-left" style="display:flex; flex-direction:column; gap:4px;">
-                    <span style="font-weight:600; font-size:0.85rem;">${s.name} <span style="font-size:0.7rem; background:var(--bg-subtle); padding:2px 6px; border-radius:4px;">${cycleText}</span></span>
-                    <div style="font-size:0.75rem; color:var(--text-secondary);">يسحب من: ${bankName}</div>
-                    ${statusHtml}
+            <li style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-subtle); border-radius: 16px; margin-bottom: 12px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width: 40px; height: 40px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 1.2rem;">🔄</div>
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <span style="font-weight:600; font-size:0.95rem;">${s.name} <span style="font-size:0.7rem; color: var(--text-secondary); font-weight: normal;">(${cycleText})</span></span>
+                        <div style="display:flex; gap: 6px; align-items: center;">
+                            <span style="font-size:0.75rem; color:var(--text-secondary);">🏦 ${bankName}</span>
+                            ${statusHtml}
+                        </div>
+                    </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; font-size:0.9rem;">${s.cost} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteSubscription(${idx})">&times;</button>
+                    <span style="font-weight:bold; font-size:1.05rem;">${s.cost} ر.س</span>
+                    <button class="delete-btn" style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" onclick="window.deleteSubscription(${idx})">&times;</button>
                 </div>
             </li>
         `;
-    }).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد اشتراكات</div>';
+    }).join('') || '<div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:20px; background: var(--bg-subtle); border-radius: 16px;">لا توجد اشتراكات</div>';
+    
+    const totalValEl = document.getElementById('subsTotalValue');
+    if (totalValEl) totalValEl.innerText = totalCost + ' ر.س';
 };
 
 window.addSubscription = () => {
@@ -534,7 +543,6 @@ window.deleteSubscription = (idx) => {
     window.renderSubscriptions(); window.autoSave();
 };
 
-// المالية القديمة (الدخل والمصروفات العادية والأمنيات)
 window.addIncome = () => {
     const name = document.getElementById('newIncomeName').value.trim();
     const amount = document.getElementById('newIncomeAmount').value;
@@ -649,7 +657,6 @@ window.addHabit = () => {
 window.deleteHabit = (idx) => { window.appState.habits.splice(idx, 1); window.renderLists(); window.autoSave(); };
 window.toggleHabit = (idx) => { window.appState.habits[idx].done = !window.appState.habits[idx].done; window.renderLists(); window.autoSave(); };
 
-// --- المهام المتنقلة (الكانبان) ---
 window.renderKanbanBoard = function() {
   if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
   const cols = { idea: [], scheduled: [], progress: [], done: [] };
@@ -709,7 +716,6 @@ window.dragKanbanCard = (e, idx) => { e.stopPropagation(); window.draggedKanbanI
 window.allowKanbanDrop = (e) => { e.preventDefault(); };
 window.dropKanbanCard = (e, targetStatus) => { e.preventDefault(); if (window.draggedKanbanIndex === null) return; window.appState.kanbanTasks[window.draggedKanbanIndex].status = targetStatus; window.draggedKanbanIndex = null; window.renderKanbanBoard(); window.autoSave(); };
 
-// --- الأعمال ---
 window.renderBusinessWidget = () => {
     if (!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
     const pCount = window.appState.business.projects.length;
