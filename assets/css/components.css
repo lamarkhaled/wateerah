@@ -41,20 +41,31 @@
 
 @media (max-width: 768px) {
   header { padding: 10px 16px; } .brand h1 { font-size: 1.3rem; } .brand p { font-size: 0.75rem; }
-  main { padding: 0 12px; margin-top: 16px; padding-bottom: 50px; }
+  main { padding: 0 12px; margin-top: 16px; padding-bottom: calc(100px + env(safe-area-inset-bottom)); } /* توسيع المساحة للشريط السفلي */
   .widget-card { padding: 16px; border-radius: 18px; } .card-header { margin-bottom: 12px; padding-bottom: 10px; } .card-title { font-size: 1.05rem; }
-  .btn { padding: 6px 12px; font-size: 0.75rem; } .focus-input { padding: 12px 14px; font-size: 0.9rem; } .item-text-input { font-size: 0.8rem; }
-  .add-row input, .add-row select, .add-row label { padding: 8px 12px; font-size: 0.8rem; }
-  .list-item { padding: 8px 12px; } .checkbox { width: 17px; height: 17px; font-size: 0.65rem; border-width: 1.5px; }
+  
+  /* تحسين مساحات اللمس (Touch Targets) ومنع التكبير التلقائي */
+  .btn { padding: 6px 12px; font-size: 0.75rem; min-height: 44px; display: inline-flex; justify-content: center; } 
+  .focus-input { padding: 12px 14px; font-size: 16px !important; } .item-text-input { font-size: 16px !important; }
+  .add-row input, .add-row select, .add-row label { padding: 8px 12px; font-size: 16px !important; }
+  .list-item { padding: 8px 12px; min-height: 44px; } .checkbox { width: 22px; height: 22px; font-size: 0.8rem; border-width: 1.5px; }
+  
   .greeting-box { padding: 18px 20px; border-radius: 18px; } .greeting-box h2 { font-size: 1.4rem; } .greeting-box p { font-size: 0.8rem; }
   .hero-glass-messages { padding: 16px 18px; border-radius: 18px; } .liquid-glass-msg { padding: 16px; border-radius: 20px; }
   .corkboard-surface { padding: 16px; min-height: 220px; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); border-width: 6px; border-radius: 14px; }
   .polaroid-item { padding: 6px 6px 10px 6px; } .polaroid-img { height: 100px; } .polaroid-caption { font-size: 0.78rem; margin-top: 6px; }
   #widget-journal .card-header { padding: 12px 16px !important; } #noteEditorView, #widget-journal > div:nth-child(2) { padding: 0 16px 16px !important; }
-  .apple-notes-editor { font-size: 0.95rem; min-height: 180px; } .note-list-item { padding: 10px 16px; }
-  .kanban-col { padding: 10px; min-height: 180px; } .kanban-card { padding: 10px; } .kanban-card-title { font-size: 0.82rem; } .kanban-col-header { font-size: 0.8rem; }
-  .modal-box { padding: 22px 18px; border-radius: 20px; margin: 12px; width: calc(100% - 24px); } .modal-close { top: 12px; left: 12px; width: 28px; height: 28px; font-size: 1rem; }
-  .form-group label { font-size: 0.75rem; } .form-group input, .form-group select, .form-group textarea { padding: 10px 12px; font-size: 0.85rem; }
+  .apple-notes-editor { font-size: 0.95rem; min-height: 180px; } .note-list-item { padding: 10px 16px; min-height: 44px; }
+  .kanban-col { padding: 10px; min-height: 180px; } .kanban-card { padding: 10px; min-height: 48px; } .kanban-card-title { font-size: 0.82rem; } .kanban-col-header { font-size: 0.8rem; }
+  
+  /* تحسين النوافذ المنبثقة (Modals) لتظهر كشريط سفلي ذكي (Bottom Sheet) مثل iOS */
+  .modal-overlay { align-items: flex-end; padding: 0; background: rgba(15, 15, 14, 0.6); } 
+  .modal-box { margin: 0; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; width: 100%; max-width: 100%; animation: slideUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1); } 
+  .modal-box::before { content: ''; display: block; width: 40px; height: 5px; background: var(--border-color); border-radius: 10px; margin: -10px auto 20px; }
+  .modal-close { top: 18px; left: 18px; width: 32px; height: 32px; font-size: 1.1rem; background: var(--bg-subtle); }
+  
+  .form-group label { font-size: 0.75rem; } .form-group input, .form-group select, .form-group textarea { padding: 12px; font-size: 16px !important; }
   .app-launcher-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 10px 10px 30px; }
   .app-icon-card { padding: 24px 12px; border-radius: 24px; } .app-icon { font-size: 3rem; } .app-icon-title { font-size: 0.88rem; }
 }
+@keyframes slideUpModal { from { transform: translateY(100%); opacity: 0.5; } to { transform: translateY(0); opacity: 1; } }
