@@ -145,314 +145,118 @@ window.deleteVisionSubTask = (idx) => {
     window.renderVisionTasks(); window.autoSave();
 };
 
+window.renderCareRoutines = () => {
+    const state = window.appState.dailyRecords[window.currentDateStr] || {};
+    const hList = state.healthRoutine || [];
+    const sList = state.skinRoutine || [];
 
-// --- المالية والبنوك (بالتصميم النظيف القديم) ---
-window.activeBankIndex = null;
-
-window.renderBanks = () => {
-    if(!window.appState.banks) window.appState.banks = [];
-    const container = document.getElementById('banksContainer');
-    let totalAllBanks = 0;
-    
-    if(container) {
-        container.innerHTML = window.appState.banks.map((b, idx) => {
-            let bankTotal = 0;
-            (b.accounts || []).forEach(acc => bankTotal += parseFloat(acc.balance) || 0);
-            (b.transactions || []).forEach(tx => {
-                if (tx.type === 'in') bankTotal += parseFloat(tx.amount) || 0;
-                if (tx.type === 'out') bankTotal -= parseFloat(tx.amount) || 0;
-            });
-            totalAllBanks += bankTotal;
-            
-            return `
-            <div class="list-item" style="padding: 12px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="window.openBankDetails(${idx})">
-                <span style="font-weight: 600; font-size: 0.95rem;">${b.name}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight: bold; color: var(--accent-color);">${bankTotal} ر.س</span>
-                    <button class="delete-btn" onclick="event.stopPropagation(); window.deleteBank(${idx})">&times;</button>
-                </div>
-            </div>`;
-        }).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد بنوك مسجلة</div>';
-    }
-    const overview = document.getElementById('banksTotalOverview');
-    if(overview) overview.innerText = `مجموع الأرصدة: ${totalAllBanks} ر.س`;
-};
-
-window.addBank = () => {
-    const name = document.getElementById('newBankName').value.trim();
-    if(!name) return window.showToast('الرجاء كتابة اسم البنك');
-    if(!window.appState.banks) window.appState.banks = [];
-    window.appState.banks.push({ name, accounts: [], transactions: [] });
-    document.getElementById('newBankName').value = '';
-    window.renderBanks();
-    window.autoSave();
-};
-
-window.deleteBank = (idx) => {
-    window.appState.banks.splice(idx, 1);
-    window.renderBanks();
-    window.autoSave();
-};
-
-window.openBankDetails = (idx) => {
-    window.activeBankIndex = idx;
-    const bank = window.appState.banks[idx];
-    document.getElementById('activeBankTitle').innerText = bank.name;
-    
-    document.getElementById('widget-finance').style.display = 'none';
-    document.getElementById('widget-finance').classList.add('hidden-el');
-    
-    document.getElementById('bankDetailsPage').style.display = 'block';
-    document.getElementById('bankDetailsPage').classList.remove('hidden-el');
-    
-    window.renderBankDetailsView();
-};
-
-window.closeBankDetails = () => {
-    window.activeBankIndex = null;
-    document.getElementById('bankDetailsPage').style.display = 'none';
-    document.getElementById('bankDetailsPage').classList.add('hidden-el');
-    
-    document.getElementById('widget-finance').style.display = 'block';
-    document.getElementById('widget-finance').classList.remove('hidden-el');
-    
-    window.renderBanks();
-};
-
-window.renderBankDetailsView = () => {
-    if(window.activeBankIndex === null) return;
-    const bank = window.appState.banks[window.activeBankIndex];
-    
-    const accList = document.getElementById('bankAccountsList');
-    if(accList) {
-        accList.innerHTML = (bank.accounts || []).map((acc, idx) => `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <span style="font-weight:bold;">${acc.name}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; color:var(--text-primary);">${acc.balance} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteBankAccount(${idx})">&times;</button>
-                </div>
-            </li>
-        `).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد حسابات فرعية</div>';
-    }
-    
-    const txList = document.getElementById('bankTransactionsList');
-    if(txList) {
-        txList.innerHTML = (bank.transactions || []).map((tx, idx) => {
-            const color = tx.type === 'in' ? '#22c55e' : '#ef4444';
-            const sign = tx.type === 'in' ? '+' : '-';
-            return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <span style="font-weight:600;">${tx.desc}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; color:${color}; direction:ltr;">${sign}${tx.amount} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteBankTransaction(${idx})">&times;</button>
-                </div>
-            </li>
-            `;
-        }).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد حركات مسجلة</div>';
-    }
-};
-
-window.addBankAccount = () => {
-    if(window.activeBankIndex === null) return;
-    const name = document.getElementById('newBankAccountName').value.trim();
-    const bal = parseFloat(document.getElementById('newBankAccountBalance').value) || 0;
-    if(!name) return;
-    const bank = window.appState.banks[window.activeBankIndex];
-    if(!bank.accounts) bank.accounts = [];
-    bank.accounts.push({ name, balance: bal });
-    document.getElementById('newBankAccountName').value = '';
-    document.getElementById('newBankAccountBalance').value = '';
-    window.renderBankDetailsView(); window.autoSave();
-};
-
-window.deleteBankAccount = (idx) => {
-    if(window.activeBankIndex === null) return;
-    window.appState.banks[window.activeBankIndex].accounts.splice(idx, 1);
-    window.renderBankDetailsView(); window.autoSave();
-};
-
-window.addBankTransaction = () => {
-    if(window.activeBankIndex === null) return;
-    const type = document.getElementById('newBankTxType').value;
-    const desc = document.getElementById('newBankTxDesc').value.trim();
-    const amount = parseFloat(document.getElementById('newBankTxAmount').value) || 0;
-    if(!desc || !amount) return;
-    const bank = window.appState.banks[window.activeBankIndex];
-    if(!bank.transactions) bank.transactions = [];
-    bank.transactions.push({ type, desc, amount });
-    document.getElementById('newBankTxDesc').value = '';
-    document.getElementById('newBankTxAmount').value = '';
-    window.renderBankDetailsView(); window.autoSave();
-};
-
-window.deleteBankTransaction = (idx) => {
-    if(window.activeBankIndex === null) return;
-    window.appState.banks[window.activeBankIndex].transactions.splice(idx, 1);
-    window.renderBankDetailsView(); window.autoSave();
-};
-
-
-// --- بقية المالية الأساسية (بالتصميم النظيف) ---
-window.addIncome = () => {
-    const name = document.getElementById('newIncomeName').value.trim();
-    const amount = document.getElementById('newIncomeAmount').value;
-    const date = document.getElementById('newIncomeDate').value;
-    if(!name || !amount) return;
-    if(!window.appState.incomeSources) window.appState.incomeSources = [];
-    window.appState.incomeSources.push({name, amount: parseFloat(amount), date});
-    document.getElementById('newIncomeName').value = '';
-    document.getElementById('newIncomeAmount').value = '';
-    document.getElementById('newIncomeDate').value = '';
-    window.renderLists();
-    window.autoSave();
-};
-
-window.deleteIncome = (idx) => {
-    window.appState.incomeSources.splice(idx, 1);
-    window.renderLists();
-    window.autoSave();
-};
-
-window.addWishlistItem = () => {
-    const title = document.getElementById('newWishTitle').value.trim();
-    const cost = document.getElementById('newWishCost').value;
-    if(!title || !cost) return;
-    if(!window.appState.wishlist) window.appState.wishlist = [];
-    window.appState.wishlist.push({title, cost: parseFloat(cost)});
-    document.getElementById('newWishTitle').value = '';
-    document.getElementById('newWishCost').value = '';
-    window.renderLists();
-    window.autoSave();
-};
-
-window.deleteWishlistItem = (idx) => {
-    window.appState.wishlist.splice(idx, 1);
-    window.renderLists();
-    window.autoSave();
-};
-
-window.addSubscription = () => {
-    const name = document.getElementById('newSubName').value.trim();
-    const cost = document.getElementById('newSubCost').value;
-    if(!name || !cost) return;
-    if(!window.appState.subscriptions) window.appState.subscriptions = [];
-    window.appState.subscriptions.push({name, cost: parseFloat(cost)||0});
-    document.getElementById('newSubName').value = ''; document.getElementById('newSubCost').value = '';
-    window.renderLists();
-    window.autoSave();
-};
-
-window.deleteSubscription = (idx) => {
-    window.appState.subscriptions.splice(idx, 1);
-    window.renderLists();
-    window.autoSave();
-};
-
-window.renderLists = () => {
-    // العادات
-    const habitsList = document.getElementById('habitsList');
-    if(habitsList) {
-        habitsList.innerHTML = (window.appState.habits || []).map((h, idx) => `
-            <li class="list-item ${h.done ? 'completed' : ''}" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <div class="item-left">
-                    <div class="checkbox" onclick="window.toggleHabit(${idx})">${h.done ? '✓' : ''}</div>
-                    <span>${h.text}</span>
-                </div>
-                <button class="delete-btn" onclick="window.deleteHabit(${idx})">&times;</button>
-            </li>
-        `).join('');
-    }
-    
-    // الدخل
-    let totalIncome = 0;
-    const incList = document.getElementById('incomeSourcesList');
-    if(incList) {
-        incList.innerHTML = (window.appState.incomeSources || []).map((inc, idx) => {
-            totalIncome += parseFloat(inc.amount) || 0;
-            return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <span style="font-weight:600; font-size:0.85rem;">${inc.name}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">${inc.amount} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteIncome(${idx})">&times;</button>
-                </div>
-            </li>`;
-        }).join('');
-        const sumCard = document.getElementById('incomeSummaryCard');
-        if (sumCard) {
-            sumCard.innerHTML = `<div style="font-weight:bold; margin-top:8px;">إجمالي الدخل المُسجل: ${totalIncome} ر.س</div>`;
-        }
-    }
-
-    // التوزيع
-    const totalInput = document.getElementById('totalIncomeInput');
-    const distGrid = document.getElementById('distributionResults');
-    if (totalInput && distGrid) {
-        const total = parseFloat(totalInput.value) || 0;
-        const dist = [
-            { label: 'الاحتياجات (50%)', val: total * 0.5, color: '#3b82f6' },
-            { label: 'الرغبات (30%)', val: total * 0.3, color: '#f59e0b' },
-            { label: 'الادخار/الاستثمار (20%)', val: total * 0.2, color: '#10b981' }
-        ];
-        distGrid.innerHTML = dist.map(d => `
-            <div style="background:var(--bg-subtle); padding:10px; border-radius:12px; border:1px solid var(--border-color); text-align:center;">
-                <div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:4px;">${d.label}</div>
-                <div style="font-size:1.05rem; font-weight:bold; color:${d.color}; direction:ltr;">${d.val.toFixed(2)}</div>
+    const renderList = (list, type) => list.map((item, idx) => `
+        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 8px 12px; margin-bottom: 8px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
+            <div class="item-left">
+                <div class="checkbox" onclick="window.toggleCareRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
+                <span style="font-size: 0.85rem;">${item.text}</span>
             </div>
-        `).join('');
-    }
+            <button class="delete-btn" onclick="window.deleteCareRoutine('${type}', ${idx})">&times;</button>
+        </li>
+    `).join('');
 
-    // الأمنيات
-    const wList = document.getElementById('wishlistList');
-    if (wList) {
-        wList.innerHTML = (window.appState.wishlist || []).map((w, idx) => `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <span style="font-weight:600; font-size:0.85rem;">${w.title}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; font-size:0.85rem;">${w.cost} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteWishlistItem(${idx})">&times;</button>
-                </div>
-            </li>
-        `).join('');
-    }
-
-    // الاشتراكات
-    const subList = document.getElementById('subscriptionsList');
-    if (subList) {
-        subList.innerHTML = (window.appState.subscriptions || []).map((s, idx) => `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <span style="font-weight:600; font-size:0.85rem;">${s.name}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; font-size:0.85rem;">${s.cost} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteSubscription(${idx})">&times;</button>
-                </div>
-            </li>
-        `).join('');
-    }
+    const hEl = document.getElementById('healthRoutineList');
+    const sEl = document.getElementById('skinRoutineList');
+    if(hEl) hEl.innerHTML = renderList(hList, 'health') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
+    if(sEl) sEl.innerHTML = renderList(sList, 'skin') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
 };
 
-window.addHabit = () => {
-    const input = document.getElementById('newHabitInput');
-    const v = input.value.trim();
-    if (!v) return;
-    if (!window.appState.habits) window.appState.habits = [];
-    window.appState.habits.push({ text: v, done: false });
+window.addCareRoutine = (type) => {
+    const input = document.getElementById(type === 'health' ? 'newHealthTask' : 'newSkinTask');
+    if(!input) return;
+    const val = input.value.trim();
+    if(!val) return;
+    const state = window.appState.dailyRecords[window.currentDateStr];
+    if(type === 'health') {
+        if(!state.healthRoutine) state.healthRoutine = [];
+        state.healthRoutine.push({text: val, done: false});
+    } else {
+        if(!state.skinRoutine) state.skinRoutine = [];
+        state.skinRoutine.push({text: val, done: false});
+    }
     input.value = '';
-    window.renderLists(); window.autoSave();
+    window.renderCareRoutines();
+    window.autoSave();
 };
 
-window.deleteHabit = (idx) => { window.appState.habits.splice(idx, 1); window.renderLists(); window.autoSave(); };
-window.toggleHabit = (idx) => { window.appState.habits[idx].done = !window.appState.habits[idx].done; window.renderLists(); window.autoSave(); };
+window.toggleCareRoutine = (type, idx) => {
+    const state = window.appState.dailyRecords[window.currentDateStr];
+    const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
+    list[idx].done = !list[idx].done;
+    window.renderCareRoutines();
+    window.autoSave();
+};
 
-// --- المهام المتنقلة (الكانبان) ---
+window.deleteCareRoutine = (type, idx) => {
+    const state = window.appState.dailyRecords[window.currentDateStr];
+    const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
+    list.splice(idx, 1);
+    window.renderCareRoutines();
+    window.autoSave();
+};
+
+window.renderMatrix = () => {
+    if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
+    const doEl = document.getElementById('matrix-do');
+    const scheduleEl = document.getElementById('matrix-schedule');
+    const delegateEl = document.getElementById('matrix-delegate');
+    const dropEl = document.getElementById('matrix-drop');
+
+    if(!doEl) return;
+    doEl.innerHTML = ''; scheduleEl.innerHTML = ''; delegateEl.innerHTML = ''; dropEl.innerHTML = '';
+    
+    let counts = { do: 0, schedule: 0, delegate: 0, drop: 0 };
+
+    window.appState.matrixTasks.forEach((task, idx) => {
+        counts[task.type]++;
+        const html = `
+            <li class="list-item" style="padding: 6px 12px; margin-bottom: 6px; background: transparent; border: 1px dashed var(--border-color);">
+                <div class="item-left" style="font-size: 0.85rem;">${task.text}</div>
+                <button class="delete-btn" onclick="window.deleteMatrixTask(${idx})">&times;</button>
+            </li>
+        `;
+        if (task.type === 'do') doEl.innerHTML += html;
+        if (task.type === 'schedule') scheduleEl.innerHTML += html;
+        if (task.type === 'delegate') delegateEl.innerHTML += html;
+        if (task.type === 'drop') dropEl.innerHTML += html;
+    });
+
+    ['do', 'schedule', 'delegate', 'drop'].forEach(key => {
+        const cEl = document.getElementById(`count-${key}`);
+        if(cEl) cEl.innerText = counts[key];
+    });
+};
+
+window.addMatrixTask = () => {
+    const textEl = document.getElementById('newMatrixTitle');
+    const typeEl = document.getElementById('newMatrixType');
+    if(!textEl.value.trim()) return;
+    
+    if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
+    window.appState.matrixTasks.push({ text: textEl.value.trim(), type: typeEl.value });
+    
+    textEl.value = '';
+    window.renderMatrix();
+    window.autoSave();
+};
+
+window.deleteMatrixTask = (idx) => {
+    window.appState.matrixTasks.splice(idx, 1);
+    window.renderMatrix();
+    window.autoSave();
+};
+
 window.renderKanbanBoard = function() {
   if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
   const cols = { idea: [], scheduled: [], progress: [], done: [] };
   window.appState.kanbanTasks.forEach((task, idx) => { const st = cols[task.status] ? task.status : 'idea'; cols[st].push({ ...task, idx }); });
 
-  const priorityLabel = { do: 'عاجل ومهم', schedule: 'جدولها', delegate: 'تفوّيض', drop: 'غير مهم' };
+  const priorityLabel = { do: 'عاجل ومهم', schedule: 'مهم ومجدول', delegate: 'تفوّيض', drop: 'غير مهم' };
   const priorityStyle = {
       do: 'background:#fee2e2; color:#ef4444; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;',
       schedule: 'background:#e0f2fe; color:#3b82f6; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;',
@@ -504,7 +308,6 @@ window.dragKanbanCard = (e, idx) => { e.stopPropagation(); window.draggedKanbanI
 window.allowKanbanDrop = (e) => { e.preventDefault(); };
 window.dropKanbanCard = (e, targetStatus) => { e.preventDefault(); if (window.draggedKanbanIndex === null) return; window.appState.kanbanTasks[window.draggedKanbanIndex].status = targetStatus; window.draggedKanbanIndex = null; window.renderKanbanBoard(); window.autoSave(); };
 
-// --- الأعمال ---
 window.renderBusinessWidget = () => {
     if (!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
     const pCount = window.appState.business.projects.length;
@@ -583,3 +386,22 @@ window.addBusinessCampaign = () => {
     window.renderBusinessDetailsView(); window.renderBusinessWidget(); window.autoSave();
 };
 window.deleteBusinessCampaign = (idx) => { window.appState.business.campaigns.splice(idx,1); window.renderBusinessDetailsView(); window.renderBusinessWidget(); window.autoSave(); };
+
+window.addHabit = () => {
+    const input = document.getElementById('newHabitInput');
+    const v = input.value.trim();
+    if (!v) return;
+    if (!window.appState.habits) window.appState.habits = [];
+    window.appState.habits.push({ text: v, done: false });
+    input.value = '';
+    window.renderLists(); window.autoSave();
+};
+
+window.deleteHabit = (idx) => { window.appState.habits.splice(idx, 1); window.renderLists(); window.autoSave(); };
+window.toggleHabit = (idx) => { window.appState.habits[idx].done = !window.appState.habits[idx].done; window.renderLists(); window.autoSave(); };
+
+
+// --- المالية (الميزانية، الأمنيات، البنوك، توزيع الدخل والاشتراكات المتطورة) ---
+window.addIncome = () => {
+    const name = document.getElementById('newIncomeName').value.trim();
+    const amount = document.getElementById('new
