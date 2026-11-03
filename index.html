@@ -1,796 +1,697 @@
-window.compressAndAddVision = function(file, title, date) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function(event) {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 800; const MAX_HEIGHT = 800;
-            let width = img.width; let height = img.height;
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>وتيرة — صمّم إيقاع يومك</title>
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="وتيرة">
+  <meta name="theme-color" content="#F9F8F6">
 
-            if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-            } else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-            
-            canvas.width = width; canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-            saveVisionToState(title, date, dataUrl);
-        }
-    }
-};
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
+</head>
+<body>
 
-window.addVisionItem = function() {
-    const title = document.getElementById('newVisionTitle').value.trim();
-    const date = document.getElementById('newVisionDate').value;
-    const fileInput = document.getElementById('newVisionImgFile');
+  <div id="toastContainer"></div>
 
-    if (!title) return window.showToast('الرجاء إدخال عنوان الهدف');
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>وتيرة<span class="dot">.</span></h1>
+        <p>نظام إدارة الحياة الشخصي</p>
+      </div>
+      <div class="nav-actions">
+        <button id="iosInstallBtn" class="btn btn-subtle" onclick="window.openModal('iosGuideModal')">تثبيت التطبيق</button>
+        <button id="lockScreenBtn" class="btn btn-danger" style="display: none; padding: 6px 12px; font-size: 0.8rem;" onclick="window.handleLogout()">تسجيل خروج</button>
+        <span id="planBadge" class="pro-badge" onclick="window.openModal('pricingModal')">الباقة الأساسية</span>
+        <button id="upgradeBtn" class="btn" onclick="window.openModal('pricingModal')">إدارة الاشتراك</button>
+        <div id="userProfilePill" class="profile-pill" style="display: none;" onclick="window.openModal('profileModal')">
+          <div id="headerAvatar" class="avatar-circle">و</div>
+          <span id="headerUserName">مستخدم</span>
+        </div>
+      </div>
+    </div>
+  </header>
 
-    if (fileInput.files && fileInput.files[0]) {
-        window.compressAndAddVision(fileInput.files[0], title, date);
-    } else {
-        saveVisionToState(title, date, '');
-    }
-};
+  <main>
+    <section id="onboardingScreen" class="hidden-el">
+      <div class="time-pill" id="onboardingTimePill">الفترة الصباحية</div>
+      <h2 id="onboardingGreeting">صباح الخير، أهلاً بك في وتيرة</h2>
+      <p>اختر المظهر المفضل لديك للبدء.</p>
+      <div class="theme-selector-grid">
+        <div class="theme-card active" onclick="window.selectOnboardingTheme('default', this)">ورق دافئ</div>
+        <div class="theme-card" onclick="window.selectOnboardingTheme('minimal', this)">صباح نقي</div>
+        <div class="theme-card" onclick="window.selectOnboardingTheme('dark', this)">سكون ليلي</div>
+      </div>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 0.95rem; font-weight: 600;" onclick="window.startWorkspaceFirstTime()">بدء استخدام وتيرة</button>
+    </section>
 
-function saveVisionToState(title, date, imgData) {
-    if (!window.appState.visionBoard) window.appState.visionBoard = [];
-    window.appState.visionBoard.push({ title, date, img: imgData, plan: '', tasks: [], progress: 0 });
-    
-    document.getElementById('newVisionTitle').value = '';
-    document.getElementById('newVisionDate').value = '';
-    document.getElementById('newVisionImgFile').value = '';
-    const imgText = document.getElementById('visionImgText');
-    if(imgText) imgText.innerText = '📷 إرفاق صورة';
-    const imgLabel = document.getElementById('visionImgLabel');
-    if(imgLabel) {
-        imgLabel.style.borderColor = 'var(--border-color)';
-        imgLabel.style.color = 'var(--text-secondary)';
-    }
-    window.renderVisionBoard();
-    window.autoSave();
-}
-
-window.renderVisionBoard = function() {
-    if (!window.appState.visionBoard) window.appState.visionBoard = [];
-    const container = document.getElementById('corkboardContainer');
-    if (!container) return;
-
-    container.innerHTML = window.appState.visionBoard.map((item, idx) => {
-        const imgHtml = item.img ? `<img src="${item.img}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:8px;">` : `<div style="width:100%; height:80px; background:var(--bg-primary); border-radius:8px; margin-bottom:8px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">بدون صورة</div>`;
-        return `
-        <div class="vision-pin-card" onclick="window.openVisionDetail(${idx})" style="background:var(--bg-subtle); padding:12px; border-radius:12px; border:1px solid var(--border-color); cursor:pointer;">
-            ${imgHtml}
-            <div style="font-weight:bold; font-size:0.95rem;">${item.title}</div>
-            <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">${item.date || 'بدون تاريخ'}</div>
-        </div>`;
-    }).join('');
-};
-
-window.openVisionDetail = function(idx) {
-    window.activeVisionIndex = idx;
-    const item = window.appState.visionBoard[idx];
-    document.getElementById('vModalTitle').innerText = item.title;
-    document.getElementById('vModalDate').value = item.date || '';
-    document.getElementById('vModalPlan').value = item.plan || '';
-    const imgEl = document.getElementById('vModalImg');
-    if (item.img) { imgEl.src = item.img; imgEl.style.display = 'block'; }
-    else { imgEl.style.display = 'none'; }
-    window.renderVisionTasks();
-    window.openModal('visionDetailModal');
-};
-
-window.saveVisionModalChanges = () => {
-    if (window.activeVisionIndex === null) return;
-    const item = window.appState.visionBoard[window.activeVisionIndex];
-    item.date = document.getElementById('vModalDate').value;
-    item.plan = document.getElementById('vModalPlan').value;
-    window.renderVisionBoard(); window.autoSave();
-};
-
-window.deleteCurrentVisionItem = () => {
-    if (window.activeVisionIndex === null) return;
-    window.appState.visionBoard.splice(window.activeVisionIndex, 1);
-    window.closeModal('visionDetailModal');
-    window.renderVisionBoard(); window.autoSave();
-};
-
-window.addVisionSubTask = () => {
-    if (window.activeVisionIndex === null) return;
-    const input = document.getElementById('vModalNewTaskInput');
-    const txt = input.value.trim();
-    if (!txt) return;
-    const item = window.appState.visionBoard[window.activeVisionIndex];
-    if (!item.tasks) item.tasks = [];
-    item.tasks.push({ text: txt, done: false });
-    input.value = '';
-    window.renderVisionTasks(); window.autoSave();
-};
-
-window.renderVisionTasks = () => {
-    if (window.activeVisionIndex === null) return;
-    const item = window.appState.visionBoard[window.activeVisionIndex];
-    const list = document.getElementById('vModalTasksList');
-    if(!list) return;
-    
-    let completed = 0;
-    list.innerHTML = (item.tasks || []).map((t, idx) => {
-        if(t.done) completed++;
-        return `
-        <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-            <div class="item-left" style="display:flex; align-items:center; gap:8px;">
-                <div class="checkbox" onclick="window.toggleVisionSubTask(${idx})">${t.done ? '✓' : ''}</div>
-                <span style="${t.done ? 'text-decoration:line-through; color:var(--text-secondary);' : ''}">${t.text}</span>
+    <!-- لوحة الإدارة المستقلة -->
+    <div id="adminWorkspace" class="hidden-el" style="display: none; padding: 40px 20px; max-width: 1100px; margin: 0 auto;">
+      <div style="background: var(--bg-glass-strong); padding: 40px; border-radius: 24px; border: 2px solid var(--accent-color); box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div>
+                <h2 style="color: var(--accent-color); margin-bottom: 6px; font-size: 2rem;">لوحة الإدارة المركزية</h2>
+                <p style="color: var(--text-secondary); margin: 0;">إدارة المستخدمين، المبيعات، وإصدار التراخيص.</p>
             </div>
-            <button class="delete-btn" onclick="window.deleteVisionSubTask(${idx})">&times;</button>
-        </li>`;
-    }).join('');
-
-    const pct = item.tasks && item.tasks.length > 0 ? Math.round((completed / item.tasks.length) * 100) : 0;
-    document.getElementById('vModalProgressBar').style.width = `${pct}%`;
-    document.getElementById('vModalPercentBadge').innerText = `${pct}% مكتمل`;
-};
-
-window.toggleVisionSubTask = (idx) => {
-    const item = window.appState.visionBoard[window.activeVisionIndex];
-    item.tasks[idx].done = !item.tasks[idx].done;
-    window.renderVisionTasks(); window.autoSave();
-};
-
-window.deleteVisionSubTask = (idx) => {
-    const item = window.appState.visionBoard[window.activeVisionIndex];
-    item.tasks.splice(idx, 1);
-    window.renderVisionTasks(); window.autoSave();
-};
-
-window.renderCareRoutines = () => {
-    const state = window.appState.dailyRecords[window.currentDateStr] || {};
-    const hList = state.healthRoutine || [];
-    const sList = state.skinRoutine || [];
-
-    const renderList = (list, type) => list.map((item, idx) => `
-        <li class="list-item ${item.done ? 'completed' : ''}" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-            <div class="item-left">
-                <div class="checkbox" onclick="window.toggleCareRoutine('${type}', ${idx})">${item.done ? '✓' : ''}</div>
-                <span style="font-size: 0.85rem;">${item.text}</span>
-            </div>
-            <button class="delete-btn" onclick="window.deleteCareRoutine('${type}', ${idx})">&times;</button>
-        </li>
-    `).join('');
-
-    const hEl = document.getElementById('healthRoutineList');
-    const sEl = document.getElementById('skinRoutineList');
-    if(hEl) hEl.innerHTML = renderList(hList, 'health') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
-    if(sEl) sEl.innerHTML = renderList(sList, 'skin') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center;">القائمة فارغة</div>';
-};
-
-window.addCareRoutine = (type) => {
-    const input = document.getElementById(type === 'health' ? 'newHealthTask' : 'newSkinTask');
-    if(!input) return;
-    const val = input.value.trim();
-    if(!val) return;
-    const state = window.appState.dailyRecords[window.currentDateStr];
-    if(type === 'health') {
-        if(!state.healthRoutine) state.healthRoutine = [];
-        state.healthRoutine.push({text: val, done: false});
-    } else {
-        if(!state.skinRoutine) state.skinRoutine = [];
-        state.skinRoutine.push({text: val, done: false});
-    }
-    input.value = '';
-    document.getElementById(type === 'health' ? 'addHealthForm' : 'addSkinForm').style.display = 'none';
-    document.getElementById(type === 'health' ? 'addHealthPlusBtn' : 'addSkinPlusBtn').style.display = 'flex';
-    window.renderCareRoutines();
-    window.autoSave();
-};
-
-window.toggleCareRoutine = (type, idx) => {
-    const state = window.appState.dailyRecords[window.currentDateStr];
-    const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
-    list[idx].done = !list[idx].done;
-    window.renderCareRoutines();
-    window.autoSave();
-};
-
-window.deleteCareRoutine = (type, idx) => {
-    const state = window.appState.dailyRecords[window.currentDateStr];
-    const list = type === 'health' ? state.healthRoutine : state.skinRoutine;
-    list.splice(idx, 1);
-    window.renderCareRoutines();
-    window.autoSave();
-};
-
-window.renderMatrix = () => {
-    if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
-    const doEl = document.getElementById('matrix-do');
-    const scheduleEl = document.getElementById('matrix-schedule');
-    const delegateEl = document.getElementById('matrix-delegate');
-    const dropEl = document.getElementById('matrix-drop');
-
-    if(!doEl) return;
-    doEl.innerHTML = ''; scheduleEl.innerHTML = ''; delegateEl.innerHTML = ''; dropEl.innerHTML = '';
-    
-    let counts = { do: 0, schedule: 0, delegate: 0, drop: 0 };
-
-    window.appState.matrixTasks.forEach((task, idx) => {
-        counts[task.type]++;
-        const html = `
-            <li class="list-item" style="padding: 10px 14px; margin-bottom: 6px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius:0;">
-                <div class="item-left" style="font-size: 0.85rem;">${task.text}</div>
-                <button class="delete-btn" onclick="window.deleteMatrixTask(${idx})">&times;</button>
-            </li>
-        `;
-        if (task.type === 'do') doEl.innerHTML += html;
-        if (task.type === 'schedule') scheduleEl.innerHTML += html;
-        if (task.type === 'delegate') delegateEl.innerHTML += html;
-        if (task.type === 'drop') dropEl.innerHTML += html;
-    });
-
-    ['do', 'schedule', 'delegate', 'drop'].forEach(key => {
-        const cEl = document.getElementById(`count-${key}`);
-        if(cEl) cEl.innerText = counts[key];
-    });
-};
-
-window.addMatrixTask = () => {
-    const textEl = document.getElementById('newMatrixTitle');
-    const typeEl = document.getElementById('newMatrixType');
-    if(!textEl.value.trim()) return;
-    
-    if (!window.appState.matrixTasks) window.appState.matrixTasks = [];
-    window.appState.matrixTasks.push({ text: textEl.value.trim(), type: typeEl.value });
-    
-    textEl.value = '';
-    document.getElementById('addMatrixForm').style.display = 'none';
-    document.getElementById('addMatrixPlusBtn').style.display = 'flex';
-    window.renderMatrix();
-    window.autoSave();
-};
-
-window.deleteMatrixTask = (idx) => {
-    window.appState.matrixTasks.splice(idx, 1);
-    window.renderMatrix();
-    window.autoSave();
-};
-
-window.activeBankIndex = null;
-
-// دالة عرض البنوك بالتصميم الناعم والأنيق
-window.renderBanks = () => {
-    if(!window.appState.banks) window.appState.banks = [];
-    const container = document.getElementById('banksContainer');
-    let totalAllBanks = 0;
-    
-    if(container) {
-        container.innerHTML = window.appState.banks.map((b, idx) => {
-            let bankTotal = 0;
-            (b.accounts || []).forEach(acc => bankTotal += parseFloat(acc.balance) || 0);
-            (b.transactions || []).forEach(tx => {
-                if (tx.type === 'in') bankTotal += parseFloat(tx.amount) || 0;
-                if (tx.type === 'out') bankTotal -= parseFloat(tx.amount) || 0;
-            });
-            totalAllBanks += bankTotal;
-            
-            return `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-subtle); border-radius: 16px; border: none; cursor: pointer; transition: transform 0.2s;" onclick="window.openBankDetails(${idx})">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 40px; height: 40px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 1.2rem;">🏦</div>
-                    <span style="font-weight: 600; font-size: 1rem;">${b.name}</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:16px;">
-                    <span style="font-weight: bold; font-size: 1.05rem;">${bankTotal} ر.س</span>
-                    <button class="delete-btn" style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); window.deleteBank(${idx})">&times;</button>
-                </div>
-            </div>`;
-        }).join('') || '<div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:20px; background: var(--bg-subtle); border-radius: 16px;">لا توجد بنوك مسجلة</div>';
-    }
-    const overview = document.getElementById('banksTotalOverview');
-    if(overview) overview.innerText = `مجموع الأرصدة: ${totalAllBanks} ر.س`;
-};
-
-window.addBank = () => {
-    const name = document.getElementById('newBankName').value.trim();
-    if(!name) return window.showToast('الرجاء كتابة اسم البنك');
-    if(!window.appState.banks) window.appState.banks = [];
-    window.appState.banks.push({ name, accounts: [], transactions: [] });
-    document.getElementById('newBankName').value = '';
-    document.getElementById('addBankForm').style.display = 'none';
-    document.getElementById('addBankPlusBtn').style.display = 'flex';
-    window.renderBanks();
-    window.autoSave();
-};
-
-window.deleteBank = (idx) => {
-    window.appState.banks.splice(idx, 1);
-    window.renderBanks();
-    window.autoSave();
-};
-
-window.openBankDetails = (idx) => {
-    window.activeBankIndex = idx;
-    const bank = window.appState.banks[idx];
-    document.getElementById('activeBankTitle').innerText = bank.name;
-    document.getElementById('widget-finance').style.display = 'none';
-    document.getElementById('widget-finance').classList.add('hidden-el');
-    document.getElementById('bankDetailsPage').style.display = 'block';
-    document.getElementById('bankDetailsPage').classList.remove('hidden-el');
-    window.renderBankDetailsView();
-};
-
-window.closeBankDetails = () => {
-    window.activeBankIndex = null;
-    document.getElementById('bankDetailsPage').style.display = 'none';
-    document.getElementById('bankDetailsPage').classList.add('hidden-el');
-    document.getElementById('widget-finance').style.display = 'block';
-    document.getElementById('widget-finance').classList.remove('hidden-el');
-    window.renderBanks();
-};
-
-// تصميم الحسابات الفرعية الناعم
-window.renderBankDetailsView = () => {
-    if(window.activeBankIndex === null) return;
-    const bank = window.appState.banks[window.activeBankIndex];
-    
-    const accList = document.getElementById('bankAccountsList');
-    if(accList) {
-        accList.innerHTML = (bank.accounts || []).map((acc, idx) => `
-            <li style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-subtle); border-radius: 16px; margin-bottom: 12px;">
-                <span style="font-weight:600; font-size: 0.95rem;">${acc.name}</span>
-                <div style="display:flex; align-items:center; gap:16px;">
-                    <span style="font-weight:bold; font-size: 1.05rem; color:var(--text-primary);">${acc.balance} ر.س</span>
-                    <button class="delete-btn" style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" onclick="window.deleteBankAccount(${idx})">&times;</button>
-                </div>
-            </li>
-        `).join('') || '<div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:20px; background: var(--bg-subtle); border-radius: 16px;">لا توجد حسابات فرعية</div>';
-    }
-    
-    const txList = document.getElementById('bankTransactionsList');
-    if(txList) {
-        txList.innerHTML = (bank.transactions || []).map((tx, idx) => {
-            const color = tx.type === 'in' ? '#22c55e' : '#ef4444';
-            const sign = tx.type === 'in' ? '+' : '-';
-            return `
-            <li style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-subtle); border-radius: 16px; margin-bottom: 12px;">
-                <span style="font-weight:600; font-size: 0.95rem;">${tx.desc}</span>
-                <div style="display:flex; align-items:center; gap:16px;">
-                    <span style="font-weight:bold; font-size: 1.05rem; color:${color}; direction:ltr;">${sign}${tx.amount} ر.س</span>
-                    <button class="delete-btn" style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" onclick="window.deleteBankTransaction(${idx})">&times;</button>
-                </div>
-            </li>
-            `;
-        }).join('') || '<div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:20px; background: var(--bg-subtle); border-radius: 16px;">لا توجد حركات مسجلة</div>';
-    }
-};
-
-window.addBankAccount = () => {
-    if(window.activeBankIndex === null) return;
-    const name = document.getElementById('newBankAccountName').value.trim();
-    const bal = parseFloat(document.getElementById('newBankAccountBalance').value) || 0;
-    if(!name) return;
-    const bank = window.appState.banks[window.activeBankIndex];
-    if(!bank.accounts) bank.accounts = [];
-    bank.accounts.push({ name, balance: bal });
-    document.getElementById('newBankAccountName').value = '';
-    document.getElementById('newBankAccountBalance').value = '';
-    document.getElementById('addBankAccountForm').style.display = 'none';
-    document.getElementById('addBankAccountPlusBtn').style.display = 'flex';
-    window.renderBankDetailsView(); window.autoSave();
-};
-
-window.deleteBankAccount = (idx) => {
-    if(window.activeBankIndex === null) return;
-    window.appState.banks[window.activeBankIndex].accounts.splice(idx, 1);
-    window.renderBankDetailsView(); window.autoSave();
-};
-
-window.addBankTransaction = () => {
-    if(window.activeBankIndex === null) return;
-    const type = document.getElementById('newBankTxType').value;
-    const desc = document.getElementById('newBankTxDesc').value.trim();
-    const amount = parseFloat(document.getElementById('newBankTxAmount').value) || 0;
-    if(!desc || !amount) return;
-    const bank = window.appState.banks[window.activeBankIndex];
-    if(!bank.transactions) bank.transactions = [];
-    bank.transactions.push({ type, desc, amount });
-    document.getElementById('newBankTxDesc').value = '';
-    document.getElementById('newBankTxAmount').value = '';
-    document.getElementById('addBankTxForm').style.display = 'none';
-    document.getElementById('addBankTxPlusBtn').style.display = 'flex';
-    window.renderBankDetailsView(); window.autoSave();
-};
-
-window.deleteBankTransaction = (idx) => {
-    if(window.activeBankIndex === null) return;
-    window.appState.banks[window.activeBankIndex].transactions.splice(idx, 1);
-    window.renderBankDetailsView(); window.autoSave();
-};
-
-window.renderAllocations = () => {
-    if(!window.appState.allocations) window.appState.allocations = [
-        { label: 'الاحتياجات', percent: 50 },
-        { label: 'الرغبات', percent: 30 },
-        { label: 'الادخار', percent: 20 }
-    ];
-
-    const totalInput = document.getElementById('totalIncomeInput');
-    const distGrid = document.getElementById('allocationResults');
-    const remEl = document.getElementById('remainingPercent');
-    
-    if(!distGrid) return;
-    
-    const total = parseFloat(totalInput?.value) || 0;
-    let usedPercent = 0;
-    
-    distGrid.innerHTML = window.appState.allocations.map((a, idx) => {
-        usedPercent += parseFloat(a.percent);
-        const val = total * (a.percent / 100);
-        return `
-            <div style="background:var(--bg-subtle); padding:10px; border-radius:12px; border:1px solid var(--border-color); text-align:center; position:relative;">
-                <button class="delete-btn" style="position:absolute; top:4px; left:4px;" onclick="window.deleteAllocation(${idx})">&times;</button>
-                <div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:4px;">${a.label} (${a.percent}%)</div>
-                <div style="font-size:1.05rem; font-weight:bold; color:var(--accent-color); direction:ltr;">${val.toFixed(2)}</div>
-            </div>
-        `;
-    }).join('');
-
-    const rem = 100 - usedPercent;
-    if(remEl) {
-        remEl.innerText = `${rem}%`;
-        remEl.style.color = rem < 0 ? 'var(--danger-color)' : 'var(--accent-color)';
-        if(rem < 0) window.showToast('تنبيه: مجموع النسب يتجاوز 100%!');
-    }
-};
-
-window.addAllocation = () => {
-    const name = document.getElementById('newAllocName').value.trim();
-    const pct = parseFloat(document.getElementById('newAllocPercent').value);
-    
-    if(!name || isNaN(pct)) return window.showToast('الرجاء إدخال اسم ونسبة صحيحة');
-    
-    let usedPercent = 0;
-    window.appState.allocations.forEach(a => usedPercent += parseFloat(a.percent));
-    
-    if (usedPercent + pct > 100) return window.showToast(`لا يمكنك تجاوز 100%. المتبقي المسموح هو ${100 - usedPercent}%`);
-    
-    window.appState.allocations.push({ label: name, percent: pct });
-    document.getElementById('newAllocName').value = '';
-    document.getElementById('newAllocPercent').value = '';
-    window.renderAllocations(); window.autoSave();
-};
-
-window.deleteAllocation = (idx) => {
-    window.appState.allocations.splice(idx, 1);
-    window.renderAllocations(); window.autoSave();
-};
-
-// تصميم الاشتراكات المتقدمة والأنيقة
-window.renderSubscriptions = () => {
-    if(!window.appState.subscriptions) window.appState.subscriptions = [];
-    const list = document.getElementById('subscriptionsList');
-    let totalCost = 0;
-    if(!list) return;
-
-    list.innerHTML = window.appState.subscriptions.map((s, idx) => {
-        totalCost += parseFloat(s.cost) || 0;
-        const startDate = new Date(s.date);
-        let endDate = new Date(s.date);
-        let cycleText = '';
-        
-        if(s.cycle === 'monthly') { endDate.setMonth(endDate.getMonth() + 1); cycleText = 'شهري'; }
-        else { endDate.setFullYear(endDate.getFullYear() + 1); cycleText = 'سنوي'; }
-        
-        const now = new Date();
-        const diffTime = endDate - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        let statusHtml = '';
-        if (diffDays <= 3 && diffDays >= 0) statusHtml = `<span style="color:var(--danger-color); font-size:0.75rem; font-weight:bold; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 8px;">ينتهي خلال ${diffDays} أيام</span>`;
-        else if (diffDays < 0) statusHtml = `<span style="color:var(--danger-color); font-size:0.75rem; font-weight:bold; background: rgba(239, 68, 68, 0.1); padding: 2px 8px; border-radius: 8px;">منتهي</span>`;
-        else statusHtml = `<span style="color:var(--text-secondary); font-size:0.75rem; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 8px;">باقي ${diffDays} يوم</span>`;
-
-        const bankName = s.bankIdx !== '' && window.appState.banks[s.bankIdx] ? window.appState.banks[s.bankIdx].name : 'بدون بنك';
-
-        return `
-            <li style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-subtle); border-radius: 16px; margin-bottom: 12px;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width: 40px; height: 40px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 1.2rem;">🔄</div>
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <span style="font-weight:600; font-size:0.95rem;">${s.name} <span style="font-size:0.7rem; color: var(--text-secondary); font-weight: normal;">(${cycleText})</span></span>
-                        <div style="display:flex; gap: 6px; align-items: center;">
-                            <span style="font-size:0.75rem; color:var(--text-secondary);">🏦 ${bankName}</span>
-                            ${statusHtml}
-                        </div>
-                    </div>
-                </div>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; font-size:1.05rem;">${s.cost} ر.س</span>
-                    <button class="delete-btn" style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;" onclick="window.deleteSubscription(${idx})">&times;</button>
-                </div>
-            </li>
-        `;
-    }).join('') || '<div style="font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:20px; background: var(--bg-subtle); border-radius: 16px;">لا توجد اشتراكات</div>';
-    
-    const totalValEl = document.getElementById('subsTotalValue');
-    if (totalValEl) totalValEl.innerText = totalCost + ' ر.س';
-};
-
-window.addSubscription = () => {
-    const name = document.getElementById('newSubName').value.trim();
-    const cost = parseFloat(document.getElementById('newSubCost').value);
-    const cycle = document.getElementById('newSubCycle').value;
-    const bankIdx = document.getElementById('newSubBank').value;
-    const date = document.getElementById('newSubDate').value;
-    
-    if(!name || isNaN(cost) || !date) return window.showToast('الرجاء تعبئة الاسم والسعر والتاريخ');
-    
-    if(!window.appState.subscriptions) window.appState.subscriptions = [];
-    window.appState.subscriptions.push({name, cost, cycle, bankIdx, date});
-    
-    document.getElementById('newSubName').value = ''; 
-    document.getElementById('newSubCost').value = '';
-    document.getElementById('newSubDate').value = '';
-    
-    document.getElementById('addSubForm').style.display = 'none';
-    document.getElementById('addSubPlusBtn').style.display = 'flex';
-    
-    window.renderSubscriptions(); window.autoSave();
-};
-
-window.deleteSubscription = (idx) => {
-    window.appState.subscriptions.splice(idx, 1);
-    window.renderSubscriptions(); window.autoSave();
-};
-
-window.addIncome = () => {
-    const name = document.getElementById('newIncomeName').value.trim();
-    const amount = document.getElementById('newIncomeAmount').value;
-    const date = document.getElementById('newIncomeDate').value;
-    if(!name || !amount) return;
-    if(!window.appState.incomeSources) window.appState.incomeSources = [];
-    window.appState.incomeSources.push({name, amount: parseFloat(amount), date});
-    document.getElementById('newIncomeName').value = '';
-    document.getElementById('newIncomeAmount').value = '';
-    document.getElementById('newIncomeDate').value = '';
-    document.getElementById('addIncomeForm').style.display = 'none';
-    document.getElementById('addIncomePlusBtn').style.display = 'flex';
-    window.renderLists(); window.autoSave();
-};
-
-window.deleteIncome = (idx) => { window.appState.incomeSources.splice(idx, 1); window.renderLists(); window.autoSave(); };
-
-window.addWishlistItem = () => {
-    const title = document.getElementById('newWishTitle').value.trim();
-    const cost = document.getElementById('newWishCost').value;
-    const priority = document.getElementById('newWishPriority').value;
-    const link = document.getElementById('newWishLink').value.trim();
-    if (!title || !cost) return;
-    if (!window.appState.wishlist) window.appState.wishlist = [];
-    window.appState.wishlist.push({ title, cost: parseFloat(cost)||0, priority, link });
-    document.getElementById('newWishTitle').value = '';
-    document.getElementById('newWishCost').value = '';
-    document.getElementById('newWishLink').value = '';
-    document.getElementById('addWishForm').style.display = 'none';
-    document.getElementById('addWishPlusBtn').style.display = 'flex';
-    window.renderLists(); window.autoSave();
-};
-
-window.deleteWishlistItem = (idx) => { window.appState.wishlist.splice(idx, 1); window.renderLists(); window.autoSave(); };
-
-window.renderLists = () => {
-    const habitsList = document.getElementById('habitsList');
-    if(habitsList) {
-        habitsList.innerHTML = (window.appState.habits || []).map((h, idx) => `
-            <li class="list-item ${h.done ? 'completed' : ''}" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <div class="item-left">
-                    <div class="checkbox" onclick="window.toggleHabit(${idx})">${h.done ? '✓' : ''}</div>
-                    <span>${h.text}</span>
-                </div>
-                <button class="delete-btn" onclick="window.deleteHabit(${idx})">&times;</button>
-            </li>
-        `).join('');
-    }
-    
-    let totalIncome = 0;
-    const incList = document.getElementById('incomeSourcesList');
-    if(incList) {
-        incList.innerHTML = (window.appState.incomeSources || []).map((inc, idx) => {
-            totalIncome += parseFloat(inc.amount) || 0;
-            return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <span style="font-weight:600; font-size:0.85rem;">${inc.name}</span>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="color:var(--accent-color); font-weight:bold; font-size:0.85rem;">${inc.amount} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteIncome(${idx})">&times;</button>
-                </div>
-            </li>`;
-        }).join('');
-        const sumCard = document.getElementById('incomeSummaryCard');
-        if (sumCard) {
-            sumCard.innerHTML = `<div style="font-weight:bold; margin-top:8px;">إجمالي الدخل المُسجل: ${totalIncome} ر.س</div>`;
-        }
-    }
-
-    const wList = document.getElementById('wishlistList');
-    if (wList) {
-        let wishTotal = 0;
-        const priorityColors = { high: '#ef4444', medium: '#f59e0b', low: '#3b82f6' };
-        const priorityLabels = { high: 'قصوى', medium: 'متوسطة', low: 'منخفضة' };
-
-        wList.innerHTML = (window.appState.wishlist || []).map((w, idx) => {
-            wishTotal += w.cost;
-            const linkHtml = w.link ? `<a href="${w.link}" target="_blank" style="margin-right:8px; font-size:0.75rem; color:var(--accent-color); text-decoration:none;">🔗 الرابط</a>` : '';
-            return `
-            <li class="list-item" style="padding: 10px 14px; background: transparent; border-bottom: 1px dashed var(--border-color); border-radius: 0;">
-                <div class="item-left" style="display:flex; flex-direction:column; gap:4px;">
-                    <span style="font-weight: 600; font-size:0.85rem;">${w.title}</span>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span style="font-size:0.7rem; padding:2px 6px; border-radius:8px; background:var(--bg-subtle); color:${priorityColors[w.priority] || '#333'}">${priorityLabels[w.priority] || 'عادية'}</span>
-                        ${linkHtml}
-                    </div>
-                </div>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight: bold; font-size:0.85rem;">${w.cost} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteWishlistItem(${idx})">&times;</button>
-                </div>
-            </li>
-            `;
-        }).join('');
-        const totalEl = document.getElementById('wishlistTotal');
-        if (totalEl) totalEl.innerText = wishTotal.toFixed(2) + ' ر.س';
-    }
-};
-
-window.addHabit = () => {
-    const input = document.getElementById('newHabitInput');
-    const v = input.value.trim();
-    if (!v) return;
-    if (!window.appState.habits) window.appState.habits = [];
-    window.appState.habits.push({ text: v, done: false });
-    input.value = '';
-    document.getElementById('addHabitForm').style.display = 'none';
-    document.getElementById('addHabitPlusBtn').style.display = 'flex';
-    window.renderLists(); window.autoSave();
-};
-
-window.deleteHabit = (idx) => { window.appState.habits.splice(idx, 1); window.renderLists(); window.autoSave(); };
-window.toggleHabit = (idx) => { window.appState.habits[idx].done = !window.appState.habits[idx].done; window.renderLists(); window.autoSave(); };
-
-window.renderKanbanBoard = function() {
-  if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
-  const cols = { idea: [], scheduled: [], progress: [], done: [] };
-  window.appState.kanbanTasks.forEach((task, idx) => { const st = cols[task.status] ? task.status : 'idea'; cols[st].push({ ...task, idx }); });
-
-  const priorityLabel = { do: 'عاجل ومهم', schedule: 'جدولها', delegate: 'تفوّيض', drop: 'غير مهم' };
-  const priorityStyle = {
-      do: 'background:#fee2e2; color:#ef4444; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;',
-      schedule: 'background:#e0f2fe; color:#3b82f6; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;',
-      delegate: 'background:#fef3c7; color:#f59e0b; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;',
-      drop: 'background:#f3f4f6; color:#6b7280; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:bold;'
-  };
-
-  ['idea', 'scheduled', 'progress', 'done'].forEach(colKey => {
-    const countEl = document.getElementById(`count-${colKey}`);
-    const wrapEl = document.getElementById(`col-${colKey}`);
-    if(countEl) countEl.innerText = cols[colKey].length;
-    if(wrapEl) {
-      wrapEl.innerHTML = cols[colKey].map(item => `
-        <div class="kanban-card" draggable="true" ondragstart="window.dragKanbanCard(event, ${item.idx})">
-          <div class="kanban-card-title">${item.title}</div>
-          <div class="kanban-badges" style="display:flex; gap:6px; margin-top:8px;">
-            <span style="${priorityStyle[item.priority] || priorityStyle['schedule']}">${priorityLabel[item.priority] || 'مهم ومجدول'}</span>
-            ${item.date ? `<span style="background:var(--bg-subtle); color:var(--text-secondary); padding:2px 8px; border-radius:12px; font-size:0.75rem;">${item.date}</span>` : ''}
+            <button class="btn btn-danger" onclick="window.handleLogout()">خروج للإدارة</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); grid-column: 1 / -1;">
+            <h3 style="margin-bottom: 15px;">قاعدة بيانات المستخدمين وإدارة الاشتراكات</h3>
+            <ul id="adminUsersList" class="item-list" style="max-height: 400px; overflow-y: auto;"></ul>
           </div>
-          <div class="kanban-card-footer" style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
-            <select style="font-size:0.75rem; padding:4px; border-radius:4px;" onchange="window.changeKanbanStatus(${item.idx}, this.value)">
-                <option value="idea" ${item.status==='idea'?'selected':''}>فكرة</option>
-                <option value="scheduled" ${item.status==='scheduled'?'selected':''}>مجدول</option>
-                <option value="progress" ${item.status==='progress'?'selected':''}>تنفيذ</option>
-                <option value="done" ${item.status==='done'?'selected':''}>مكتمل</option>
-            </select>
-            <button class="delete-btn" onclick="window.deleteKanbanTask(${item.idx})">&times;</button>
-          </div>
-        </div>`).join('');
-    }
-  });
-};
-
-window.addKanbanTask = () => {
-  const title = document.getElementById('newKanbanTitle').value.trim(); 
-  const status = document.getElementById('newKanbanStatus').value; 
-  const priority = document.getElementById('newKanbanPriority').value; 
-  const date = document.getElementById('newKanbanDate').value;
-  if (!title) return window.showToast('أدخل عنوان المهمة');
-  if (!window.appState.kanbanTasks) window.appState.kanbanTasks = [];
-  window.appState.kanbanTasks.push({ title, status, priority, date }); 
-  document.getElementById('newKanbanTitle').value = ''; 
-  document.getElementById('addKanbanForm').style.display = 'none';
-  document.getElementById('addKanbanPlusBtn').style.display = 'flex';
-  window.renderKanbanBoard(); window.autoSave();
-};
-
-window.changeKanbanStatus = (idx, newStatus) => { window.appState.kanbanTasks[idx].status = newStatus; window.renderKanbanBoard(); window.autoSave(); };
-window.deleteKanbanTask = (idx) => { window.appState.kanbanTasks.splice(idx, 1); window.renderKanbanBoard(); window.autoSave(); };
-window.dragKanbanCard = (e, idx) => { e.stopPropagation(); window.draggedKanbanIndex = idx; };
-window.allowKanbanDrop = (e) => { e.preventDefault(); };
-window.dropKanbanCard = (e, targetStatus) => { e.preventDefault(); if (window.draggedKanbanIndex === null) return; window.appState.kanbanTasks[window.draggedKanbanIndex].status = targetStatus; window.draggedKanbanIndex = null; window.renderKanbanBoard(); window.autoSave(); };
-
-window.renderBusinessWidget = () => {
-    if (!window.appState.business) window.appState.business = { projects: [], campaigns: [] };
-    const pCount = window.appState.business.projects.length;
-    let income = 0;
-    window.appState.business.projects.forEach(p => { income += parseFloat(p.price) || 0; });
-    const summaryCard = document.getElementById('businessSummaryCard');
-    if (summaryCard) {
-        summaryCard.innerHTML = `
-            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-                <div style="background:var(--bg-subtle); padding:16px; border-radius:12px; flex:1; margin-left:8px; text-align:center; border:1px solid var(--border-color);">
-                    <div style="font-size:1.8rem; margin-bottom:4px;">${pCount}</div>
-                    <div style="font-size:0.8rem; color:var(--text-secondary);">مشاريع نشطة</div>
-                </div>
-                <div style="background:var(--bg-subtle); padding:16px; border-radius:12px; flex:1; text-align:center; border:1px solid var(--border-color);">
-                    <div style="font-size:1.8rem; margin-bottom:4px; color:var(--accent-color);">${income}</div>
-                    <div style="font-size:0.8rem; color:var(--text-secondary);">إيرادات متوقعة</div>
-                </div>
+          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 15px;">إصدار تراخيص جديدة</h3>
+            <div class="form-group" style="display: flex; gap: 8px;">
+                <input type="text" id="adminCodeInputPage" placeholder="الكود (اختياري)..." style="flex: 2; padding: 12px; border-radius: 10px;">
+                <select id="adminDaysSelectPage" style="flex: 1.5; padding: 12px; border-radius: 10px; background: var(--bg-subtle);">
+                    <option value="30">شهر (1)</option>
+                    <option value="90">3 أشهر</option>
+                    <option value="180">6 أشهر</option>
+                    <option value="365">سنة كاملة (12)</option>
+                    <option value="lifetime">مدى الحياة</option>
+                </select>
             </div>
-            <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="window.openPage('businessDetailsPage')">إدارة الأعمال والتفاصيل</button>
-        `;
-    }
-};
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="window.generateActivationCodePage()">توليد واعتماد الكود</button>
+          </div>
+          <div style="background: var(--bg-primary); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 15px;">الأكواد النشطة المتاحة للبيع</h3>
+            <ul id="adminCodesListPage" class="item-list" style="max-height: 220px; overflow-y: auto;"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
-window.renderBusinessDetailsView = () => {
-    const pList = document.getElementById('businessProjectsList');
-    const cList = document.getElementById('businessCampaignsList');
-    if (pList) {
-        pList.innerHTML = window.appState.business.projects.map((p, idx) => `
-            <li class="list-item" style="padding:12px; margin-bottom:8px; border-radius:12px; background:var(--bg-subtle);">
-                <div style="display:flex; flex-direction:column; gap:4px;">
-                    <span style="font-weight:bold;">${p.name}</span>
-                    <span style="font-size:0.75rem; color:var(--text-secondary);">${p.type} | التسليم: ${p.date || 'غير محدد'}</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-weight:bold; color:var(--accent-color);">${p.price} ر.س</span>
-                    <button class="delete-btn" onclick="window.deleteBusinessProject(${idx})">&times;</button>
-                </div>
-            </li>
-        `).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد مشاريع حالياً</div>';
-    }
-    if (cList) {
-        cList.innerHTML = window.appState.business.campaigns.map((c, idx) => `
-            <li class="list-item" style="padding:12px; margin-bottom:8px; border-radius:12px; background:var(--bg-subtle);">
-                <div style="display:flex; flex-direction:column; gap:4px;">
-                    <span style="font-weight:bold;">${c.name}</span>
-                    <span style="font-size:0.75rem; color:var(--text-secondary);">النشر: ${c.date || 'غير محدد'}</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <span style="font-size:0.75rem; padding:4px 8px; border-radius:8px; background:var(--bg-primary);">${c.platform}</span>
-                    <button class="delete-btn" onclick="window.deleteBusinessCampaign(${idx})">&times;</button>
-                </div>
-            </li>
-        `).join('') || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">لا توجد حملات حالياً</div>';
-    }
-};
+    <!-- مساحة عمل المستخدم -->
+    <div id="mainWorkspace" class="hidden-el">
+      <section class="hero-section">
+        <div class="greeting-box">
+          <div id="liveDateText" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-color); margin-bottom: 6px;"></div>
+          <h2 id="welcomeText" style="margin-top: 0;">صباح الخير، أهلاً بك.</h2>
+          <p id="dayNightSubtext">رتّب أولوياتك بهدوء وتركيز.</p>
+        </div>
+      </section>
 
-window.closeBusinessDetails = () => { window.openPage('widget-business'); };
-window.addBusinessProject = () => {
-    const name = document.getElementById('newProjectName').value.trim();
-    const type = document.getElementById('newProjectType').value;
-    const price = document.getElementById('newProjectPrice').value;
-    const date = document.getElementById('newProjectDate').value;
-    if(!name) return;
-    window.appState.business.projects.push({name, type, price, date});
-    document.getElementById('newProjectName').value=''; document.getElementById('newProjectPrice').value=''; document.getElementById('newProjectDate').value='';
-    window.renderBusinessDetailsView(); window.renderBusinessWidget(); window.autoSave();
-};
-window.deleteBusinessProject = (idx) => { window.appState.business.projects.splice(idx,1); window.renderBusinessDetailsView(); window.renderBusinessWidget(); window.autoSave(); };
-window.addBusinessCampaign = () => {
-    const name = document.getElementById('newCampaignName').value.trim();
-    const platform = document.getElementById('newCampaignPlatform').value;
-    const date = document.getElementById('newCampaignDate').value;
-    if(!name) return;
-    window.appState.business.campaigns.push({name, platform, date});
-    document.getElementById('newCampaignName').value=''; document.getElementById('newCampaignDate').value='';
-    window.renderBusinessDetailsView(); window.renderBusinessWidget(); window.autoSave();
-};
-window.deleteBusinessCampaign = (idx) => { window.appState.business.campaigns.splice(idx,1); window.renderBusinessDetailsView(); window.renderBusinessWidget(); window.autoSave(); };
+      <section class="toolbar-ios">
+        <div class="toolbar-group">
+          <span class="toolbar-label">المظهر:</span>
+          <button class="chip active" data-theme-btn="default" onclick="window.setTheme('default', this)">ورق دافئ</button>
+          <button class="chip" data-theme-btn="minimal" onclick="window.setTheme('minimal', this)">صباح نقي</button>
+          <button class="chip" data-theme-btn="dark" onclick="window.setTheme('dark', this)">سكون ليلي</button>
+        </div>
+        <div class="toolbar-group" id="toolbarToolsContainer">
+          <button class="btn btn-subtle" style="font-weight: 700; padding: 8px 16px;" onclick="window.openModal('addWidgetModal')">المكتبة +</button>
+        </div>
+        <div class="toolbar-group" id="homeBtnContainer" style="display: none;">
+          <button class="btn btn-primary" style="font-weight: 700; padding: 8px 16px;" onclick="window.goHome()">العودة للرئيسية</button>
+        </div>
+      </section>
+
+      <div id="emptyWorkspaceState" class="hidden-el">
+        <h3>لا توجد تطبيقات مثبتة</h3>
+        <p>اضغط على زر المكتبة لتنزيل التطبيقات التي تحتاجها.</p>
+        <button class="btn btn-primary" onclick="window.openModal('addWidgetModal')">فتح المكتبة</button>
+      </div>
+
+      <div id="appLauncherGrid" class="app-launcher-grid"></div>
+
+      <div id="pageContainer" style="display: none;">
+        
+        <!-- الأهداف -->
+        <div id="widget-vision" class="widget-card col-12 hidden-el" data-widget-id="widget-vision">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">لوحة الأهداف</span></div>
+            <button id="addVisionPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addVisionForm').style.display='block'; this.style.display='none';">+</button>
+          </div>
+          <div id="addVisionForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 0.85rem; color: var(--accent-color);">هدف جديد</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addVisionForm').style.display='none'; document.getElementById('addVisionPlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0; align-items: stretch;">
+              <input type="text" id="newVisionTitle" placeholder="عنوان الهدف..." style="flex:2;">
+              <label id="visionImgLabel" style="cursor:pointer; display:flex; align-items:center; justify-content:center; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-secondary); flex: 1.5; font-size: 0.85rem;">
+                <span id="visionImgText">📷 إرفاق صورة</span>
+                <input type="file" id="newVisionImgFile" accept="image/*" style="display:none;" onchange="document.getElementById('visionImgText').innerText='✅ تم الإرفاق'; this.parentElement.style.borderColor='var(--accent-color)'; this.parentElement.style.color='var(--accent-color)';">
+              </label>
+              <input type="date" id="newVisionDate" style="flex:1;">
+              <button class="btn btn-primary" onclick="window.addVisionItem()">تثبيت</button>
+            </div>
+          </div>
+          <div id="corkboardContainer" class="corkboard-surface" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;"></div>
+        </div>
+
+        <!-- مصفوفة الأولويات -->
+        <div id="widget-matrix" class="widget-card col-12 hidden-el" data-widget-id="widget-matrix">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">مصفوفة الأولويات</span></div>
+            <button id="addMatrixPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addMatrixForm').style.display='block'; this.style.display='none';">+</button>
+          </div>
+          <div id="addMatrixForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة جديدة</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addMatrixForm').style.display='none'; document.getElementById('addMatrixPlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0;">
+              <input type="text" id="newMatrixTitle" placeholder="اسم المهمة..." style="flex: 2;">
+              <select id="newMatrixType" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                <option value="do">عاجل ومهم (نفذ فوراً)</option>
+                <option value="schedule">مهم وغير عاجل (جدولها)</option>
+                <option value="delegate">عاجل وغير مهم (فوضها)</option>
+                <option value="drop">غير مهم (إلغاء)</option>
+              </select>
+              <button class="btn btn-primary" onclick="window.addMatrixTask()">إضافة</button>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="color: var(--danger-color); font-size: 0.95rem;">عاجل ومهم (نفذ فوراً)</strong>
+              <span id="count-do" style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary);">0</span>
+            </div>
+            <ul id="matrix-do" class="item-list"></ul>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="color: var(--accent-color); font-size: 0.95rem;">مهم ومجدول (خطط له)</strong>
+              <span id="count-schedule" style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary);">0</span>
+            </div>
+            <ul id="matrix-schedule" class="item-list"></ul>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="color: #f59e0b; font-size: 0.95rem;">عاجل وغير مهم (فوّض)</strong>
+              <span id="count-delegate" style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary);">0</span>
+            </div>
+            <ul id="matrix-delegate" class="item-list"></ul>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="color: var(--text-secondary); font-size: 0.95rem;">غير مهم (تجاهل)</strong>
+              <span id="count-drop" style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary);">0</span>
+            </div>
+            <ul id="matrix-drop" class="item-list"></ul>
+          </div>
+        </div>
+
+        <!-- المهام (الكانبان) -->
+        <div id="widget-kanban" class="widget-card col-12 hidden-el" data-widget-id="widget-kanban">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المهام المتنقلة</span></div>
+            <button id="addKanbanPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addKanbanForm').style.display='block'; this.style.display='none';">+</button>
+          </div>
+          <div id="addKanbanForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة جديدة</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addKanbanForm').style.display='none'; document.getElementById('addKanbanPlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0;">
+              <input type="text" id="newKanbanTitle" placeholder="عنوان المهمة...">
+              <select id="newKanbanStatus"><option value="idea">فكرة</option><option value="scheduled">مجدول</option><option value="progress">تنفيذ</option><option value="done">مكتمل</option></select>
+              <select id="newKanbanPriority"><option value="urgent">عاجل</option><option value="normal" selected>عادي</option><option value="low">غير مهم</option></select>
+              <input type="date" id="newKanbanDate">
+              <button class="btn btn-primary" onclick="window.addKanbanTask()">تأكيد</button>
+            </div>
+          </div>
+          <div class="kanban-grid">
+            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'idea')"><div class="kanban-col-header"><span>فكرة</span><span class="kanban-count" id="count-idea">0</span></div><div class="kanban-cards-wrap" id="col-idea"></div></div>
+            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'scheduled')"><div class="kanban-col-header"><span>مجدول</span><span class="kanban-count" id="count-scheduled">0</span></div><div class="kanban-cards-wrap" id="col-scheduled"></div></div>
+            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'progress')"><div class="kanban-col-header"><span>قيد التنفيذ</span><span class="kanban-count" id="count-progress">0</span></div><div class="kanban-cards-wrap" id="col-progress"></div></div>
+            <div class="kanban-col" ondragover="window.allowKanbanDrop(event)" ondrop="window.dropKanbanCard(event, 'done')"><div class="kanban-col-header"><span>مكتمل</span><span class="kanban-count" id="count-done">0</span></div><div class="kanban-cards-wrap" id="col-done"></div></div>
+          </div>
+        </div>
+
+        <!-- الصحة والعناية الشخصية -->
+        <div id="widget-care" class="widget-card col-12 hidden-el" data-widget-id="widget-care">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">الصحة والعناية الشخصية</span></div>
+          </div>
+          <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <strong style="font-size: 0.95rem;">الصحة والنشاط البدني</strong>
+              <button id="addHealthPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHealthForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addHealthForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة صحية جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addHealthForm').style.display='none'; document.getElementById('addHealthPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newHealthTask" placeholder="شرب ماء، مشي 30 دقيقة..." onkeypress="if(event.key==='Enter') window.addCareRoutine('health')">
+                <button class="btn btn-primary" onclick="window.addCareRoutine('health')">إضافة</button>
+              </div>
+            </div>
+            <ul id="healthRoutineList" class="item-list"></ul>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <strong style="font-size: 0.95rem;">العناية بالبشرة (Skin Care)</strong>
+              <button id="addSkinPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addSkinForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addSkinForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مهمة عناية جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addSkinForm').style.display='none'; document.getElementById('addSkinPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newSkinTask" placeholder="غسول، سيروم، مرطب..." onkeypress="if(event.key==='Enter') window.addCareRoutine('skin')">
+                <button class="btn btn-primary" onclick="window.addCareRoutine('skin')">إضافة</button>
+              </div>
+            </div>
+            <ul id="skinRoutineList" class="item-list"></ul>
+          </div>
+        </div>
+
+        <!-- المالية الشاملة (المحسنة بتصميم أبل) -->
+        <div id="widget-finance" class="widget-card col-12 hidden-el" data-widget-id="widget-finance">
+          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">المالية الشاملة</span></div></div>
+          
+          <!-- متتبع الدخل -->
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">متتبع الدخل</div>
+              <button id="addIncomePlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addIncomeForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addIncomeForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مصدر دخل جديد</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addIncomeForm').style.display='none'; document.getElementById('addIncomePlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
+                <input type="text" id="newIncomeName" placeholder="المصدر..." style="flex:2; min-width:120px;">
+                <input type="number" id="newIncomeAmount" placeholder="المبلغ" style="flex:1; min-width:90px;">
+                <input type="date" id="newIncomeDate" style="flex:1.5; min-width:130px;">
+                <button class="btn btn-primary" style="flex:1; min-width:90px;" onclick="window.addIncome()">إضافة</button>
+              </div>
+            </div>
+            <ul id="incomeSourcesList" class="item-list"></ul>
+            <div id="incomeSummaryCard"></div>
+          </div>
+
+          <!-- توزيع الدخل المخصص -->
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 0.95rem; font-weight: 700;">تخصيص وتوزيع الدخل</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.85rem;">الدخل المتوقع:</span>
+                <input type="number" id="totalIncomeInput" value="5000" oninput="window.renderAllocations(); window.autoSave();" style="width: 120px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); font-weight: bold;">
+                <span style="font-size: 0.85rem;">ر.س</span>
+              </div>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; text-align: left;">
+              نسبة التوزيع المتبقية: <span id="remainingPercent" style="font-weight:bold; color:var(--accent-color);">100%</span>
+            </div>
+            <div id="allocationResults" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 16px;"></div>
+            
+            <div id="addAllocForm" style="background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color);">
+              <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 8px; color: var(--text-primary);">إضافة قسم جديد للتوزيع</div>
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="newAllocName" placeholder="احتياجات، ادخار..." style="flex:2; padding: 8px; border-radius: 8px;">
+                <input type="number" id="newAllocPercent" placeholder="النسبة %" style="flex:1; padding: 8px; border-radius: 8px;">
+                <button class="btn btn-subtle" onclick="window.addAllocation()">إضافة</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- قائمة الأمنيات -->
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">قائمة الأمنيات</div>
+              <button id="addWishPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addWishForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addWishForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">أمنية جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addWishForm').style.display='none'; document.getElementById('addWishPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="align-items: stretch; margin-top: 0;">
+                <input type="text" id="newWishTitle" placeholder="الاسم..." style="flex:2;">
+                <input type="number" id="newWishCost" placeholder="السعر" style="flex:1;">
+                <button class="btn btn-primary" style="flex:1;" onclick="window.addWishlistItem()">تأكيد</button>
+              </div>
+            </div>
+            <ul id="wishlistList" class="item-list"></ul>
+          </div>
+
+          <!-- البنوك والحسابات بتصميم Apple-like -->
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.2rem;">🏦</span>
+                <div style="font-size: 0.95rem; font-weight: 700;">البنوك والحسابات</div>
+              </div>
+              <button id="addBankPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addBankForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="banksTotalOverview" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px;">مجموع الأرصدة: 0 ر.س</div>
+            
+            <div id="addBankForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">بنك جديد</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankForm').style.display='none'; document.getElementById('addBankPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newBankName" placeholder="اسم البنك (الراجحي، الأهلي)...">
+                <button class="btn btn-primary" onclick="window.addBank()">إضافة البنك</button>
+              </div>
+            </div>
+            <div id="banksContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
+          </div>
+
+          <!-- الاشتراكات (المتقدمة بتصميم Apple-like) -->
+          <div style="margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.2rem;">💳</span>
+                <div style="font-size: 0.95rem; font-weight: 700;">الاشتراكات الشهرية والسنوية</div>
+              </div>
+              <button id="addSubPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="window.prepareSubscriptionForm(); document.getElementById('addSubForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            
+            <div id="subsTotalOverview" style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-subtle); padding: 16px; border-radius: 16px; margin-bottom: 16px;">
+                <span style="font-weight: 600; font-size: 0.9rem;">إجمالي الالتزامات</span>
+                <span id="subsTotalValue" style="font-weight: bold; font-size: 1.1rem; color: var(--accent-color);">0 ر.س</span>
+            </div>
+
+            <div id="addSubForm" style="display: none; background: var(--bg-subtle); padding: 18px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 18px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">اشتراك جديد</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addSubForm').style.display='none'; document.getElementById('addSubPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="display: flex; gap: 8px;">
+                      <input type="text" id="newSubName" placeholder="اسم الاشتراك..." style="flex:2; padding: 10px; border-radius: 8px;">
+                      <input type="number" id="newSubCost" placeholder="السعر" style="flex:1; padding: 10px; border-radius: 8px;">
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                      <select id="newSubCycle" style="flex:1; padding: 10px; border-radius: 8px;">
+                          <option value="monthly">شهري</option>
+                          <option value="yearly">سنوي</option>
+                      </select>
+                      <select id="newSubBank" style="flex:1.5; padding: 10px; border-radius: 8px;">
+                          <!-- يتم تعبئتها ديناميكياً بأسماء البنوك -->
+                      </select>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <label style="font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap;">تاريخ البدء:</label>
+                      <input type="date" id="newSubDate" style="flex:1; padding: 10px; border-radius: 8px;">
+                      <button class="btn btn-primary" onclick="window.addSubscription()">إضافة</button>
+                  </div>
+              </div>
+            </div>
+            <ul id="subscriptionsList" class="item-list"></ul>
+          </div>
+        </div>
+
+        <!-- صفحة تفاصيل البنك الفرعية -->
+        <div id="bankDetailsPage" class="widget-card col-12 hidden-el" style="display: none;">
+          <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeBankDetails()">عودة للمالية</button>
+              <div class="card-title" id="activeBankTitle" style="font-size: 1.15rem; font-weight: 700;">اسم البنك</div>
+              <div style="width: 70px;"></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">الحسابات الفرعية</div>
+              <button id="addBankAccountPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addBankAccountForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addBankAccountForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">حساب فرعي جديد</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankAccountForm').style.display='none'; document.getElementById('addBankAccountPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0;">
+                <input type="text" id="newBankAccountName" placeholder="جاري، ادخار، استثمار..." style="flex:2;">
+                <input type="number" id="newBankAccountBalance" placeholder="الرصيد الافتتاحي" style="flex:1;">
+                <button class="btn btn-primary" onclick="window.addBankAccount()">إضافة</button>
+              </div>
+            </div>
+            <ul id="bankAccountsList" class="item-list"></ul>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">حركة الحساب (صادر ووارد)</div>
+              <button id="addBankTxPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addBankTxForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addBankTxForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">عملية بنكية جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addBankTxForm').style.display='none'; document.getElementById('addBankTxPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap;">
+                <select id="newBankTxType" style="flex:1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary);">
+                  <option value="in">إيداع (+)</option>
+                  <option value="out">سحب (-)</option>
+                </select>
+                <input type="text" id="newBankTxDesc" placeholder="الوصف (راتب، تحويل...)" style="flex:2;">
+                <input type="number" id="newBankTxAmount" placeholder="المبلغ" style="flex:1;">
+                <button class="btn btn-primary" onclick="window.addBankTransaction()">تسجيل</button>
+              </div>
+            </div>
+            <ul id="bankTransactionsList" class="item-list"></ul>
+          </div>
+        </div>
+
+        <!-- الأعمال -->
+        <div id="widget-business" class="widget-card col-12 hidden-el" data-widget-id="widget-business">
+          <div class="card-header"><div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">استوديو الأعمال</span></div></div>
+          <div id="businessSummaryCard"></div>
+        </div>
+
+        <div id="businessDetailsPage" class="widget-card col-12 hidden-el" style="display: none;">
+          <div class="card-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <button class="btn btn-subtle" style="font-weight:700;" onclick="window.closeBusinessDetails()">الرئيسية</button>
+              <div class="card-title" style="font-size: 1.15rem; font-weight: 700;">المشاريع والحملات</div>
+              <div style="width: 70px;"></div>
+            </div>
+          </div>
+          <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">المشاريع والعملاء</div>
+              <button id="addProjectPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addProjectForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addProjectForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">مشروع جديد</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addProjectForm').style.display='none'; document.getElementById('addProjectPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
+                <input type="text" id="newProjectName" placeholder="الاسم..." style="flex:2; min-width:130px;">
+                <select id="newProjectType" style="flex:1; min-width:110px;">
+                  <option value="تصميم">تصميم</option>
+                  <option value="برمجة">برمجة</option>
+                  <option value="منتج/متجر">منتج/متجر</option>
+                  <option value="استشارة">استشارة</option>
+                </select>
+                <input type="number" id="newProjectPrice" placeholder="السعر" style="flex:1; min-width:80px;">
+                <input type="date" id="newProjectDate" title="تاريخ التسليم" style="flex:1.2; min-width:110px;">
+                <button class="btn btn-primary" style="flex:1; min-width:80px;" onclick="window.addBusinessProject()">إضافة</button>
+              </div>
+            </div>
+            <ul id="businessProjectsList" class="item-list"></ul>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.95rem; font-weight: 700;">الحملات والمحتوى</div>
+              <button id="addCampaignPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addCampaignForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+            <div id="addCampaignForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <strong style="font-size: 0.85rem; color: var(--accent-color);">حملة جديدة</strong>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addCampaignForm').style.display='none'; document.getElementById('addCampaignPlusBtn').style.display='flex';">&times;</button>
+              </div>
+              <div class="add-row" style="margin-top: 0; align-items: stretch; flex-wrap: wrap; gap: 8px;">
+                <input type="text" id="newCampaignName" placeholder="الفكرة..." style="flex:2; min-width:140px;">
+                <select id="newCampaignPlatform" style="flex:1; min-width:100px;">
+                  <option value="إنستغرام">إنستغرام</option>
+                  <option value="تيك توك">تيك توك</option>
+                  <option value="متجر">متجر</option>
+                  <option value="إكس">إكس</option>
+                </select>
+                <input type="date" id="newCampaignDate" title="تاريخ النشر" style="flex:1.2; min-width:110px;">
+                <button class="btn btn-primary" style="flex:1; min-width:80px;" onclick="window.addBusinessCampaign()">إضافة</button>
+              </div>
+            </div>
+            <ul id="businessCampaignsList" class="item-list"></ul>
+          </div>
+        </div>
+
+        <div id="widget-focus" class="widget-card col-12 hidden-el" data-widget-id="widget-focus">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">بوصلة التركيز</span></div>
+            <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
+          </div>
+          <input type="text" id="focusGoalInput" class="focus-input" placeholder="النتيجة الأهم التي تريد تحقيقها اليوم؟" oninput="window.autoSave()">
+        </div>
+
+        <div id="widget-habits" class="widget-card col-12 hidden-el" data-widget-id="widget-habits">
+          <div class="card-header">
+            <div class="card-title-wrap"><span class="card-title" style="font-size:1.2rem;">العادات</span></div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-subtle" onclick="window.openModal('accountHistoryModal')">السجل</button>
+              <button id="addHabitPlusBtn" class="add-widget-plus" style="width: 28px; height: 28px; font-size: 1.2rem; background: transparent; color: var(--accent-color); border: 1px dashed var(--accent-color); display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('addHabitForm').style.display='block'; this.style.display='none';">+</button>
+            </div>
+          </div>
+          <div id="addHabitForm" style="display: none; background: var(--bg-subtle); padding: 16px; border-radius: 16px; border: 1px dashed var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 0.85rem; color: var(--accent-color);">عادة جديدة</strong>
+              <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.2rem;" onclick="document.getElementById('addHabitForm').style.display='none'; document.getElementById('addHabitPlusBtn').style.display='flex';">&times;</button>
+            </div>
+            <div class="add-row" style="margin-top: 0;">
+              <input type="text" id="newHabitInput" placeholder="أدخل العادة..." onkeypress="if(event.key==='Enter') window.addHabit()">
+              <button class="btn btn-primary" onclick="window.addHabit()">إضافة</button>
+            </div>
+          </div>
+          <ul id="habitsList" class="item-list"></ul>
+        </div>
+
+        <div id="widget-journal" class="widget-card col-12 hidden-el" data-widget-id="widget-journal" style="padding: 0; border: none; overflow: hidden; box-shadow: var(--shadow-ios); display: flex; flex-direction: column; min-height: 400px;">
+          <div class="card-header" style="background: var(--bg-glass-strong); margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <div class="card-title-wrap"><span class="card-title" style="color: var(--accent-color); font-size:1.2rem; font-weight: 700;">التدوين</span></div>
+            <button style="background:none; border:none; color:var(--accent-color); font-size:1rem; font-weight:700; cursor:pointer;" onclick="window.createNewNote()">ملاحظة جديدة</button>
+          </div>
+          <div id="notesListView" style="flex: 1; overflow-y: auto; background: var(--bg-glass-strong); display: block;"></div>
+          <div id="noteEditorView" style="display: none; flex: 1; flex-direction: column; background: var(--bg-glass-strong); padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <button style="background:none; border:none; color:var(--accent-color); font-weight:700; cursor:pointer; font-size:1rem;" onclick="window.showNotesList()">العودة</button>
+              <button style="background:none; border:none; color:var(--danger-color); font-size:1rem; cursor:pointer;" onclick="window.deleteCurrentNote()">حذف</button>
+            </div>
+            <div id="currentNoteDate" style="text-align: center; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 16px;"></div>
+            <div id="noteContentEditable" class="apple-notes-editor" contenteditable="true" placeholder="ملاحظة جديدة..." oninput="window.autoSaveNote()"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <div id="authModal" style="display: flex; position: fixed; inset: 0; background: var(--bg-primary); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+    <div style="width: 100%; max-width: 420px; background: var(--bg-glass-strong); padding: 40px 30px; border-radius: 24px; border: 1px solid var(--border-color); text-align: center;">
+      <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 4px;">وتيرة<span style="color: var(--text-primary);">.</span></h1>
+      <p id="authModalSub" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.5;">سجل دخولك للوصول إلى مساحتك</p>
+      
+      <div id="viewLogin">
+        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني</label><input type="email" id="loginEmail" style="padding: 14px; border-radius: 12px;"></div>
+        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">كلمة المرور</label><input type="password" id="loginPassword" style="padding: 14px; border-radius: 12px;"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleLogin()">دخول</button>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('register')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">إنشاء حساب جديد</a><a href="#" onclick="window.switchAuthView('reset')" style="color: var(--text-secondary); text-decoration: none;">نسيت كلمة المرور؟</a></div>
+      </div>
+
+      <div id="viewRegister" style="display: none;">
+        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">الاسم</label><input type="text" id="regName" style="padding: 14px; border-radius: 12px;"></div>
+        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني</label><input type="email" id="regEmail" style="padding: 14px; border-radius: 12px;"></div>
+        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">كلمة المرور</label><input type="password" id="regPassword" style="padding: 14px; border-radius: 12px;"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleRegister()">التسجيل وبدء الاستخدام</button>
+        <div style="font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('login')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">العودة لتسجيل الدخول</a></div>
+      </div>
+
+      <div id="viewReset" style="display: none;">
+        <div class="form-group" style="text-align: right;"><label style="font-weight: 600;">البريد الإلكتروني المسجل</label><input type="email" id="resetEmail" style="padding: 14px; border-radius: 12px;"></div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px; margin-bottom: 16px; padding: 14px; border-radius: 14px;" onclick="window.handleResetPassword()">إرسال الرابط</button>
+        <div style="font-size: 0.9rem;"><a href="#" onclick="window.switchAuthView('login')" style="color: var(--accent-color); text-decoration: none; font-weight: 700;">العودة لتسجيل الدخول</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="verificationNoticeModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px; text-align: center;">
+      <h3 style="margin-bottom: 14px;">تفعيل البريد الإلكتروني</h3>
+      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">يرجى تفعيل حسابك من بريدك الإلكتروني.</p>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.resendVerificationEmailDirectly()">إعادة إرسال الرابط</button>
+      <button class="btn btn-subtle" style="width: 100%; justify-content: center;" onclick="window.returnToLogin()">العودة لتسجيل الدخول</button>
+    </div>
+  </div>
+
+  <div id="pricingModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 450px;">
+      <button class="modal-close" onclick="window.closeModal('pricingModal')">&times;</button>
+      <h3 style="margin-bottom: 14px;">إدارة الاشتراك</h3>
+      <div id="pricingViewUnsubscribed">
+         <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">حسابك الحالي على الباقة الأساسية.</p>
+         <div class="form-group"><input type="text" id="userActivationCodeInput" placeholder="أدخل كود التفعيل هنا..." style="padding: 12px; border-radius: 8px;"></div>
+         <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="window.activateUserSubscriptionWithCode('userActivationCodeInput')">تفعيل الاشتراك</button>
+      </div>
+      <div id="pricingViewSubscribed" style="display: none;">
+         <div id="subActiveDetails" style="font-size: 0.95rem; margin-bottom: 10px; line-height: 1.6;"></div>
+         <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px;"><span id="daysRemainingText"></span></div>
+         <div class="progress-bar-bg" id="subProgressBarBg" style="height: 10px; margin-bottom: 20px;"><div id="subProgressBarFill" class="progress-bar-fill" style="width: 0%;"></div></div>
+         <h4 style="margin-bottom: 10px; font-size: 0.9rem;">تجديد الاشتراك</h4>
+         <div class="form-group" style="display: flex; gap: 8px;"><input type="text" id="userRenewalCodeInput" placeholder="كود التجديد..." style="flex: 1; padding: 8px; border-radius: 8px;"><button class="btn btn-primary" onclick="window.activateUserSubscriptionWithCode('userRenewalCodeInput')">تجديد</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="profileModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px;">
+      <button class="modal-close" onclick="window.closeModal('profileModal')">&times;</button>
+      <h3 style="margin-bottom: 14px;">إعدادات الحساب</h3>
+      <div class="form-group"><label>الاسم</label><input type="text" id="profileNameInput"></div>
+      <div class="form-group"><label>معرف الحساب</label><input type="text" id="profileUidDisplay" readonly style="opacity: 0.7;"></div>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;" onclick="window.saveProfile()">حفظ التغييرات</button>
+      <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="window.handleLogout()">تسجيل الخروج</button>
+    </div>
+  </div>
+
+  <div id="addWidgetModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px;">
+      <button class="modal-close" onclick="window.closeModal('addWidgetModal')">&times;</button>
+      <h3 style="margin-bottom: 6px;">المكتبة</h3>
+      <div id="widgetLibraryList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+  </div>
+
+  <div id="accountHistoryModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; max-height: 85vh; display: flex; flex-direction: column;">
+      <button class="modal-close" onclick="window.closeModal('accountHistoryModal')">&times;</button>
+      <h3 id="accountHistoryTitle" style="margin-bottom: 16px;">سجل الحساب</h3>
+      <div id="accountHistoryContent" style="overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;"></div>
+    </div>
+  </div>
+  
+  <div id="visionDetailModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 400px; padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
+        <button class="modal-close" style="top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white;" onclick="window.closeModal('visionDetailModal')">&times;</button>
+        <img id="vModalImg" src="" style="width: 100%; height: 200px; object-fit: cover;">
+        <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 id="vModalTitle" style="margin: 0; font-size: 1.25rem;"></h3>
+                <span id="vModalPercentBadge" style="background: var(--accent-color); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">0% مكتمل</span>
+            </div>
+            <div class="progress-bar-bg" style="height: 6px; margin-bottom: 20px;"><div id="vModalProgressBar" class="progress-bar-fill" style="width: 0%;"></div></div>
+            <div class="form-group"><label>تاريخ الهدف</label><input type="date" id="vModalDate" onchange="window.saveVisionModalChanges()"></div>
+            <div class="form-group"><label>خطة التنفيذ</label><textarea id="vModalPlan" rows="3" placeholder="اكتب خطتك هنا..." oninput="window.saveVisionModalChanges()"></textarea></div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">المهام الصغرى</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="vModalNewTaskInput" placeholder="مهمة جديدة..." style="flex: 1;" onkeypress="if(event.key==='Enter') window.addVisionSubTask()"><button class="btn btn-subtle" onclick="window.addVisionSubTask()">إضافة</button></div>
+                <ul id="vModalTasksList" class="item-list"></ul>
+            </div>
+            <button class="btn btn-danger" style="width: 100%; justify-content: center; font-size: 0.85rem;" onclick="window.deleteCurrentVisionItem()">حذف الهدف</button>
+        </div>
+    </div>
+  </div>
+
+  <script type="module" src="./assets/js/firebase-config.js"></script>
+  <script type="module" src="./assets/js/ui.js"></script>
+  <script type="module" src="./assets/js/widgets.js"></script>
+  <script type="module" src="./assets/js/auth.js"></script>
+  <script type="module" src="./assets/js/admin.js"></script>
+  <script type="module" src="./assets/js/main.js"></script>
+
+</body>
+</html>
